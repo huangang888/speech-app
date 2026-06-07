@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="讲话助手">
+<meta name="theme-color" content="#8B1A1A">
+<title>讲话助手 - 黄主任专属</title>
+<link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogIuiusuivneWKqeWJiyAtIOm7hOS4u+S7u+eJueWxnCIsCiAgInNob3J0X25hbWUiOiAi6K6y6K+d5Yqp5omLIiwKICAic3RhcnRfdXJsIjogIi4iLAogICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLAogICJiYWNrZ3JvdW5kX2NvbG9yIjogIiM4QjFBMUEiLAogICJ0aGVtZV9jb2xvciI6ICIjOEIxQTFBIiwKICAiaWNvbnMiOiBbXQp9">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect width='200' height='200' rx='40' fill='%238B1A1A'/%3E%3Ctext x='100' y='135' font-size='110' text-anchor='middle' fill='%23C9A96E' font-family='serif'%3E讲%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --primary:#8B1A1A;
+  --primary-light:#A52A2A;
+  --gold:#C9A96E;
+  --gold-light:#D4BC8A;
+  --bg:#FAF7F2;
+  --card:#FFFFFF;
+  --text:#2C2C2C;
+  --text-light:#666;
+  --border:#E8E0D5;
+  --shadow:0 2px 16px rgba(0,0,0,0.06);
+  --radius:12px;
+  --radius-sm:8px;
+  --font-heading:'Noto Serif SC','STSong','SimSun','Songti SC',serif;
+  --font-body:'Noto Sans SC','PingFang SC','Microsoft YaHei','Hiragino Sans GB',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:16px;}
+body{
+  font-family:var(--font-body);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(ellipse at 20% 10%,rgba(139,26,26,0.03) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 90%,rgba(201,169,110,0.04) 0%,transparent 50%);
+}
+
+/* Header */
+.header{
+  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);
+  color:#fff;
+  padding:20px 20px 24px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.header::before{
+  content:'';
+  position:absolute;
+  top:-50%;left:-20%;
+  width:140%;height:200%;
+  background:radial-gradient(ellipse at center,rgba(201,169,110,0.12) 0%,transparent 70%);
+  pointer-events:none;
+}
+.header-title{
+  font-family:var(--font-heading);
+  font-size:1.6rem;
+  font-weight:700;
+  letter-spacing:0.08em;
+  position:relative;
+  z-index:1;
+}
+.header-sub{
+  font-size:0.82rem;
+  opacity:0.85;
+  margin-top:4px;
+  position:relative;
+  z-index:1;
+  letter-spacing:0.05em;
+}
+
+/* Container */
+.container{
+  max-width:600px;
+  margin:0 auto;
+  padding:16px;
+}
+
+/* Cards */
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:20px;
+  margin-bottom:16px;
+  border:1px solid var(--border);
+}
+
+/* Section titles */
+.section-title{
+  font-family:var(--font-heading);
+  font-size:1.05rem;
+  font-weight:700;
+  color:var(--primary);
+  margin-bottom:14px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.section-title::before{
+  content:'';
+  display:inline-block;
+  width:4px;
+  height:20px;
+  background:var(--gold);
+  border-radius:2px;
+}
+
+/* Meeting type grid */
+.type-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.type-btn{
+  padding:12px 8px;
+  border:2px solid var(--border);
+  border-radius:var(--radius-sm);
+  background:var(--card);
+  font-family:var(--font-body);
+  font-size:0.82rem;
+  color:var(--text);
+  cursor:pointer;
+  transition:all 0.2s;
+  text-align:center;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+  line-height:1.3;
+}
+.type-btn:active{transform:scale(0.97);}
+.type-btn.selected{
+  border-color:var(--primary);
+  background:linear-gradient(135deg,rgba(139,26,26,0.05) 0%,rgba(139,26,26,0.02) 100%);
+  color:var(--primary);
+  font-weight:600;
+  box-shadow:0 0 0 3px rgba(139,26,26,0.08);
+}
+
+/* Input */
+.input-group{margin-bottom:14px;}
+.input-label{
+  display:block;
+  font-size:0.88rem;
+  font-weight:600;
+  color:var(--text);
+  margin-bottom:6px;
+}
+.input-hint{
+  font-size:0.75rem;
+  color:var(--text-light);
+  font-weight:400;
+}
+.text-input{
+  width:100%;
+  padding:12px 14px;
+  border:2px solid var(--border);
+  border-radius:var(--radius-sm);
+  font-family:var(--font-body);
+  font-size:0.95rem;
+  color:var(--text);
+  background:var(--card);
+  transition:border-color 0.2s;
+  -webkit-appearance:none;
+}
+.text-input:focus{
+  outline:none;
+  border-color:var(--primary);
+  box-shadow:0 0 0 3px rgba(139,26,26,0.06);
+}
+.text-input::placeholder{color:#bbb;}
+
+/* Buttons */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:14px 28px;
+  border:none;
+  border-radius:var(--radius-sm);
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:all 0.2s;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+.btn:active{transform:scale(0.97);}
+.btn-primary{
+  background:linear-gradient(135deg,var(--primary) 0%,var(--primary-light) 100%);
+  color:#fff;
+  width:100%;
+  box-shadow:0 4px 14px rgba(139,26,26,0.25);
+}
+.btn-primary:hover{box-shadow:0 6px 20px rgba(139,26,26,0.35);}
+.btn-primary:disabled{
+  opacity:0.5;
+  cursor:not-allowed;
+  box-shadow:none;
+}
+.btn-outline{
+  background:var(--card);
+  color:var(--primary);
+  border:2px solid var(--primary);
+}
+.btn-sm{
+  padding:8px 16px;
+  font-size:0.85rem;
+}
+
+/* Result */
+.result-block{
+  margin-bottom:20px;
+}
+.result-block-title{
+  font-family:var(--font-heading);
+  font-size:1.1rem;
+  font-weight:700;
+  color:var(--primary);
+  margin-bottom:10px;
+  padding-bottom:8px;
+  border-bottom:2px solid var(--gold);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.result-block-title .dot{
+  width:8px;height:8px;
+  border-radius:50%;
+  background:var(--gold);
+  flex-shrink:0;
+}
+.result-point{
+  padding:8px 0 8px 16px;
+  border-left:2px solid var(--border);
+  margin-bottom:8px;
+  font-size:0.9rem;
+  line-height:1.7;
+  color:var(--text);
+}
+.result-point strong{
+  color:var(--primary);
+  font-family:var(--font-heading);
+  font-size:0.95rem;
+}
+
+/* Speech title */
+.speech-title{
+  font-family:var(--font-heading);
+  font-size:1.3rem;
+  font-weight:700;
+  text-align:center;
+  color:var(--primary);
+  margin-bottom:20px;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--border);
+  line-height:1.5;
+}
+
+/* Action bar */
+.action-bar{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:16px;
+}
+
+/* Toast */
+.toast{
+  position:fixed;
+  top:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--primary);
+  color:#fff;
+  padding:12px 24px;
+  border-radius:24px;
+  font-size:0.9rem;
+  z-index:999;
+  opacity:0;
+  transition:opacity 0.3s;
+  pointer-events:none;
+  box-shadow:0 4px 16px rgba(0,0,0,0.2);
+}
+.toast.show{opacity:1;}
+
+/* Loading */
+.loading{
+  display:none;
+  text-align:center;
+  padding:40px 20px;
+}
+.loading.active{display:block;}
+.spinner{
+  width:40px;height:40px;
+  border:3px solid var(--border);
+  border-top-color:var(--primary);
+  border-radius:50%;
+  margin:0 auto 16px;
+  animation:spin 0.8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{
+  color:var(--text-light);
+  font-size:0.9rem;
+}
+
+/* History */
+.history-item{
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  margin-bottom:8px;
+  cursor:pointer;
+  transition:all 0.2s;
+}
+.history-item:active{background:#f9f6f0;}
+.history-meta{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:4px;
+}
+.history-type{
+  font-size:0.78rem;
+  color:var(--primary);
+  font-weight:600;
+}
+.history-time{
+  font-size:0.72rem;
+  color:var(--text-light);
+}
+.history-topic{
+  font-size:0.9rem;
+  color:var(--text);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* Settings */
+.setting-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 0;
+  border-bottom:1px solid var(--border);
+}
+.setting-row:last-child{border-bottom:none;}
+.setting-label{
+  font-size:0.9rem;
+  font-weight:500;
+}
+
+/* Tabs */
+.tabs{
+  display:flex;
+  gap:0;
+  margin-bottom:16px;
+  background:var(--border);
+  border-radius:var(--radius-sm);
+  padding:3px;
+}
+.tab{
+  flex:1;
+  padding:10px;
+  text-align:center;
+  font-size:0.85rem;
+  font-weight:600;
+  border:none;
+  background:transparent;
+  color:var(--text-light);
+  cursor:pointer;
+  border-radius:6px;
+  transition:all 0.2s;
+  -webkit-tap-highlight-color:transparent;
+}
+.tab.active{
+  background:var(--card);
+  color:var(--primary);
+  box-shadow:0 1px 4px rgba(0,0,0,0.08);
+}
+
+/* Welcome */
+.welcome{
+  text-align:center;
+  padding:30px 20px;
+  color:var(--text-light);
+}
+.welcome-icon{
+  font-size:3rem;
+  margin-bottom:12px;
+  font-family:var(--font-heading);
+  color:var(--gold);
+}
+.welcome-text{
+  font-size:0.92rem;
+  line-height:1.7;
+}
+.welcome-text strong{color:var(--primary);}
+
+/* Stats */
+.stats-row{
+  display:flex;
+  gap:10px;
+  margin-bottom:16px;
+}
+.stat-card{
+  flex:1;
+  text-align:center;
+  padding:12px 8px;
+  background:linear-gradient(135deg,rgba(139,26,26,0.04) 0%,rgba(201,169,110,0.06) 100%);
+  border-radius:var(--radius-sm);
+}
+.stat-num{
+  font-family:var(--font-heading);
+  font-size:1.5rem;
+  font-weight:700;
+  color:var(--primary);
+}
+.stat-label{
+  font-size:0.72rem;
+  color:var(--text-light);
+  margin-top:2px;
+}
+
+/* Footer */
+.footer{
+  text-align:center;
+  padding:20px;
+  color:var(--text-light);
+  font-size:0.75rem;
+}
+.footer .brand{
+  font-family:var(--font-heading);
+  color:var(--primary);
+  font-weight:600;
+}
+
+/* Page transitions */
+.page{display:none;}
+.page.active{display:block;}
+
+/* Responsive */
+.type-grid{grid-template-columns:1fr 1fr;}
+@media(min-width:400px){.type-grid{grid-template-columns:1fr 1fr;}}
+@media(min-width:600px){
+  .type-grid{grid-template-columns:1fr 1fr 1fr 1fr;}
+  .header-title{font-size:1.8rem;}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-title">讲话助手</div>
+  <div class="header-sub">黄主任专属 · 智能会议发言生成器</div>
+</div>
+
+<div class="container">
+
+<!-- Tabs -->
+<div class="tabs" id="tabs">
+  <button class="tab active" data-page="generate">撰写发言</button>
+  <button class="tab" data-page="history">历史记录</button>
+  <button class="tab" data-page="settings">设置</button>
+</div>
+
+<!-- Generate Page -->
+<div class="page active" id="page-generate">
+
+  <!-- Step 1: Meeting Type -->
+  <div class="card" id="card-type">
+    <div class="section-title">选择会议类型</div>
+    <div class="type-grid" id="typeGrid"></div>
+  </div>
+
+  <!-- Step 2: Topic -->
+  <div class="card" id="card-topic">
+    <div class="section-title">发言主题</div>
+    <div class="input-group">
+      <label class="input-label">会议主题或关键词 <span class="input-hint">（如"文化传承与创新"）</span></label>
+      <input type="text" class="text-input" id="topicInput" placeholder="请输入发言主题...">
+    </div>
+    <div class="input-group">
+      <label class="input-label">补充说明 <span class="input-hint">（可选，如身份、特殊要求等）</span></label>
+      <input type="text" class="text-input" id="noteInput" placeholder="例如：作为政协委员代表发言...">
+    </div>
+    <div class="input-group">
+      <label class="input-label">参考资料 <span class="input-hint">（上传会议通知、汇报材料、微信文件等，支持txt/docx。手机端可浏览微信下载目录选取文件）</span></label>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <input type="file" id="fileInput" accept=".txt,.docx,.pdf,.doc" style="display:none;" onchange="handleFileUpload(event)">
+        <button class="btn btn-outline btn-sm" onclick="document.getElementById('fileInput').click()" style="flex-shrink:0;">选择文件</button>
+        <span id="fileName" style="font-size:0.82rem;color:var(--text-light);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">未选择文件</span>
+        <button id="clearFileBtn" class="btn btn-outline btn-sm" onclick="clearRefFile()" style="flex-shrink:0;display:none;color:#c00;border-color:#c00;">清除</button>
+      </div>
+<textarea class="text-input" id="refText" placeholder="或直接粘贴参考资料内容..." style="margin-top:8px;min-height:80px;resize:vertical;" oninput="updateRefWordCount()"></textarea>
+      <span class="input-hint" id="refWordCount" style="margin-top:2px;display:block;">已输入 0 字</span>
+    </div>
+    <button class="btn btn-primary" id="generateBtn" onclick="handleGenerate()">
+      开始生成发言稿
+    </button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-text">正在为您精心撰写发言稿...</div>
+  </div>
+
+  <!-- Result -->
+  <div class="card" id="card-result" style="display:none;">
+    <div class="speech-title" id="speechTitle"></div>
+    <div id="resultContent"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;">
+      <span id="wordCount" style="font-size:0.8rem;color:var(--text-light);"></span>
+      <span id="apiUsage" style="font-size:0.8rem;color:var(--text-light);"></span>
+    </div>
+    <div class="action-bar">
+      <button class="btn btn-outline btn-sm" onclick="copySpeech()">复制全文</button>
+      <button class="btn btn-outline btn-sm" onclick="handleGenerate()">重新生成</button>
+      <button class="btn btn-outline btn-sm" onclick="likeSpeech()" style="color:#2e7d32;border-color:#2e7d32;">满意，保存为范文</button>
+    </div>
+    <!-- 修改反馈 -->
+    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
+      <label class="input-label" style="margin-bottom:6px;">修改建议 <span class="input-hint">（我会记住您的意见，下次改进）</span></label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" class="text-input" id="feedbackInput" placeholder="如：标题不够有力、建议再具体一些、多加点排比句..." style="flex:1;">
+        <button class="btn btn-primary btn-sm" onclick="handleFeedback()" style="flex-shrink:0;width:auto;">提交修改</button>
+      </div>
+      <div id="feedbackHistory" style="margin-top:10px;display:none;">
+        <div class="section-title" style="font-size:0.85rem;">历史修改记录</div>
+        <div id="feedbackList" style="font-size:0.8rem;color:var(--text-light);"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- History Page -->
+<div class="page" id="page-history">
+  <div class="card" id="historyCard">
+    <div class="section-title">历史发言</div>
+    <div id="historyList">
+      <div class="welcome">
+        <div class="welcome-text">暂无历史记录</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Page -->
+<div class="page" id="page-settings">
+  <div class="card">
+    <div class="section-title">API 设置</div>
+    <div class="input-group">
+      <label class="input-label">DeepSeek API Key</label>
+      <input type="password" class="text-input" id="apiKeyInput" placeholder="sk-...">
+      <span class="input-hint" style="margin-top:4px;display:block;">获取地址：platform.deepseek.com</span>
+    </div>
+    <div class="input-group" style="margin-top:12px;">
+      <label class="input-label">AI 模型 <span class="input-hint">（推荐 deepseek-reasoner，质量更高）</span></label>
+      <select class="text-input" id="modelSelect" style="appearance:auto;-webkit-appearance:auto;">
+        <option value="deepseek-v4-pro">deepseek-v4-pro（推荐，最高质量）</option>
+        <option value="deepseek-v4-flash">deepseek-v4-flash（快速响应）</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="saveSettings()" style="margin-top:8px;">保存设置</button>
+    <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span style="font-size:0.85rem;">账户余额 & 充值</span>
+        <a href="https://platform.deepseek.com/top_up" target="_blank" class="btn btn-outline btn-sm" style="text-decoration:none;">去充值</a>
+      </div>
+      <span class="input-hint" style="margin-top:2px;display:block;">V4 Pro：输入 ¥2/百万token，输出 ¥6/百万token</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">使用统计</div>
+    <div class="stats-row" id="statsRow">
+      <div class="stat-card"><div class="stat-num" id="statTotal">0</div><div class="stat-label">累计生成</div></div>
+      <div class="stat-card"><div class="stat-num" id="statLevel">1</div><div class="stat-label">智能等级</div></div>
+      <div class="stat-card"><div class="stat-num" id="statFav">-</div><div class="stat-label">常用会议</div></div>
+    </div>
+    <div class="stats-row" style="margin-top:0;">
+      <div class="stat-card"><div class="stat-num" id="statCumTokens">0</div><div class="stat-label">累计消耗token</div></div>
+      <div class="stat-card"><div class="stat-num" id="statCumCost">¥0.00</div><div class="stat-label">累计费用</div></div>
+      <div class="stat-card"><div class="stat-num" id="statBalance">请设置</div><div class="stat-label">剩余余额</div></div>
+    </div>
+    <div class="input-group" style="margin-top:12px;">
+      <label class="input-label">DeepSeek 账户余额 <span class="input-hint">（在 <a href="https://platform.deepseek.com/top_up" target="_blank" style="color:var(--primary);">platform.deepseek.com</a> 查看余额后填入，每次生成后自动扣减）</span></label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="number" class="text-input" id="balanceInput" placeholder="输入当前账户余额（元）" style="flex:1;" step="0.01" min="0">
+        <button class="btn btn-primary btn-sm" onclick="setBalance()" style="width:auto;flex-shrink:0;">保存</button>
+        <a href="https://platform.deepseek.com/top_up" target="_blank" class="btn btn-outline btn-sm" style="text-decoration:none;flex-shrink:0;">查余额</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言
+</div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== 常量 =====
+var STORAGE_KEY = 'speech_app_data';
+var API_URL = 'https://api.deepseek.com/chat/completions';
+
+// ===== 会议类型 =====
+var MEETING_TYPES = [
+  {id:'wenhua',name:'文化交流会',icon:'文'},
+  {id:'diaoyan',name:'调研座谈会',icon:'研'},
+  {id:'shicha',name:'视察座谈会',icon:'察'},
+  {id:'kaocha',name:'考察座谈会',icon:'考'},
+  {id:'xuexi',name:'学习研讨会',icon:'学'},
+  {id:'jiandu',name:'监督协商会',icon:'协'},
+  {id:'qingdian',name:'庆典宴会致词',icon:'庆'},
+  {id:'biaotai',name:'会议表态发言',icon:'表'}
+];
+
+// ===== 状态 =====
+var state = {
+  meetingType:'',
+  topic:'',
+  note:'',
+  result:null,
+  currentPage:'generate',
+  model:'deepseek-v4-pro'
+};
+
+// ===== 数据存储 =====
+function loadData(){
+  try{
+    var d = localStorage.getItem(STORAGE_KEY);
+    return d ? JSON.parse(d) : {history:[],apiKey:'',memory:{count:0,typeCounts:{},topics:[],level:1}}
+  }catch(e){
+    return {history:[],apiKey:'',memory:{count:0,typeCounts:{},topics:[],level:1}}
+  }
+}
+
+function saveData(data){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data));}catch(e){}
+}
+
+function getMemory(){
+  var data = loadData();
+  return data.memory;
+}
+
+function updateMemory(type,topic){
+  var data = loadData();
+  var m = data.memory;
+  m.count = (m.count || 0) + 1;
+  m.typeCounts = m.typeCounts || {};
+  m.typeCounts[type] = (m.typeCounts[type] || 0) + 1;
+  m.topics = m.topics || [];
+  if(m.topics.indexOf(topic) === -1) m.topics.push(topic);
+  if(m.topics.length > 50) m.topics.shift();
+  m.lastUsed = new Date().toISOString();
+  if(m.count >= 5 && m.level < 2) m.level = 2;
+  if(m.count >= 20 && m.level < 3) m.level = 3;
+  if(m.count >= 50 && m.level < 4) m.level = 4;
+  if(m.count >= 100 && m.level < 5) m.level = 5;
+  data.memory = m;
+  saveData(data);
+}
+
+// ===== 反馈学习系统 =====
+function saveFeedback(feedback){
+  var data = loadData();
+  var m = data.memory;
+  m.feedbacks = m.feedbacks || [];
+  m.feedbacks.push({
+    time: new Date().toISOString(),
+    type: state.meetingType,
+    topic: state.topic,
+    feedback: feedback,
+    original: state.result ? state.result.substring(0,200) : ''
+  });
+  if(m.feedbacks.length > 50) m.feedbacks.shift();
+  // 分析反馈模式，更新偏好
+  analyzeFeedbackPattern(feedback);
+  data.memory = m;
+  saveData(data);
+  renderFeedbackHistory();
+}
+
+function analyzeFeedbackPattern(feedback){
+  var data = loadData();
+  var m = data.memory;
+  m.preferences = m.preferences || {};
+  var fb = feedback.toLowerCase();
+  // 识别常见模式
+  var patterns = [
+    {keys:['啰嗦','太长','精简','简洁','短','压缩','减少','删减'], pref:'concise', desc:'简洁有力，删繁就简，每句话都有分量'},
+    {keys:['标题','题目','对仗','比喻','拟人','工整'], pref:'title', desc:'标题用比喻/拟人手法，对仗工整，令人过目不忘'},
+    {keys:['排比','节奏','韵律','气势','金句','金言'], pref:'rhythm', desc:'多用排比句、对仗句、四字短语，增强节奏感和气势'},
+    {keys:['平淡','没新意','俗套','老套','普通','一般'], pref:'novel', desc:'观点新颖独到，不落俗套，有独到见解'},
+    {keys:['空洞','虚','不实在','套话','空话','官话'], pref:'concrete', desc:'言之有物，拿数据说话，讲真问题、真感受'},
+    {keys:['感情','真情','感染力','感动','共鸣','温度'], pref:'emotional', desc:'以情动人，语言有温度，引发共鸣'},
+    {keys:['深度','深入','浅','表面','浅薄'], pref:'deep', desc:'思考深入本质，不浮于表面，有理论深度'},
+    {keys:['涟源','接地气','本地','地方'], pref:'local', desc:'自然融入涟源元素，结合实际情况，接地气'},
+    {keys:['太长','500字','超了','字数'], pref:'short', desc:'严格控制字数，精炼表达'},
+  ];
+  for(var i = 0; i < patterns.length; i++){
+    var p = patterns[i];
+    for(var j = 0; j < p.keys.length; j++){
+      if(fb.indexOf(p.keys[j]) !== -1){
+        m.preferences[p.pref] = (m.preferences[p.pref] || 0) + 1;
+        if(!m.preferences[p.pref + '_desc']) m.preferences[p.pref + '_desc'] = p.desc;
+        break;
+      }
+    }
+  }
+  data.memory = m;
+  saveData(data);
+}
+
+function getFeedbackContext(){
+  var data = loadData();
+  var m = data.memory;
+  var fbs = m.feedbacks || [];
+  var prefs = m.preferences || {};
+  if(fbs.length === 0 && Object.keys(prefs).length === 0) return '';
+  
+  var ctx = '\n\n【学习记忆——根据历史反馈自动提炼的偏好】\n';
+  
+  // 提炼高频偏好（出现2次以上）
+  var topPrefs = [];
+  var keys = Object.keys(prefs);
+  for(var i = 0; i < keys.length; i++){
+    if(keys[i].indexOf('_desc') !== -1) continue;
+    if(prefs[keys[i]] >= 2){
+      topPrefs.push({key:keys[i], count:prefs[keys[i]], desc:prefs[keys[i] + '_desc'] || keys[i]});
+    }
+  }
+  topPrefs.sort(function(a,b){return b.count - a.count;});
+  
+  if(topPrefs.length > 0){
+    ctx += '用户反复强调的偏好：\n';
+    for(var j = 0; j < Math.min(topPrefs.length, 5); j++){
+      ctx += '• ' + topPrefs[j].desc + '（反馈' + topPrefs[j].count + '次）\n';
+    }
+    ctx += '\n';
+  }
+  
+  // 最近5条具体反馈
+  if(fbs.length > 0){
+    var recent = fbs.slice(-5);
+    ctx += '最近的具体修改意见：\n';
+    for(var k = 0; k < recent.length; k++){
+      var fb = recent[k];
+      ctx += '• ' + fb.feedback + '\n';
+    }
+  }
+  
+  // 范文引用（用户满意的发言）
+  var liked = m.likedSpeeches || [];
+  if(liked.length > 0){
+    var recentLiked = liked.slice(-3);
+    ctx += '\n以下发言曾被用户点赞，请参考其风格：\n';
+    for(var l = 0; l < recentLiked.length; l++){
+      var ls = recentLiked[l];
+      ctx += '【范文' + (l+1) + '】主题：' + ls.topic + '\n' + ls.speech.substring(0, 300) + '...\n\n';
+    }
+  }
+  
+  return ctx;
+}
+
+function handleFeedback(){
+  var feedback = document.getElementById('feedbackInput').value.trim();
+  if(!feedback){
+    showToast('请输入修改建议');
+    return;
+  }
+  saveFeedback(feedback);
+  showToast('修改意见已记录，正在重新生成...');
+  document.getElementById('feedbackInput').value = '';
+  // 重新生成（会带上反馈记忆）
+  handleGenerate();
+}
+
+function likeSpeech(){
+  if(!state.result) return;
+  var data = loadData();
+  var m = data.memory;
+  m.likedSpeeches = m.likedSpeeches || [];
+  // 去重
+  for(var i = m.likedSpeeches.length - 1; i >= 0; i--){
+    if(m.likedSpeeches[i].topic === state.topic && m.likedSpeeches[i].type === state.meetingType){
+      m.likedSpeeches.splice(i, 1);
+    }
+  }
+  m.likedSpeeches.push({
+    time: new Date().toISOString(),
+    type: state.meetingType,
+    topic: state.topic,
+    speech: state.result
+  });
+  if(m.likedSpeeches.length > 20) m.likedSpeeches.shift();
+  data.memory = m;
+  saveData(data);
+  showToast('已保存为范文，我会学习您的偏好风格');
+}
+
+function renderFeedbackHistory(){
+  var data = loadData();
+  var m = data.memory;
+  var fbs = m.feedbacks || [];
+  if(fbs.length === 0){
+    document.getElementById('feedbackHistory').style.display = 'none';
+    return;
+  }
+  document.getElementById('feedbackHistory').style.display = 'block';
+  var html = '';
+  var recent = fbs.slice(-5).reverse();
+  for(var i = 0; i < recent.length; i++){
+    var fb = recent[i];
+    html += '<div style="padding:4px 0;border-bottom:1px dotted var(--border);">' + escapeHtml(fb.feedback) + '</div>';
+  }
+  document.getElementById('feedbackList').innerHTML = html;
+}
+
+function getFavType(){
+  var m = getMemory();
+  var tc = m.typeCounts || {};
+  var max = 0, fav = '-';
+  for(var i = 0; i < MEETING_TYPES.length; i++){
+    var t = MEETING_TYPES[i];
+    var c = tc[t.id] || 0;
+    if(c > max){max = c; fav = t.name;}
+  }
+  return fav;
+}
+
+function saveHistory(speech){
+  var data = loadData();
+  data.history.unshift({
+    id:Date.now(),
+    type:state.meetingType,
+    topic:state.topic,
+    speech:speech,
+    time:new Date().toLocaleString('zh-CN')
+  });
+  if(data.history.length > 50) data.history.pop();
+  saveData(data);
+}
+
+// ===== 渲染 =====
+function renderTypeGrid(){
+  var grid = document.getElementById('typeGrid');
+  var html = '';
+  for(var i = 0; i < MEETING_TYPES.length; i++){
+    var t = MEETING_TYPES[i];
+    var sel = state.meetingType === t.id ? ' selected' : '';
+    html += '<button class="type-btn' + sel + '" onclick="selectType(\'' + t.id + '\')" data-type="' + t.id + '">' + t.name + '</button>';
+  }
+  grid.innerHTML = html;
+}
+
+function selectType(typeId){
+  // 切换会议类型时清除参考资料
+  if(state.meetingType && state.meetingType !== typeId){
+    clearRefFile();
+  }
+  state.meetingType = typeId;
+  var btns = document.querySelectorAll('.type-btn');
+  for(var i = 0; i < btns.length; i++){
+    var btn = btns[i];
+    if(btn.getAttribute('data-type') === typeId){
+      btn.classList.add('selected');
+    }else{
+      btn.classList.remove('selected');
+    }
+  }
+}
+
+function clearRefFile(){
+  document.getElementById('refText').value = '';
+  document.getElementById('fileName').textContent = '未选择文件';
+  document.getElementById('clearFileBtn').style.display = 'none';
+  document.getElementById('fileInput').value = '';
+  updateRefWordCount();
+}
+
+function renderHistory(){
+  var data = loadData();
+  var list = document.getElementById('historyList');
+  if(!data.history || data.history.length === 0){
+    list.innerHTML = '<div class="welcome"><div class="welcome-text">暂无历史记录</div></div>';
+    return;
+  }
+  var html = '';
+  for(var i = 0; i < data.history.length; i++){
+    var h = data.history[i];
+    var typeName = h.type;
+    for(var j = 0; j < MEETING_TYPES.length; j++){
+      if(MEETING_TYPES[j].id === h.type){typeName = MEETING_TYPES[j].name;break;}
+    }
+    html += '<div class="history-item" onclick="viewHistory(' + i + ')">';
+    html += '<div class="history-meta"><span class="history-type">' + typeName + '</span><span class="history-time">' + h.time + '</span></div>';
+    html += '<div class="history-topic">' + escapeHtml(h.topic) + '</div>';
+    html += '</div>';
+  }
+  list.innerHTML = html;
+}
+
+function viewHistory(index){
+  var data = loadData();
+  var h = data.history[index];
+  if(!h) return;
+  state.meetingType = h.type;
+  state.topic = h.topic;
+  state.result = h.speech;
+  showResult(h.speech);
+  switchTab('generate');
+}
+
+function renderStats(){
+  var m = getMemory();
+  var data = loadData();
+  document.getElementById('statTotal').textContent = m.count || 0;
+  document.getElementById('statLevel').textContent = 'Lv.' + (m.level || 1);
+  document.getElementById('statFav').textContent = getFavType();
+  // 显示最近使用
+  if(m.lastUsed){
+    var d = new Date(m.lastUsed);
+    var timeStr = d.getMonth()+1 + '/' + d.getDate() + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0');
+    document.getElementById('statFav').textContent = getFavType() + ' | ' + timeStr;
+  }
+  // 累计使用统计
+  var cum = data.cumUsage || {totalTokens:0, totalCost:0};
+  document.getElementById('statCumTokens').textContent = cum.totalTokens.toLocaleString();
+  document.getElementById('statCumCost').textContent = '¥' + cum.totalCost.toFixed(2);
+  // 估算余额
+  var savedBalance = data.balanceInput || 0;
+  if(savedBalance > 0){
+    var remaining = savedBalance - cum.totalCost;
+    document.getElementById('statBalance').textContent = remaining > 0 ? '¥' + remaining.toFixed(2) : '已超支';
+    document.getElementById('statBalance').style.color = remaining > 0 ? '' : '#c00';
+  }else{
+    document.getElementById('statBalance').textContent = '请设置';
+    document.getElementById('statBalance').style.color = 'var(--text-light)';
+  }
+  // 恢复余额输入
+  document.getElementById('balanceInput').value = savedBalance || '';
+}
+
+function setBalance(){
+  var val = parseFloat(document.getElementById('balanceInput').value);
+  if(isNaN(val) || val < 0){
+    showToast('请输入有效金额');
+    return;
+  }
+  var data = loadData();
+  var cum = data.cumUsage || {totalCost:0};
+  data.balanceInput = val;
+  saveData(data);
+  var remaining = val - cum.totalCost;
+  showToast('余额已保存：¥' + val.toFixed(2) + '，可用约' + Math.floor(remaining / 0.03) + '次发言');
+  renderStats();
+}
+
+function switchTab(page){
+  state.currentPage = page;
+  var pages = document.querySelectorAll('.page');
+  for(var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
+  document.getElementById('page-' + page).classList.add('active');
+  var tabs = document.querySelectorAll('.tab');
+  for(var j = 0; j < tabs.length; j++) tabs[j].classList.remove('active');
+  document.querySelector('[data-page="' + page + '"]').classList.add('active');
+  if(page === 'history') renderHistory();
+  if(page === 'settings') renderStats();
+}
+
+// ===== 生成 =====
+function handleGenerate(){
+  if(!state.meetingType){
+    showToast('请先选择会议类型');
+    return;
+  }
+  var topic = document.getElementById('topicInput').value.trim();
+  if(!topic){
+    showToast('请输入发言主题');
+    return;
+  }
+  state.topic = topic;
+  state.note = document.getElementById('noteInput').value.trim();
+
+  var data = loadData();
+  if(!data.apiKey){
+    showToast('请先在设置中填写 DeepSeek API Key');
+    switchTab('settings');
+    return;
+  }
+
+  // Show loading
+  document.getElementById('loading').classList.add('active');
+  document.getElementById('card-result').style.display = 'none';
+  document.getElementById('generateBtn').disabled = true;
+
+  callAI(data.apiKey);
+}
+
+function buildPrompt(){
+  var m = getMemory();
+  var typeName = state.meetingType;
+  for(var i = 0; i < MEETING_TYPES.length; i++){
+    if(MEETING_TYPES[i].id === state.meetingType){typeName = MEETING_TYPES[i].name;break;}
+  }
+
+  var noteText = state.note ? '\n补充说明：' + state.note : '';
+  var refText = document.getElementById('refText').value.trim();
+  var refSection = '';
+  if(refText){
+    refSection = '\n\n【参考资料——请仔细研读，发言必须紧扣以下材料】\n';
+    refSection += '• 如果是会议方案/通知：请从中提取参会人员、会议主题、议程安排、会议要求，发言要契合会议目的和参会者身份。\n';
+    refSection += '• 如果是汇报材料/工作总结：请从中提取工作亮点、特色做法、存在问题、下步打算，发言要呼应材料中的关键数据和做法。\n';
+    refSection += '• 如果是领导讲话/政策文件：请从中提取核心精神、关键提法、政策导向，发言要体现对上级精神的深刻理解和贯彻落实。\n';
+    refSection += '\n材料内容如下：\n' + refText.substring(0, 3000);
+  }
+
+  // 每种会议类型的语调风格
+  var typeTones = {
+    'wenhua': '文雅诗意，引经据典，有文化纵深和人文温度',
+    'diaoyan': '朴实有力，接地气有泥土味，讲真问题真感受',
+    'shicha': '温暖有力，肯定成绩又提建设性意见，有鼓励有鞭策',
+    'kaocha': '开放包容，有比较有鉴别，突出"学到了什么、怎么用"',
+    'xuexi': '严谨深刻，理论联系实际，学思践悟有理论高度',
+    'jiandu': '真诚坦率，监督有力度协商有温度，指出问题也提出方案',
+    'qingdian': '喜庆热烈，温暖真挚，有仪式感和感染力，如祝酒词般自然',
+    'biaotai': '态度鲜明掷地有声，干脆利落有执行力，展现决心和担当'
+  };
+
+  var tone = typeTones[state.meetingType] || typeTones['diaoyan'];
+  var maxWords = (state.meetingType === 'qingdian' || state.meetingType === 'biaotai') ? '500字' : '800字';
+  var isShort = (state.meetingType === 'qingdian' || state.meetingType === 'biaotai');
+
+  var feedbackCtx = getFeedbackContext();
+
+  // 记忆上下文
+  var memCtx = '';
+  if(m.count > 0){
+    memCtx = '\n使用记录：已累计使用' + m.count + '次，智能等级Lv.' + m.level + '。';
+    var fav = getFavType();
+    if(fav !== '-') memCtx += '常用会议类型：' + fav + '。';
+    if(m.topics && m.topics.length > 0){
+      var recent = m.topics.slice(-5).join('、');
+      memCtx += '近期关注话题：' + recent + '。';
+    }
+  }
+
+  return '你是一位顶级发言撰稿人，正在为一位资深政协委员撰写会议发言稿。\n\n' +
+    '【发言人画像——理解即可，切勿在发言中提及】\n' +
+    '一位扎根湖南涟源多年的基层干部和政协委员，对涟源的山山水水饱含深情，正在从事文史编书工作。\n' +
+    '他追求的观点是：新颖独到、不落俗套；语言是：鲜活有力、排比如浪；境界是：大气蓬勃、感人至深。\n' +
+    '涟源概况：湘中腹地，煤机建陶、富硒蔬菜油茶、湘军故里龙山湄江、高铁高速贯通。\n' +
+    '涟源县名由来：1951年置蓝田县，1952年因与陕西蓝田重名，取"涟水源头"之意改为涟源县。\n\n' +
+    '**严禁在发言中提及发言人姓名、家庭、具体职务。发言以"我"的第一人称，"我"只体现为：一个关心涟源发展的基层干部。**\n\n' +
+    '═══════════════════════════════════\n' +
+    '会议类型：' + typeName + '\n' +
+    '会议主题：' + state.topic + '\n' +
+    '语调风格：' + tone + '\n' +
+    '字数限制：' + maxWords + '\n' +
+    '═══════════════════════════════════\n' +
+    memCtx + noteText + refSection + feedbackCtx + '\n\n' +
+    '【写作要求——请逐条遵循】\n\n' +
+    '一、标题：必须用比喻或拟人手法，对仗工整，如"以文铸魂，以文化人""根深叶茂，源远流长"。\n' +
+    '   标题要让人过目不忘，有自己的创造，不要套用常见句式。\n\n' +
+    '二、开头：开门见山，真诚自然，一两句话切入主题，不铺垫不客套。\n\n' +
+    '三、正文：自然分为三个层次（感受→认识→建议），不用"一、二、三"标注，用空行自然过渡。\n' +
+    '   每个层次提炼一个核心观点，用一句精炼的排比句或对仗句作为该层次的点睛之笔。\n\n' +
+    '四、语言：\n' +
+    '   · 多用排比句、对仗句、四字短语，节奏铿锵有力\n' +
+    '   · 每200字左右插入一句金句（自创的或化用的，不要堆砌名言）\n' +
+    '   · 习近平金句如需引用，一处足矣，自然融入不刻意\n' +
+    '   · 涟源元素根据主题自然关联，没有合适切入点就不硬加\n\n' +
+    '五、深度：不要停留在表面，要往深处想一层，讲出别人讲不出的道理。\n' +
+    '   好发言的标准是：听完后让人记住至少一个观点、一句金句、一种感受。\n\n' +
+    '六、' + (isShort ? '庆典/表态类发言，自然流畅，不分层次标注，如即兴发言般真挚。控制在500字，3分钟讲完。' : '控制在800字以内，5分钟讲完。每句话都要有分量，不写正确的废话。') + '\n\n' +
+    '【输出格式】\n' +
+    '纯文本，不要markdown符号。第一行是标题（不加书名号），空行后开始正文，段落间空行分隔。\n' +
+    '禁止任何标注说明（如"标题：""正文：""一、二、三"等），直接给出完整的发言稿。';
+}
+
+function callAI(apiKey){
+  var prompt = buildPrompt();
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', API_URL, true);
+  xhr.setRequestHeader('Content-Type','application/json');
+  xhr.setRequestHeader('Authorization','Bearer ' + apiKey);
+  xhr.timeout = 60000;
+
+  xhr.onload = function(){
+    document.getElementById('loading').classList.remove('active');
+    document.getElementById('generateBtn').disabled = false;
+
+    if(xhr.status === 200){
+      try{
+        var data = JSON.parse(xhr.responseText);
+        var choices = data.choices || [];
+        var first = choices.length > 0 ? choices[0] : null;
+        var msg = first ? (first.message || {}) : {};
+        var content = (msg && msg.content) || '';
+        if(content){
+          state.result = content;
+          // 捕获 API 用量
+          var usage = data.usage || {};
+          var pt = usage.prompt_tokens || 0;
+          var ct = usage.completion_tokens || 0;
+          var total = usage.total_tokens || (pt + ct);
+          var cost = (total / 1000000 * 6).toFixed(4); // V4 Pro: 6元/百万token
+          state.lastUsage = {tokens:total, cost:cost};
+          // 累计使用追踪
+          var cumData = loadData();
+          cumData.cumUsage = cumData.cumUsage || {totalTokens:0, totalCost:0, history:[]};
+          cumData.cumUsage.totalTokens += total;
+          cumData.cumUsage.totalCost += parseFloat(cost);
+          cumData.cumUsage.history.push({time:new Date().toISOString(),tokens:total,cost:parseFloat(cost),type:state.meetingType,topic:state.topic});
+          if(cumData.cumUsage.history.length > 100) cumData.cumUsage.history.shift();
+          saveData(cumData);
+          updateMemory(state.meetingType, state.topic);
+          saveHistory(content);
+          showResult(content);
+        }else{
+          showToast('AI 返回为空，请重试');
+        }
+      }catch(e){
+        showToast('解析结果失败');
+      }
+    }else if(xhr.status === 401){
+      showToast('API Key 无效，请检查设置');
+      switchTab('settings');
+    }else if(xhr.status === 429){
+      showToast('请求过于频繁，请稍后再试');
+    }else{
+      showToast('生成失败: ' + xhr.status);
+    }
+  };
+
+  xhr.onerror = function(){
+    document.getElementById('loading').classList.remove('active');
+    document.getElementById('generateBtn').disabled = false;
+    showToast('网络错误，请检查网络连接');
+  };
+
+  xhr.ontimeout = function(){
+    document.getElementById('loading').classList.remove('active');
+    document.getElementById('generateBtn').disabled = false;
+    showToast('请求超时，请重试');
+  };
+
+  var body = JSON.stringify({
+    model:state.model || 'deepseek-reasoner',
+    messages:[
+      {role:'system',content:'你是黄主任的专属AI秘书。你了解黄主任的身份：涟源人、政协委员、文史编书工作者。你写的发言稿以黄主任的视角和立场出发，但不提及他的个人信息。你遵循黄主任的写作理念：大秘的逻辑、诗人的情怀、专家的严谨、学者的钻研。你能根据不同会议类型切换话术风格，标题比喻化对仗工整，观点深刻独到，语言简洁有力，金句自然点睛。'},
+      {role:'user',content:prompt}
+    ],
+    temperature:0.5,
+    max_tokens:4096
+  });
+
+  xhr.send(body);
+}
+
+function showResult(content){
+  document.getElementById('card-result').style.display = 'block';
+  var html = parseSpeech(content);
+  document.getElementById('resultContent').innerHTML = html;
+  // 提取标题
+  var lines = content.trim().split('\n');
+  var title = lines[0].replace(/^#+\s*/, '').trim() || '发言稿';
+  if(title.length > 40) title = title.substring(0,40) + '...';
+  document.getElementById('speechTitle').textContent = title;
+  // 字数统计
+  var wordCount = content.replace(/\s/g,'').length;
+  document.getElementById('wordCount').textContent = '共 ' + wordCount + ' 字';
+  // API 用量
+  if(state.lastUsage){
+    document.getElementById('apiUsage').textContent = '本次消耗 ' + state.lastUsage.tokens + ' token（约¥' + state.lastUsage.cost + '）';
+  }
+  // 滚动
+  renderFeedbackHistory();
+  document.getElementById('card-result').scrollIntoView({behavior:'smooth'});
+}
+
+function parseSpeech(text){
+  var lines = text.trim().split('\n');
+  var html = '';
+  var inParagraph = false;
+  for(var i = 0; i < lines.length; i++){
+    var line = lines[i].trim();
+    if(!line){
+      if(inParagraph){html += '</p>'; inParagraph = false;}
+      continue;
+    }
+    // 跳过标题行（第一行，已单独显示）
+    if(i === 0 && line.indexOf('尊敬的') === -1 && line.indexOf('各位') === -1){
+      continue;
+    }
+    // 开场白
+    if(line.indexOf('尊敬的') !== -1 || line.indexOf('各位') !== -1){
+      if(inParagraph){html += '</p>';}
+      html += '<p style="font-size:1rem;color:var(--primary);font-weight:600;text-align:center;margin-bottom:16px;">' + line + '</p>';
+      inParagraph = false;
+      continue;
+    }
+    // 一级标题：一、二、三（加粗，缩进2字符）
+    if(/^[一二三四五六七八九十]、/.test(line)){
+      if(inParagraph){html += '</p>'; inParagraph = false;}
+      html += '<p style="font-weight:700;font-size:1rem;color:var(--primary);text-indent:2em;margin:14px 0 6px 0;">' + line + '</p>';
+      continue;
+    }
+    // 小标题：短句开头
+    var isSubtitle = false;
+    var stPatterns = [/^（[一二三四五六七八九十]）/,/^第[一二三四五六七八九十]/,/^[1-9]、/,/^[1-9]\./];
+    for(var j = 0; j < stPatterns.length; j++){
+      if(stPatterns[j].test(line)){isSubtitle = true; break;}
+    }
+    if(!isSubtitle && line.length <= 30 && /^(是|要|在|把|以|让|用|真|心|情|力|深|坚|强|凝|聚|汇|做|干|抓|落|推|促|善|勇|敢|乐|喜|爱|重|注|关|注)/.test(line)){
+      isSubtitle = true;
+    }
+    if(isSubtitle){
+      if(inParagraph){html += '</p>'; inParagraph = false;}
+      html += '<div class="result-point"><strong>' + line + '</strong></div>';
+      continue;
+    }
+    // 普通段落
+    if(!inParagraph){
+      html += '<p style="text-indent:2em;">';
+      inParagraph = true;
+    }else{
+      html += '<br>';
+    }
+    html += line;
+  }
+  if(inParagraph){html += '</p>';}
+  return html;
+}
+
+function copySpeech(){
+  if(!state.result){showToast('没有可复制的内容');return;}
+  // 创建临时文本
+  var textarea = document.createElement('textarea');
+  textarea.value = state.result;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  try{
+    document.execCommand('copy');
+    showToast('已复制到剪贴板');
+  }catch(e){
+    showToast('复制失败，请手动选择文本');
+  }
+  document.body.removeChild(textarea);
+}
+
+// ===== 设置 =====
+function saveSettings(){
+  var apiKey = document.getElementById('apiKeyInput').value.trim();
+  if(!apiKey){
+    showToast('请输入 API Key');
+    return;
+  }
+  var data = loadData();
+  data.apiKey = apiKey;
+  var modelEl = document.getElementById('modelSelect');
+  if(modelEl){
+    state.model = modelEl.value;
+    data.model = modelEl.value;
+  }
+  saveData(data);
+  showToast('设置已保存');
+}
+
+function loadSettings(){
+  var data = loadData();
+  if(data.apiKey){
+    document.getElementById('apiKeyInput').value = data.apiKey;
+  }
+  if(data.model){
+    state.model = data.model;
+    var modelEl = document.getElementById('modelSelect');
+    if(modelEl) modelEl.value = data.model;
+  }
+}
+
+// ===== Toast =====
+function showToast(msg){
+  var toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(function(){toast.classList.remove('show');},2500);
+}
+
+// ===== 工具 =====
+function escapeHtml(str){
+  var div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ===== 初始化 =====
+function init(){
+  renderTypeGrid();
+  loadSettings();
+
+  // Tab 切换
+  var tabs = document.querySelectorAll('.tab');
+  for(var i = 0; i < tabs.length; i++){
+    tabs[i].addEventListener('click',function(){
+      switchTab(this.getAttribute('data-page'));
+    });
+  }
+}
+
+// 页面加载
+document.addEventListener('DOMContentLoaded',init);
+
+// ===== 文件上传 =====
+function handleFileUpload(event){
+  var file = event.target.files[0];
+  if(!file) return;
+  document.getElementById('fileName').textContent = file.name;
+  document.getElementById('clearFileBtn').style.display = '';
+  var ext = file.name.split('.').pop().toLowerCase();
+  if(ext === 'txt'){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var text = e.target.result;
+      document.getElementById('refText').value = text;
+      updateRefWordCount();
+    };
+    reader.readAsText(file, 'UTF-8');
+  }else if(ext === 'docx' || ext === 'doc'){
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var arrayBuffer = e.target.result;
+      if(typeof mammoth !== 'undefined'){
+        mammoth.extractRawText({arrayBuffer:arrayBuffer}).then(function(result){
+          document.getElementById('refText').value = result.value;
+          updateRefWordCount();
+        }).catch(function(err){
+          showToast('解析docx失败，请复制粘贴内容');
+        });
+      }else{
+        showToast('docx解析库加载中，请稍后再试或粘贴文本');
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }else if(ext === 'pdf'){
+    showToast('PDF暂不支持直接解析，请复制粘贴内容');
+  }else{
+    showToast('不支持的文件格式，请上传txt或docx');
+  }
+}
+
+function updateRefWordCount(){
+  var text = document.getElementById('refText').value;
+  var count = text.replace(/\s/g,'').length;
+  document.getElementById('refWordCount').textContent = '已输入 ' + count + ' 字';
+}
+</script>
+</body>
+</html>
