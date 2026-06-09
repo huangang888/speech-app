@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="讲话助手">
 <meta name="theme-color" content="#8B1A1A">
-<title>讲话助手 - 黄主任专属</title>
+<title>讲话助手 - 智能会议发言生成器</title>
 <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjogIuiusuivneWKqeaJiyAtIOm7hOS4u+S7u+S4k+WxniIsICJzaG9ydF9uYW1lIjogIuiusuivneWKqeaJiyIsICJzdGFydF91cmwiOiAiLiIsICJkaXNwbGF5IjogInN0YW5kYWxvbmUiLCAiYmFja2dyb3VuZF9jb2xvciI6ICIjOEIxQTFBIiwgInRoZW1lX2NvbG9yIjogIiM4QjFBMUEiLCAib3JpZW50YXRpb24iOiAicG9ydHJhaXQiLCAiaWNvbnMiOiBbeyJzcmMiOiAiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01EQXZjM1puSWo0OFkybHlZMnhsSUdONFBTSTJOQ0lnWTNrOUlqWWlJSGRwWkhSb0lDMk1ZVzV6VUdsdVpXNTJMblYxYzJWeWRtVnlPazVqYVhSbFkzUWlJR1pwYkd3OUltNXZibVVpSUhodGJHNXpQU0pvZEhSd09pOHZkM2QzTG5jekxtOXlaeTh5TURBd0wzTjJaeUkrUEdSbFpuTStQR3hwYm1WaGNrZHlZV1JwWlc1MGNHbHpZV0ZzZEdWeUlHWnBiR3c5SW0xdVp5QnlaVzVrYkdWdWRDSWdabWxzYkQwaUl6QmhNR0V3WkNJZ1ptbHNiRDBpSTJobFkyaHZJRDA5SUNoRFUzUmhkR2xqVW1WemIzVnlZMlVnU1hORGFHVmphMlZrUFNKaFlpSXBPQ0lnWm1sc2JEMGlkMmhwZEdVaUlITjBjbTlyWlQwaWQyaHBkR1VpSUhOMGNtOXJaUzEzYVdSMGFEMGlOQ0l2UGp3dmMzWm5QZz09IiwgInNpemVzIjogIjE5MngxOTIiLCAidHlwZSI6ICJpbWFnZS9zdmcreG1sIiwgInB1cnBvc2UiOiAiYW55IG1hc2thYmxlIn0sIHsic3JjIjogImRhdGE6aW1hZ2Uvc3ZnK3htbDtiYXNlNjQsUEhOMlp5QjRiV3h1Y3owaWFIUjBjRG92TDNkM2R5NTNNeTV2Y21jdk1qQXdNREF2YzNabklqNDhZMmx5WTJ4bElHTjRQU0kyTkNJZ1kzazlJallpSUhkcFpIUm9JQzJNWVc1elVHbHVaVzUyTG5WMWMyVnlkbVZ5T2s1amFYUmxZM1FpSUdacGJHdzlJbTV2Ym1VaUlIaHRiRzV6UFNKb2RIUndPajB2ZDNkM0xuY3pMbTl5Wnk4eU1EQXdMM04yWnlJK1BHUmxabk0rUEd4cGJtVmhja2R5WVdScFpXNTBjR2x6WVdGc2RHVnlJR1pwYkd3OUltMXVaeUJ5Wlc1a2JHVnVkQ0lnWm1sc2JEMGlJekJoTUdFd1pDSWdabWxzYkQwaUkyaGxZMmh2SUQwOUlDaERVM1JoZEdsalVtVnpiM1Z5WTJVZ1NYTkRhR1ZqYTJWa1BTSmhZaUlwT0NJZ1ptbHNiRDBpZDJocGRHVWlJSE4wY205clpUMGlkMmhwZEdVaUlITjBjbTlyWlMxM2FXUjBhRDBpTkNJdlBqd3ZjM1puUGc9PSIsICJzaXplcyI6ICI1MTJ4NTEyIiwgInR5cGUiOiAiaW1hZ2Uvc3ZnK3htbCIsICJwdXJwb3NlIjogImFueSBtYXNrYWJsZSJ9XX0=">
 <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect width='200' height='200' rx='40' fill='%238B1A1A'/%3E%3Ctext x='100' y='90' font-size='70' text-anchor='middle' fill='%23FFD700' font-family='sans-serif'%3E讲话%3C/text%3E%3Ctext x='100' y='165' font-size='70' text-anchor='middle' fill='%23FFF' font-family='sans-serif'%3E助手%3C/text%3E%3C/svg%3E">
 <style>
@@ -498,6 +498,10 @@ body{
       <input type="text" class="text-input" id="noteInput" placeholder="例如：作为政协委员代表发言...">
     </div>
     <div class="input-group">
+      <label class="input-label">与会听众 <span class="input-hint">（如：市领导、部门负责人、企业代表等，便于开头问好）</span></label>
+      <input type="text" class="text-input" id="audienceInput" placeholder="请输入与会听众，如：各位领导、各位委员、同志们...">
+    </div>
+    <div class="input-group">
       <label class="input-label">参考资料 <span class="input-hint">（上传会议通知、汇报材料、微信文件等，支持txt/docx。手机端可浏览微信下载目录选取文件）</span></label>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <input type="file" id="fileInput" accept=".txt,.docx,.pdf,.doc" style="display:none;" onchange="handleFileUpload(event)">
@@ -532,18 +536,7 @@ body{
       <button class="btn btn-outline btn-sm" onclick="handleGenerate()">重新生成</button>
       <button class="btn btn-outline btn-sm" onclick="likeSpeech()" style="color:#2e7d32;border-color:#2e7d32;">满意，保存为范文</button>
     </div>
-    <!-- 修改反馈 -->
-    <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);">
-      <label class="input-label" style="margin-bottom:6px;">修改建议 <span class="input-hint">（我会记住您的意见，下次改进）</span></label>
-      <div style="display:flex;gap:8px;">
-        <input type="text" class="text-input" id="feedbackInput" placeholder="如：标题不够有力、建议再具体一些、多加点排比句..." style="flex:1;">
-        <button class="btn btn-primary btn-sm" onclick="handleFeedback()" style="flex-shrink:0;width:auto;">提交修改</button>
-      </div>
-      <div id="feedbackHistory" style="margin-top:10px;display:none;">
-        <div class="section-title" style="font-size:0.85rem;">历史修改记录</div>
-        <div id="feedbackList" style="font-size:0.8rem;color:var(--text-light);"></div>
-      </div>
-    </div>
+
   </div>
 
 </div>
@@ -633,7 +626,9 @@ var MEETING_TYPES = [
   {id:'xuexi',name:'学习研讨会',icon:'学'},
   {id:'jiandu',name:'监督协商会',icon:'协'},
   {id:'qingdian',name:'庆典宴会致词',icon:'庆'},
-  {id:'biaotai',name:'会议表态发言',icon:'表'}
+  {id:'biaotai',name:'会议表态发言',icon:'表'},
+  {id:'qita',name:'其他会议场景',icon:'他'},
+  {id:'tigang',name:'发言方向提纲',icon:'纲'}
 ];
 
 // ===== 状态 =====
@@ -892,6 +887,23 @@ function selectType(typeId){
       btn.classList.remove('selected');
     }
   }
+  // 根据类型动态设置提示
+  var noteInput = document.getElementById('noteInput');
+  var topicInput = document.getElementById('topicInput');
+  var genBtn = document.getElementById('generateBtn');
+  if(typeId === 'qita'){
+    noteInput.placeholder = '请写明讲话人的职务身份，如：市长、局长、企业董事长...';
+    topicInput.placeholder = '请输入具体会议主题或场景，如：全市经济工作会议...';
+    genBtn.textContent = '开始生成发言稿';
+  }else if(typeId === 'tigang'){
+    noteInput.placeholder = '可选，补充讲话身份、重点方向等';
+    topicInput.placeholder = '请输入需要提炼观点的会议主题...';
+    genBtn.textContent = '生成发言方向提纲';
+  }else{
+    noteInput.placeholder = '例如：作为政协委员代表发言...';
+    topicInput.placeholder = '请输入发言主题...';
+    genBtn.textContent = '开始生成发言稿';
+  }
 }
 
 function clearRefFile(){
@@ -1029,6 +1041,8 @@ function buildPrompt(){
   }
 
   var noteText = state.note ? '\n补充说明：' + state.note : '';
+  var audienceText = document.getElementById('audienceInput').value.trim();
+  var audienceSection = audienceText ? '\n与会听众：' + audienceText : '';
   var refText = document.getElementById('refText').value.trim();
   var refSection = '';
   if(refText){
@@ -1039,7 +1053,75 @@ function buildPrompt(){
     refSection += '\n材料内容如下：\n' + refText.substring(0, 3000);
   }
 
-  // 每种会议类型的语调风格
+  // 检查用户是否在补充说明中指定了字数
+  var userWordReq = null;
+  if(state.note){
+    var wm = state.note.match(/(\d+)\s*[字左右]/);
+    if(wm) userWordReq = parseInt(wm[1]);
+  }
+
+  // ===== 发言方向提纲（特殊模式） =====
+  if(state.meetingType === 'tigang'){
+    var tigangFeedbackCtx = getFeedbackContext();
+    return '你是一位顶级发言撰稿人和思想顾问，擅长为各类会议发言提炼核心观点和金句。\n\n' +
+      '═══════════════════════════════════\n' +
+      '任务模式：发言方向提纲\n' +
+      '会议主题：' + state.topic + '\n' +
+      audienceSection + noteText + refSection + tigangFeedbackCtx + '\n' +
+      '═══════════════════════════════════\n\n' +
+      '【任务要求】\n' +
+      '针对上述会议主题，提炼出至少3个主要观点的方向提纲。\n\n' +
+      '每个观点要求：\n' +
+      '1. 观点标题：8-16字，新颖鲜明、掷地有声，用比喻/对仗/拟人手法，让人过目不忘\n' +
+      '2. 观点阐述：200-300字，讲清楚这个观点的核心逻辑和独特思考角度\n' +
+      '3. 金言金句：一段300字以内的浓缩精华，可直接用于发言中的点睛段落，语言铿锵有力、排比如浪\n\n' +
+      '【质量标准】\n' +
+      '• 观点要新颖独到，讲出别人讲不出的道理，不落俗套\n' +
+      '• 引人思考，让人听后有启发、有收获、有共鸣\n' +
+      '• 金言金句要有现场感染力，适合口语表达，朗朗上口\n' +
+      '• 如果有听众信息，开头先对与会人员致以亲切问候\n\n' +
+      '【输出格式】\n' +
+      '纯文本，不要markdown符号。格式如下：\n' +
+      '第一行：总标题（关于XX的发言方向提纲，16字以内）\n' +
+      '空行\n' +
+      '观点一：XXXX\n（观点阐述200-300字）\n【金言金句】\n（300字以内）\n\n' +
+      '观点二：XXXX\n（观点阐述200-300字）\n【金言金句】\n（300字以内）\n\n' +
+      '（以此类推，至少3个观点）';
+  }
+
+  // ===== 其他会议场景（通用身份） =====
+  if(state.meetingType === 'qita'){
+    // 从补充说明中提取讲话人身份
+    var speakerIdentity = state.note || '请根据会议主题自行判断合适的发言人身份';
+    var qitaFeedbackCtx = getFeedbackContext();
+    var qitaMaxWords = userWordReq ? (userWordReq + '字（用户指定）') : '1000字左右';
+    return '你是一位顶级发言撰稿人，正在为一场重要会议撰写高质量发言稿。\n\n' +
+      '【发言人画像——理解即可，切勿在发言中提及】\n' +
+      speakerIdentity + '\n\n' +
+      '**严禁在发言中提及撰稿过程或AI辅助。发言以第一人称"我"来写，自然、真诚、有力。**\n\n' +
+      '═══════════════════════════════════\n' +
+      '会议类型：' + state.topic + '\n' +
+      '语调风格：根据发言人身份和会议场景自动判断，保持高水平的思考力和独特性\n' +
+      '字数限制：' + qitaMaxWords + '\n' +
+      audienceSection + refSection + qitaFeedbackCtx + '\n\n' +
+      '【写作要求——请逐条遵循】\n\n' +
+      '一、标题：必须用比喻或拟人手法，对仗工整，让人过目不忘。\n\n' +
+      '二、开头：根据听众信息，先对与会人员进行真诚自然的问候，营造现场感和带入感，让人心入身入。然后一两句话切入主题。\n' +
+      '三、正文：自然分为三个层次（感受→认识→建议），不用"一、二、三"标注，用空行自然过渡。\n' +
+      '   每个层次提炼一个核心观点，用排比句或对仗句作为点睛之笔。\n\n' +
+      '四、语言：\n' +
+      '   · 多用排比句、对仗句、四字短语，节奏铿锵有力\n' +
+      '   · 每200字左右插入一句金句（自创的或化用的）\n' +
+      '   · 权威引用（如习近平总书记重要论述）如需引用，一处足矣，自然融入不刻意\n\n' +
+      '五、深度：不要停留在表面，要往深处想一层，讲出别人讲不出的道理。\n' +
+      '   好发言的标准是：听完后让人记住至少一个观点、一句金句、一种感受。\n\n' +
+      '六、每句话都要有分量，不写正确的废话。\n\n' +
+      '【输出格式】\n' +
+      '纯文本，不要markdown符号。第一行是标题（不加书名号），空行后开始正文，段落间空行分隔。\n' +
+      '禁止任何标注说明，直接给出完整的发言稿。';
+  }
+
+  // ===== 默认模式（黄主任专属，含听众问候） =====
   var typeTones = {
     'wenhua': '文雅诗意，引经据典，有文化纵深和人文温度',
     'diaoyan': '朴实有力，接地气有泥土味，讲真问题真感受',
@@ -1052,8 +1134,15 @@ function buildPrompt(){
   };
 
   var tone = typeTones[state.meetingType] || typeTones['diaoyan'];
-  var maxWords = (state.meetingType === 'qingdian' || state.meetingType === 'biaotai') ? '500字' : '800字';
   var isShort = (state.meetingType === 'qingdian' || state.meetingType === 'biaotai');
+  var maxWords;
+  if(userWordReq){
+    maxWords = userWordReq + '字（用户指定）';
+  }else if(isShort){
+    maxWords = '500字';
+  }else{
+    maxWords = '1000字左右';
+  }
 
   var feedbackCtx = getFeedbackContext();
 
@@ -1069,6 +1158,14 @@ function buildPrompt(){
     }
   }
 
+  // 构造听众问候要求
+  var audienceReq = '';
+  if(audienceText){
+    audienceReq = '\n\n【听众问候要求】\n' +
+      '发言开头必须先对与会人员致以真诚亲切的问候。与会听众包括：' + audienceText + '。\n' +
+      '问候要自然、有现场感和带入感，让人一听就觉得心入身入，感受到被尊重和被重视。不要生硬客套，要像老朋友见面一样亲切温暖。问候后自然过渡到主题。';
+  }
+
   return '你是一位顶级发言撰稿人，正在为一位资深政协委员撰写会议发言稿。\n\n' +
     '【发言人画像——理解即可，切勿在发言中提及】\n' +
     '一位扎根湖南涟源多年的基层干部和政协委员，对涟源的山山水水饱含深情，正在从事文史编书工作。\n' +
@@ -1081,12 +1178,13 @@ function buildPrompt(){
     '会议主题：' + state.topic + '\n' +
     '语调风格：' + tone + '\n' +
     '字数限制：' + maxWords + '\n' +
+    audienceSection + '\n' +
     '═══════════════════════════════════\n' +
-    memCtx + noteText + refSection + feedbackCtx + '\n\n' +
+    memCtx + noteText + refSection + feedbackCtx + audienceReq + '\n\n' +
     '【写作要求——请逐条遵循】\n\n' +
     '一、标题：必须用比喻或拟人手法，对仗工整，如"以文铸魂，以文化人""根深叶茂，源远流长"。\n' +
     '   标题要让人过目不忘，有自己的创造，不要套用常见句式。\n\n' +
-    '二、开头：开门见山，真诚自然，一两句话切入主题，不铺垫不客套。\n\n' +
+    '二、开头：' + (audienceText ? '先对与会人员进行真诚亲切的问候，营造现场感和带入感，让人心入身入。问候要自然温暖，不生硬不客套，像老朋友见面般亲切。然后一两句话切入主题。' : '开门见山，真诚自然，一两句话切入主题，不铺垫不客套。') + '\n\n' +
     '三、正文：自然分为三个层次（感受→认识→建议），不用"一、二、三"标注，用空行自然过渡。\n' +
     '   每个层次提炼一个核心观点，用一句精炼的排比句或对仗句作为该层次的点睛之笔。\n\n' +
     '四、语言：\n' +
@@ -1096,7 +1194,7 @@ function buildPrompt(){
     '   · 涟源元素根据主题自然关联，没有合适切入点就不硬加\n\n' +
     '五、深度：不要停留在表面，要往深处想一层，讲出别人讲不出的道理。\n' +
     '   好发言的标准是：听完后让人记住至少一个观点、一句金句、一种感受。\n\n' +
-    '六、' + (isShort ? '庆典/表态类发言，自然流畅，不分层次标注，如即兴发言般真挚。控制在500字，3分钟讲完。' : '控制在800字以内，5分钟讲完。每句话都要有分量，不写正确的废话。') + '\n\n' +
+    '六、' + (isShort ? '庆典/表态类发言，自然流畅，不分层次标注，如即兴发言般真挚。控制在500字，3分钟讲完。' : '控制在' + (userWordReq || '1000') + '字左右，' + (userWordReq ? '' : '5分钟讲完。') + '每句话都要有分量，不写正确的废话。') + '\n\n' +
     '【输出格式】\n' +
     '纯文本，不要markdown符号。第一行是标题（不加书名号），空行后开始正文，段落间空行分隔。\n' +
     '禁止任何标注说明（如"标题：""正文：""一、二、三"等），直接给出完整的发言稿。';
@@ -1173,7 +1271,7 @@ function callAI(apiKey){
   var body = JSON.stringify({
     model:state.model || 'deepseek-reasoner',
     messages:[
-      {role:'system',content:'你是黄主任的专属AI秘书。你了解黄主任的身份：涟源人、政协委员、文史编书工作者。你写的发言稿以黄主任的视角和立场出发，但不提及他的个人信息。你遵循黄主任的写作理念：大秘的逻辑、诗人的情怀、专家的严谨、学者的钻研。你能根据不同会议类型切换话术风格，标题比喻化对仗工整，观点深刻独到，语言简洁有力，金句自然点睛。'},
+      {role:'system',content:'你是一位顶级发言撰稿人和思想顾问。你能根据不同会议类型和发言人身份，撰写高质量的会议发言稿或提炼发言方向提纲。你的核心理念：大秘的逻辑、诗人的情怀、专家的严谨、学者的钻研。标题比喻化对仗工整，观点深刻独到，语言简洁有力，金句自然点睛。根据任务要求灵活切换角色——有时是黄主任的专属撰稿人，有时是通用场景的高级撰稿人，有时是提炼观点的思想顾问。'},
       {role:'user',content:prompt}
     ],
     temperature:0.5,
@@ -1200,7 +1298,6 @@ function showResult(content){
     document.getElementById('apiUsage').textContent = '本次消耗 ' + state.lastUsage.tokens + ' token（约¥' + state.lastUsage.cost + '）';
   }
   // 滚动
-  renderFeedbackHistory();
   document.getElementById('card-result').scrollIntoView({behavior:'smooth'});
 }
 
@@ -1223,6 +1320,18 @@ function parseSpeech(text){
       if(inParagraph){html += '</p>';}
       html += '<p style="font-size:1rem;color:var(--primary);font-weight:600;text-align:center;margin-bottom:16px;">' + line + '</p>';
       inParagraph = false;
+      continue;
+    }
+    // 发言提纲格式：观点一/二/三
+    if(/^观点[一二三四五六七八九十]/.test(line)){
+      if(inParagraph){html += '</p>'; inParagraph = false;}
+      html += '<p style="font-weight:700;font-size:1.05rem;color:var(--primary);text-indent:0;margin:18px 0 8px 0;padding-bottom:6px;border-bottom:1px solid var(--border);">' + line + '</p>';
+      continue;
+    }
+    // 金言金句标题
+    if(line === '【金言金句】' || line.indexOf('【金言金句】') === 0){
+      if(inParagraph){html += '</p>'; inParagraph = false;}
+      html += '<p style="font-weight:700;font-size:0.88rem;color:var(--gold);margin:10px 0 4px 0;">' + line + '</p>';
       continue;
     }
     // 一级标题：一、二、三（加粗，缩进2字符）
