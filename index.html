@@ -1207,7 +1207,7 @@ function callAI(apiKey){
   xhr.open('POST', API_URL, true);
   xhr.setRequestHeader('Content-Type','application/json');
   xhr.setRequestHeader('Authorization','Bearer ' + apiKey);
-  xhr.timeout = 60000;
+  xhr.timeout = 90000;
 
   xhr.onload = function(){
     document.getElementById('loading').classList.remove('active');
@@ -1275,7 +1275,7 @@ function callAI(apiKey){
       {role:'user',content:prompt}
     ],
     temperature:0.5,
-    max_tokens:4096
+    max_tokens:8192
   });
 
   xhr.send(body);
