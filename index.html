@@ -600,6 +600,21 @@ body{
       </div>
     </div>
   </div>
+
+  <div class="card">
+    <div class="section-title">数据备份</div>
+    <p style="font-size:0.82rem;color:var(--text-light);margin-bottom:12px;">历史发言和范文存在浏览器本地，清除浏览器数据会丢失。建议定期导出备份到云盘。</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-primary btn-sm" onclick="exportHistoryTxt()" style="flex:1;min-width:120px;">导出全部发言（TXT）</button>
+      <button class="btn btn-outline btn-sm" onclick="exportLikedTxt()" style="flex:1;min-width:120px;">导出范文合集（TXT）</button>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+      <button class="btn btn-outline btn-sm" onclick="exportAllJson()" style="flex:1;min-width:120px;">导出完整数据（JSON备份）</button>
+      <button class="btn btn-outline btn-sm" onclick="document.getElementById('importFile').click()" style="flex:1;min-width:120px;border-color:#c00;color:#c00;">导入数据恢复</button>
+      <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importAllJson(event)">
+    </div>
+    <div id="exportInfo" style="font-size:0.78rem;color:var(--text-light);margin-top:8px;"></div>
+  </div>
 </div>
 
 <!-- Footer -->
@@ -668,7 +683,7 @@ function updateMemory(type,topic){
   m.typeCounts[type] = (m.typeCounts[type] || 0) + 1;
   m.topics = m.topics || [];
   if(m.topics.indexOf(topic) === -1) m.topics.push(topic);
-  if(m.topics.length > 50) m.topics.shift();
+  // topics不封顶
   m.lastUsed = new Date().toISOString();
   if(m.count >= 5 && m.level < 2) m.level = 2;
   if(m.count >= 20 && m.level < 3) m.level = 3;
@@ -690,7 +705,7 @@ function saveFeedback(feedback){
     feedback: feedback,
     original: state.result ? state.result.substring(0,200) : ''
   });
-  if(m.feedbacks.length > 50) m.feedbacks.shift();
+  // feedbacks不封顶
   // 分析反馈模式，更新偏好
   analyzeFeedbackPattern(feedback);
   data.memory = m;
@@ -811,7 +826,7 @@ function likeSpeech(){
     topic: state.topic,
     speech: state.result
   });
-  if(m.likedSpeeches.length > 20) m.likedSpeeches.shift();
+  // likedSpeeches不封顶
   data.memory = m;
   saveData(data);
   showToast('已保存为范文，我会学习您的偏好风格');
@@ -856,7 +871,7 @@ function saveHistory(speech){
     speech:speech,
     time:new Date().toLocaleString('zh-CN')
   });
-  if(data.history.length > 50) data.history.pop();
+  // history不封顶
   saveData(data);
 }
 
@@ -1428,6 +1443,148 @@ function escapeHtml(str){
   var div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+// ===== 数据导出/导入 =====
+function exportHistoryTxt(){
+  var data = loadData();
+  var history = data.history || [];
+  if(history.length === 0){showToast('暂无历史发言');return;}
+  var lines = [];
+  lines.push('讲话助手 - 全部历史发言');
+  lines.push('导出时间：' + new Date().toLocaleString('zh-CN'));
+  lines.push('共 ' + history.length + ' 篇');
+  lines.push('');
+  for(var i = 0; i < history.length; i++){
+    var h = history[i];
+    var typeName = h.type;
+    for(var j = 0; j < MEETING_TYPES.length; j++){
+      if(MEETING_TYPES[j].id === h.type){typeName = MEETING_TYPES[j].name;break;}
+    }
+    lines.push('【第' + (i+1) + '篇】' + typeName + ' | ' + h.time);
+    lines.push('主题：' + h.topic);
+    lines.push('');
+    lines.push(h.speech);
+    lines.push('');
+    lines.push('────────────────────────────────');
+    lines.push('');
+  }
+  downloadTxt(lines.join('\n'), '讲话助手_全部发言_' + formatDate() + '.txt');
+  showToast('已导出 ' + history.length + ' 篇发言');
+}
+
+function exportLikedTxt(){
+  var data = loadData();
+  var liked = (data.memory && data.memory.likedSpeeches) || [];
+  if(liked.length === 0){showToast('暂无范文');return;}
+  var lines = [];
+  lines.push('讲话助手 - 范文合集');
+  lines.push('导出时间：' + new Date().toLocaleString('zh-CN'));
+  lines.push('共 ' + liked.length + ' 篇');
+  lines.push('');
+  for(var i = 0; i < liked.length; i++){
+    var ls = liked[i];
+    var typeName = ls.type;
+    for(var j = 0; j < MEETING_TYPES.length; j++){
+      if(MEETING_TYPES[j].id === ls.type){typeName = MEETING_TYPES[j].name;break;}
+    }
+    lines.push('【范文' + (i+1) + '】' + typeName + ' | ' + ls.topic);
+    lines.push('');
+    lines.push(ls.speech);
+    lines.push('');
+    lines.push('────────────────────────────────');
+    lines.push('');
+  }
+  downloadTxt(lines.join('\n'), '讲话助手_范文合集_' + formatDate() + '.txt');
+  showToast('已导出 ' + liked.length + ' 篇范文');
+}
+
+function exportAllJson(){
+  var data = loadData();
+  var jsonStr = JSON.stringify(data, null, 2);
+  downloadTxt(jsonStr, '讲话助手_完整备份_' + formatDate() + '.json');
+  showToast('完整数据已导出，可保存到云盘');
+}
+
+function importAllJson(event){
+  var file = event.target.files[0];
+  if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      var imported = JSON.parse(e.target.result);
+      if(!imported.history && !imported.memory){
+        showToast('文件格式不正确');
+        return;
+      }
+      var data = loadData();
+      // 合并历史（按时间去重）
+      var existIds = {};
+      for(var i = 0; i < (data.history || []).length; i++){
+        existIds[data.history[i].id] = true;
+      }
+      var importedHistory = imported.history || [];
+      var newCount = 0;
+      for(var j = 0; j < importedHistory.length; j++){
+        if(!existIds[importedHistory[j].id]){
+          data.history.push(importedHistory[j]);
+          newCount++;
+        }
+      }
+      // 合并范文
+      var existLiked = {};
+      var m = data.memory = data.memory || {};
+      var liked = m.likedSpeeches = m.likedSpeeches || [];
+      for(var k = 0; k < liked.length; k++){
+        existLiked[liked[k].topic + '_' + liked[k].type] = true;
+      }
+      var importedLiked = (imported.memory && imported.memory.likedSpeeches) || [];
+      var newLiked = 0;
+      for(var l = 0; l < importedLiked.length; l++){
+        var key = importedLiked[l].topic + '_' + importedLiked[l].type;
+        if(!existLiked[key]){
+          liked.push(importedLiked[l]);
+          newLiked++;
+        }
+      }
+      // 合并反馈偏好
+      if(imported.memory && imported.memory.preferences){
+        var prefs = m.preferences = m.preferences || {};
+        var impPrefs = imported.memory.preferences;
+        for(var prefKey in impPrefs){
+          if(prefKey.indexOf('_desc') === -1){
+            prefs[prefKey] = Math.max(prefs[prefKey] || 0, impPrefs[prefKey]);
+          }else{
+            if(!prefs[prefKey]) prefs[prefKey] = impPrefs[prefKey];
+          }
+        }
+      }
+      saveData(data);
+      showToast('导入成功：新增' + newCount + '篇发言、' + newLiked + '篇范文');
+      renderStats();
+    }catch(err){
+      showToast('导入失败，文件格式不正确');
+    }
+  };
+  reader.readAsText(file, 'UTF-8');
+  event.target.value = '';
+}
+
+function downloadTxt(content, filename){
+  var blob = new Blob([content], {type:'text/plain;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function formatDate(){
+  var d = new Date();
+  return d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + '_' + String(d.getHours()).padStart(2,'0') + String(d.getMinutes()).padStart(2,'0');
 }
 
 // ===== 初始化 =====
