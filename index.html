@@ -1769,6 +1769,18 @@ function updateRefWordCount(){
   var text = document.getElementById('refText').value;
   var count = text.replace(/\s/g,'').length;
   document.getElementById('refWordCount').textContent = '已输入 ' + count + ' 字';
+  // 粘贴内容超过50字且当前无文件名时，自动记为一条最近资料
+  if(count > 50 && !document.getElementById('fileName').textContent || document.getElementById('fileName').textContent === '未选择文件'){
+    var existing = getRecentRefs();
+    // 检查是否已有完全相同内容
+    var found = false;
+    for(var i = 0; i < existing.length; i++){
+      if(existing[i].content === text){ found = true; break; }
+    }
+    if(!found){
+      saveRecentRef('粘贴资料（' + count + '字）', text);
+    }
+  }
 }
 </script>
 <script>
