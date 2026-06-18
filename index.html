@@ -450,6 +450,57 @@ body{
 .page{display:none;}
 .page.active{display:block;}
 
+/* Recent Refs */
+.recent-ref-title{
+  font-size:0.78rem;
+  color:var(--text-light);
+  margin-bottom:6px;
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+.recent-ref-item{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:8px 10px;
+  background:linear-gradient(135deg,rgba(139,26,26,0.03) 0%,rgba(201,169,110,0.05) 100%);
+  border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  margin-bottom:6px;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  user-select:none;
+}
+.recent-ref-item:active{background:rgba(139,26,26,0.06);}
+.recent-ref-name{
+  flex:1;
+  font-size:0.82rem;
+  color:var(--text);
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+.recent-ref-del{
+  font-size:0.7rem;
+  color:#c00;
+  padding:2px 6px;
+  border:1px solid rgba(204,0,0,0.3);
+  border-radius:4px;
+  flex-shrink:0;
+  background:transparent;
+  -webkit-tap-highlight-color:transparent;
+}
+.recent-ref-del:active{background:rgba(204,0,0,0.08);}
+.recent-ref-preview{
+  font-size:0.75rem;
+  color:var(--text-light);
+  margin-top:2px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
 /* Responsive */
 .type-grid{grid-template-columns:1fr 1fr;}
 @media(min-width:400px){.type-grid{grid-template-columns:1fr 1fr;}}
@@ -502,13 +553,14 @@ body{
       <input type="text" class="text-input" id="audienceInput" placeholder="请输入与会听众，如：各位领导、各位委员、同志们...">
     </div>
     <div class="input-group">
-      <label class="input-label">参考资料 <span class="input-hint">（上传会议通知、汇报材料、微信文件等，支持txt/docx。手机端可浏览微信下载目录选取文件）</span></label>
+      <label class="input-label">参考资料 <span class="input-hint">（上传会议通知、汇报材料等，支持txt/docx）</span></label>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <input type="file" id="fileInput" accept=".txt,.docx,.pdf,.doc" style="display:none;" onchange="handleFileUpload(event)">
         <button class="btn btn-outline btn-sm" onclick="document.getElementById('fileInput').click()" style="flex-shrink:0;">选择文件</button>
         <span id="fileName" style="font-size:0.82rem;color:var(--text-light);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">未选择文件</span>
         <button id="clearFileBtn" class="btn btn-outline btn-sm" onclick="clearRefFile()" style="flex-shrink:0;display:none;color:#c00;border-color:#c00;">清除</button>
       </div>
+      <div id="recentRefList" style="margin-top:8px;display:none;"></div>
 <textarea class="text-input" id="refText" placeholder="或直接粘贴参考资料内容..." style="margin-top:8px;min-height:80px;resize:vertical;" oninput="updateRefWordCount()"></textarea>
       <span class="input-hint" id="refWordCount" style="margin-top:2px;display:block;">已输入 0 字</span>
     </div>
@@ -1591,6 +1643,7 @@ function formatDate(){
 function init(){
   renderTypeGrid();
   loadSettings();
+  renderRecentRefs();
 
   // Tab 切换
   var tabs = document.querySelectorAll('.tab');
@@ -1617,6 +1670,7 @@ function handleFileUpload(event){
       var text = e.target.result;
       document.getElementById('refText').value = text;
       updateRefWordCount();
+      saveRecentRef(file.name, text);
     };
     reader.readAsText(file, 'UTF-8');
   }else if(ext === 'docx' || ext === 'doc'){
@@ -1625,8 +1679,10 @@ function handleFileUpload(event){
       var arrayBuffer = e.target.result;
       if(typeof mammoth !== 'undefined'){
         mammoth.extractRawText({arrayBuffer:arrayBuffer}).then(function(result){
-          document.getElementById('refText').value = result.value;
+          var text = result.value;
+          document.getElementById('refText').value = text;
           updateRefWordCount();
+          saveRecentRef(file.name, text);
         }).catch(function(err){
           showToast('解析docx失败，请复制粘贴内容');
         });
@@ -1640,6 +1696,73 @@ function handleFileUpload(event){
   }else{
     showToast('不支持的文件格式，请上传txt或docx');
   }
+}
+
+// ===== 最近资料管理 =====
+function getRecentRefs(){
+  try{
+    var d = localStorage.getItem('speech_app_recent_refs');
+    return d ? JSON.parse(d) : [];
+  }catch(e){ return []; }
+}
+
+function saveRecentRefData(refs){
+  try{ localStorage.setItem('speech_app_recent_refs', JSON.stringify(refs)); }catch(e){}
+}
+
+function saveRecentRef(name, content){
+  var refs = getRecentRefs();
+  // 去重：同名文件更新内容
+  for(var i = refs.length - 1; i >= 0; i--){
+    if(refs[i].name === name){ refs.splice(i, 1); break; }
+  }
+  refs.unshift({ name: name, content: content, time: Date.now() });
+  if(refs.length > 10) refs = refs.slice(0, 10);
+  saveRecentRefData(refs);
+  renderRecentRefs();
+}
+
+function deleteRecentRef(index){
+  var refs = getRecentRefs();
+  if(index >= 0 && index < refs.length){
+    refs.splice(index, 1);
+    saveRecentRefData(refs);
+    renderRecentRefs();
+    showToast('已删除');
+  }
+}
+
+function loadRecentRef(index){
+  var refs = getRecentRefs();
+  if(index >= 0 && index < refs.length){
+    var ref = refs[index];
+    document.getElementById('refText').value = ref.content;
+    document.getElementById('fileName').textContent = ref.name;
+    document.getElementById('clearFileBtn').style.display = '';
+    updateRefWordCount();
+    showToast('已载入：' + ref.name);
+  }
+}
+
+function renderRecentRefs(){
+  var refs = getRecentRefs();
+  var container = document.getElementById('recentRefList');
+  if(!refs || refs.length === 0){
+    container.style.display = 'none';
+    return;
+  }
+  container.style.display = 'block';
+  var html = '<div class="recent-ref-title">最近使用的资料（点击快速载入）</div>';
+  for(var i = 0; i < refs.length; i++){
+    var r = refs[i];
+    var preview = r.content.substring(0, 40).replace(/[\n\r]/g, ' ');
+    html += '<div class="recent-ref-item" onclick="loadRecentRef(' + i + ')">';
+    html += '<div style="flex:1;overflow:hidden;"><div class="recent-ref-name">' + escapeHtml(r.name) + '</div>';
+    html += '<div class="recent-ref-preview">' + escapeHtml(preview) + '...</div></div>';
+    html += '<button class="recent-ref-del" onclick="event.stopPropagation();deleteRecentRef(' + i + ')" style="margin-left:8px;">删除</button>';
+    html += '</div>';
+  }
+  container.innerHTML = html;
 }
 
 function updateRefWordCount(){
