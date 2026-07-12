@@ -1,6 +1,5 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
+execute_script 成功：
+<html lang="zh-CN"><head>
 <meta charset="UTF-8">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
@@ -534,7 +533,7 @@ body{
   <!-- Step 1: Meeting Type -->
   <div class="card" id="card-type">
     <div class="section-title">选择会议类型</div>
-    <div class="type-grid" id="typeGrid"></div>
+    <div class="type-grid" id="typeGrid"><button class="type-btn" onclick="selectType('wenhua')" data-type="wenhua">文化交流会</button><button class="type-btn" onclick="selectType('diaoyan')" data-type="diaoyan">调研座谈会</button><button class="type-btn" onclick="selectType('shicha')" data-type="shicha">视察座谈会</button><button class="type-btn" onclick="selectType('kaocha')" data-type="kaocha">考察座谈会</button><button class="type-btn" onclick="selectType('xuexi')" data-type="xuexi">学习研讨会</button><button class="type-btn" onclick="selectType('jiandu')" data-type="jiandu">监督协商会</button><button class="type-btn" onclick="selectType('qingdian')" data-type="qingdian">庆典宴会致词</button><button class="type-btn" onclick="selectType('biaotai')" data-type="biaotai">会议表态发言</button><button class="type-btn" onclick="selectType('qita')" data-type="qita">其他会议场景</button><button class="type-btn selected" onclick="selectType('tigang')" data-type="tigang">发言方向提纲</button></div>
   </div>
 
   <!-- Step 2: Topic -->
@@ -542,11 +541,11 @@ body{
     <div class="section-title">发言主题</div>
     <div class="input-group">
       <label class="input-label">会议主题或关键词 <span class="input-hint">（如"文化传承与创新"）</span></label>
-      <input type="text" class="text-input" id="topicInput" placeholder="请输入发言主题...">
+      <input type="text" class="text-input" id="topicInput" placeholder="请输入需要提炼观点的会议主题...">
     </div>
     <div class="input-group">
       <label class="input-label">补充说明 <span class="input-hint">（可选，如身份、特殊要求等）</span></label>
-      <input type="text" class="text-input" id="noteInput" placeholder="例如：作为政协委员代表发言...">
+      <input type="text" class="text-input" id="noteInput" placeholder="可选，补充讲话身份、重点方向等">
     </div>
     <div class="input-group">
       <label class="input-label">与会听众 <span class="input-hint">（如：市领导、部门负责人、企业代表等，便于开头问好）</span></label>
@@ -564,9 +563,7 @@ body{
 <textarea class="text-input" id="refText" placeholder="或直接粘贴参考资料内容..." style="margin-top:8px;min-height:80px;resize:vertical;" oninput="updateRefWordCount()"></textarea>
       <span class="input-hint" id="refWordCount" style="margin-top:2px;display:block;">已输入 0 字</span>
     </div>
-    <button class="btn btn-primary" id="generateBtn" onclick="handleGenerate()">
-      开始生成发言稿
-    </button>
+    <button class="btn btn-primary" id="generateBtn" onclick="handleGenerate()">生成发言方向提纲</button>
   </div>
 
   <!-- Loading -->
@@ -624,7 +621,7 @@ body{
     <button class="btn btn-primary" onclick="saveSettings()" style="margin-top:8px;">保存设置</button>
     <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);">
       <div style="display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:0.85rem;">账户余额 & 充值</span>
+        <span style="font-size:0.85rem;">账户余额 &amp; 充值</span>
         <a href="https://platform.deepseek.com/top_up" target="_blank" class="btn btn-outline btn-sm" style="text-decoration:none;">去充值</a>
       </div>
       <span class="input-hint" style="margin-top:2px;display:block;">V4 Pro：输入 ¥2/百万token，输出 ¥6/百万token</span>
@@ -695,7 +692,7 @@ var MEETING_TYPES = [
   {id:'qingdian',name:'庆典宴会致词',icon:'庆'},
   {id:'biaotai',name:'会议表态发言',icon:'表'},
   {id:'qita',name:'其他会议场景',icon:'他'},
-  {id:'tigang',name:'发言方向提纲',icon:'纲'}
+  {id:'tongtou',name:'通透人生发言',icon:'透'}
 ];
 
 // ===== 状态 =====
@@ -962,10 +959,10 @@ function selectType(typeId){
     noteInput.placeholder = '请写明讲话人的职务身份，如：市长、局长、企业董事长...';
     topicInput.placeholder = '请输入具体会议主题或场景，如：全市经济工作会议...';
     genBtn.textContent = '开始生成发言稿';
-  }else if(typeId === 'tigang'){
+  }else if(typeId === 'tongtou'){
     noteInput.placeholder = '可选，补充讲话身份、重点方向等';
     topicInput.placeholder = '请输入需要提炼观点的会议主题...';
-    genBtn.textContent = '生成发言方向提纲';
+    genBtn.textContent = '生成通透人生发言';
   }else{
     noteInput.placeholder = '例如：作为政协委员代表发言...';
     topicInput.placeholder = '请输入发言主题...';
@@ -1128,32 +1125,42 @@ function buildPrompt(){
   }
 
   // ===== 发言方向提纲（特殊模式） =====
-  if(state.meetingType === 'tigang'){
-    var tigangFeedbackCtx = getFeedbackContext();
-    return '你是一位顶级发言撰稿人和思想顾问，擅长为各类会议发言提炼核心观点和金句。\n\n' +
+  if(state.meetingType === 'tongtou'){
+    var tongtouFeedbackCtx = getFeedbackContext();
+    return '你是一位通透人生的思想者和发言撰稿人。你的文字如刀——以情绪为刃、以焦虑为饵，披着"狠话"外衣的内核却是温暖的"鸡汤"。你擅长把任何一个主题或现象用三个观点讲透、讲明、讲得扎心又提气。\n\n' +
       '═══════════════════════════════════\n' +
-      '任务模式：发言方向提纲\n' +
-      '会议主题：' + state.topic + '\n' +
-      audienceSection + noteText + refSection + tigangFeedbackCtx + '\n' +
+      '任务模式：通透人生发言\n' +
+      '发言主题：' + state.topic + '\n' +
+      audienceSection + noteText + refSection + tongtouFeedbackCtx + '\n' +
       '═══════════════════════════════════\n\n' +
-      '【任务要求】\n' +
-      '针对上述会议主题，提炼出至少3个主要观点的方向提纲。\n\n' +
-      '每个观点要求：\n' +
-      '1. 观点标题：8-16字，新颖鲜明、掷地有声，用比喻/对仗/拟人手法，让人过目不忘\n' +
-      '2. 观点阐述：200-300字，讲清楚这个观点的核心逻辑和独特思考角度\n' +
-      '3. 金言金句：一段300字以内的浓缩精华，可直接用于发言中的点睛段落，语言铿锵有力、排比如浪\n\n' +
+      '【核心风格——通透人生的"刀"与"糖"】\n' +
+      '• 以情绪为刀：直面人性弱点、社会痛点、职场困境，一刀切开虚伪，让读者感到"被看穿"\n' +
+      '• 以焦虑为饵：抓住当代人最深的焦虑（内卷、中年危机、社交疲惫、上升无望），先让你疼，再给你药\n' +
+      '• 披着狠话外衣的鸡汤：表面锋利毒舌，内核温暖有力。不说"你要加油"，而说"你除了加油别无选择"\n' +
+      '• 三刀见血：围绕主题，用三个层层递进的观点，从"看清真相"到"接受现实"再到"杀出一条路"\n\n' +
+      '【观点结构——三个层次，层层剥开】\n' +
+      '观点一：撕开伪装——揭示这个主题下人们不敢面对的真相，扎心但真实\n' +
+      '观点二：接受现实——承认无力感不是软弱，看清游戏规则才是智慧\n' +
+      '观点三：杀出重围——给出具体、可操作、不矫情的破局之道，提气又实用\n\n' +
+      '【语言要求】\n' +
+      '• 金句密度极高：每个观点至少2-3句可以单独拿出来传播的金句\n' +
+      '• 反对正确的废话：不说"努力就会成功"，而说"努力只是入场券，拿到入场券的人排到了三条街外"\n' +
+      '• 比喻要狠：用刀、枪、战场、丛林、棋局等硬核比喻，不要用花朵、阳光、春风\n' +
+      '• 节奏要脆：短句为主，排比推进，像连珠炮一样砸过来\n' +
+      '• 观点标题：8-16字，对仗工整、比喻精准、一眼入魂\n\n' +
       '【质量标准】\n' +
-      '• 观点要新颖独到，讲出别人讲不出的道理，不落俗套\n' +
-      '• 引人思考，让人听后有启发、有收获、有共鸣\n' +
-      '• 金言金句要有现场感染力，适合口语表达，朗朗上口\n' +
-      '• 如果有听众信息，开头先对与会人员致以亲切问候\n\n' +
+      '• 扎心：读完第一段就让人心里咯噔一下，觉得"说的就是我"\n' +
+      '• 提气：读完最后一段让人想站起来干点什么，不是舒服而是冲动\n' +
+      '• 好听：语言朗朗上口，适合口头表达和传播，金句能让人记住并复述\n' +
+      '• 每个观点阐述200-300字，金言金句200-300字\n\n' +
       '【输出格式】\n' +
       '纯文本，不要markdown符号。格式如下：\n' +
-      '第一行：总标题（关于XX的发言方向提纲，16字以内）\n' +
+      '第一行：总标题（16字以内，要狠、要准、要让人想点进去看）\n' +
       '空行\n' +
-      '观点一：XXXX\n（观点阐述200-300字）\n【金言金句】\n（300字以内）\n\n' +
-      '观点二：XXXX\n（观点阐述200-300字）\n【金言金句】\n（300字以内）\n\n' +
-      '（以此类推，至少3个观点）';
+      '观点一：XXXX\n（观点阐述200-300字）\n【金言金句】\n（200-300字）\n\n' +
+      '观点二：XXXX\n（观点阐述200-300字）\n【金言金句】\n（200-300字）\n\n' +
+      '观点三：XXXX\n（观点阐述200-300字）\n【金言金句】\n（200-300字）\n\n' +
+      '最后一行：【结语】一句话收尾，要有余味，让人合上页面还在想。';
   }
 
   // ===== 其他会议场景（通用身份） =====
@@ -1786,5 +1793,5 @@ function updateRefWordCount(){
 <script>
 
 </script>
-</body>
-</html>
+
+</body></html>
