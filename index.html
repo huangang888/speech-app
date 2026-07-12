@@ -320,8 +320,78 @@ body{
   margin-bottom:8px;
   cursor:pointer;
   transition:all 0.2s;
+  display:flex;
+  align-items:center;
+  gap:8px;
 }
 .history-item:active{background:#f9f6f0;}
+
+.history-del{
+  font-size:0.7rem;
+  color:#c00;
+  padding:2px 8px;
+  border:1px solid rgba(204,0,0,0.3);
+  border-radius:4px;
+  background:transparent;
+  cursor:pointer;
+  flex-shrink:0;
+  -webkit-tap-highlight-color:transparent;
+  margin-left:auto;
+}
+.history-del:active{background:rgba(204,0,0,0.08);}
+.history-meta-inner{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex:1;
+  min-width:0;
+}
+.history-confirm-overlay{
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.4);
+  z-index:1000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.history-confirm-box{
+  background:#fff;
+  border-radius:12px;
+  padding:28px 24px 20px;
+  max-width:320px;
+  width:85%;
+  box-shadow:0 8px 32px rgba(0,0,0,0.15);
+  text-align:center;
+}
+.history-confirm-msg{
+  font-size:0.95rem;
+  color:#2C2C2C;
+  margin-bottom:22px;
+  line-height:1.6;
+}
+.history-confirm-btns{
+  display:flex;
+  gap:12px;
+}
+.history-confirm-btns button{
+  flex:1;
+  padding:10px 0;
+  border-radius:8px;
+  font-size:0.9rem;
+  font-weight:600;
+  cursor:pointer;
+  border:none;
+  -webkit-tap-highlight-color:transparent;
+}
+.history-confirm-cancel{
+  background:#f0ece6;
+  color:#666;
+}
+.history-confirm-ok{
+  background:#c00;
+  color:#fff;
+}
 .history-meta{
   display:flex;
   justify-content:space-between;
@@ -996,11 +1066,47 @@ function renderHistory(){
       if(MEETING_TYPES[j].id === h.type){typeName = MEETING_TYPES[j].name;break;}
     }
     html += '<div class="history-item" onclick="viewHistory(' + i + ')">';
-    html += '<div class="history-meta"><span class="history-type">' + typeName + '</span><span class="history-time">' + h.time + '</span></div>';
-    html += '<div class="history-topic">' + escapeHtml(h.topic) + '</div>';
+    html += '<div style="flex:1;min-width:0"><div class="history-meta"><div class="history-meta-inner"><span class="history-type">' + typeName + '</span><span class="history-time">' + h.time + '</span></div></div>';
+    html += '<div class="history-topic">' + escapeHtml(h.topic) + '</div></div>';
+    html += '<button class="history-del" onclick="event.stopPropagation();confirmDeleteHistory(' + i + ')">删除</button>';
     html += '</div>';
   }
   list.innerHTML = html;
+}
+
+function confirmDeleteHistory(index){
+  var data = loadData();
+  var h = data.history[index];
+  if(!h) return;
+  var typeName = h.type;
+  for(var j = 0; j < MEETING_TYPES.length; j++){
+    if(MEETING_TYPES[j].id === h.type){typeName = MEETING_TYPES[j].name;break;}
+  }
+  var overlay = document.createElement('div');
+  overlay.className = 'history-confirm-overlay';
+  overlay.innerHTML = '<div class="history-confirm-box">' +
+    '<div class="history-confirm-msg">确定删除这条记录吗？<br><span style="font-size:0.82rem;color:#999">' + escapeHtml(h.topic) + '</span></div>' +
+    '<div class="history-confirm-btns">' +
+    '<button class="history-confirm-cancel" onclick="closeDeleteConfirm()">取消</button>' +
+    '<button class="history-confirm-ok" onclick="doDeleteHistory(' + index + ')">删除</button>' +
+    '</div></div>';
+  document.body.appendChild(overlay);
+}
+
+function closeDeleteConfirm(){
+  var overlay = document.querySelector('.history-confirm-overlay');
+  if(overlay) overlay.remove();
+}
+
+function doDeleteHistory(index){
+  var data = loadData();
+  if(data.history && data.history.length > index){
+    data.history.splice(index, 1);
+    saveData(data);
+  }
+  closeDeleteConfirm();
+  renderHistory();
+  showToast('已删除');
 }
 
 function viewHistory(index){
