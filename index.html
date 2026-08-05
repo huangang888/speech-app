@@ -558,6 +558,7 @@ body{
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
 </head>
 <body>
 
@@ -1907,7 +1908,43 @@ function handleFileUpload(event){
     };
     reader.readAsArrayBuffer(file);
   }else if(ext === 'pdf'){
-    showToast('PDF暂不支持直接解析，请复制粘贴内容');
+    if(typeof pdfjsLib === 'undefined'){
+      showToast('PDF解析库加载中，请稍后再试或粘贴内容');
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e){
+      var arrayBuffer = e.target.result;
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+      pdfjsLib.getDocument({data: arrayBuffer}).promise.then(function(pdf){
+        var pages = pdf.numPages;
+        var texts = [];
+        var readPage = function(i){
+          if(i > pages){
+            var full = texts.join('\n');
+            document.getElementById('refText').value = full;
+            updateRefWordCount();
+            saveRecentRef(file.name, full);
+            showToast('PDF已解析，共' + pages + '页');
+            return;
+          }
+          pdf.getPage(i).then(function(page){
+            page.getTextContent().then(function(content){
+              var s = '';
+              for(var k = 0; k < content.items.length; k++){
+                s += content.items[k].str + ' ';
+              }
+              texts.push(s);
+              readPage(i + 1);
+            }).catch(function(){ readPage(i + 1); });
+          }).catch(function(){ readPage(i + 1); });
+        };
+        readPage(1);
+      }).catch(function(err){
+        showToast('PDF解析失败，请复制粘贴内容');
+      });
+    };
+    reader.readAsArrayBuffer(file);
   }else{
     showToast('不支持的文件格式，请上传txt或docx');
   }
