@@ -478,12 +478,34 @@ body{
 
 /* Recent Refs */
 .recent-ref-title{
-  font-size:0.78rem;
-  color:var(--text-light);
+  font-size:0.84rem;
+  color:var(--primary);
+  font-weight:600;
   margin-bottom:6px;
   display:flex;
   align-items:center;
   gap:4px;
+}
+.recent-ref-clear{
+  font-size:0.72rem;
+  color:var(--text-light);
+  font-weight:400;
+  cursor:pointer;
+  padding:1px 6px;
+  border:1px solid var(--border);
+  border-radius:4px;
+  -webkit-tap-highlight-color:transparent;
+}
+.recent-ref-clear:active{background:rgba(204,0,0,0.08);color:#c00;border-color:#c00;}
+.recent-ref-time{
+  font-size:0.7rem;
+  color:#b0a08a;
+  margin-left:6px;
+}
+.recent-ref-empty{
+  font-size:0.78rem;
+  color:var(--text-light);
+  padding:8px 4px;
 }
 .recent-ref-item{
   display:flex;
@@ -585,10 +607,14 @@ body{
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <input type="file" id="fileInput" accept=".txt,.docx,.pdf,.doc" style="display:none;" onchange="handleFileUpload(event)">
         <button class="btn btn-outline btn-sm" onclick="document.getElementById('fileInput').click()" style="flex-shrink:0;">选择文件</button>
+        <button class="btn btn-outline btn-sm" onclick="toggleRecentPanel()" style="flex-shrink:0;">最近文件</button>
         <span id="fileName" style="font-size:0.82rem;color:var(--text-light);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">未选择文件</span>
         <button id="clearFileBtn" class="btn btn-outline btn-sm" onclick="clearRefFile()" style="flex-shrink:0;display:none;color:#c00;border-color:#c00;">清除</button>
       </div>
-      <div id="recentRefList" style="margin-top:8px;display:none;"></div>
+      <div id="recentRefPanel" style="margin-top:8px;">
+        <div class="recent-ref-title">最近文件 <span id="recentCount"></span><span style="flex:1;"></span><span class="recent-ref-clear" onclick="clearRecentRefs()">清空</span></div>
+        <div id="recentRefList"></div>
+      </div>
 <textarea class="text-input" id="refText" placeholder="或直接粘贴参考资料内容..." style="margin-top:8px;min-height:80px;resize:vertical;" oninput="updateRefWordCount()"></textarea>
       <span class="input-hint" id="refWordCount" style="margin-top:2px;display:block;">已输入 0 字</span>
     </div>
@@ -1906,7 +1932,7 @@ function saveRecentRef(name, content){
     if(refs[i].name === name){ refs.splice(i, 1); break; }
   }
   refs.unshift({ name: name, content: content, time: Date.now() });
-  if(refs.length > 10) refs = refs.slice(0, 10);
+  if(refs.length > 30) refs = refs.slice(0, 30);
   saveRecentRefData(refs);
   renderRecentRefs();
 }
@@ -1935,23 +1961,57 @@ function loadRecentRef(index){
 
 function renderRecentRefs(){
   var refs = getRecentRefs();
-  var container = document.getElementById('recentRefList');
+  var list = document.getElementById('recentRefList');
+  var cnt = document.getElementById('recentCount');
+  if(cnt) cnt.textContent = '(' + refs.length + ')';
   if(!refs || refs.length === 0){
-    container.style.display = 'none';
+    if(list) list.innerHTML = '<div class="recent-ref-empty">暂无最近文件。上传文件或粘贴资料后会自动记录，下次点一下即可载入。</div>';
     return;
   }
-  container.style.display = 'block';
-  var html = '<div class="recent-ref-title">最近使用的资料（点击快速载入）</div>';
+  var html = '';
   for(var i = 0; i < refs.length; i++){
     var r = refs[i];
-    var preview = r.content.substring(0, 40).replace(/[\n\r]/g, ' ');
+    var preview = (r.content || '').substring(0, 40).replace(/[\n\r]/g, ' ');
+    var timeText = formatRefTime(r.time);
     html += '<div class="recent-ref-item" onclick="loadRecentRef(' + i + ')">';
     html += '<div style="flex:1;overflow:hidden;"><div class="recent-ref-name">' + escapeHtml(r.name) + '</div>';
-    html += '<div class="recent-ref-preview">' + escapeHtml(preview) + '...</div></div>';
+    html += '<div class="recent-ref-preview">' + escapeHtml(preview) + (timeText ? '<span class="recent-ref-time">' + timeText + '</span>' : '') + '</div></div>';
     html += '<button class="recent-ref-del" onclick="event.stopPropagation();deleteRecentRef(' + i + ')" style="margin-left:8px;">删除</button>';
     html += '</div>';
   }
-  container.innerHTML = html;
+  list.innerHTML = html;
+}
+
+function toggleRecentPanel(){
+  var panel = document.getElementById('recentRefPanel');
+  if(panel.style.display === 'none'){
+    panel.style.display = 'block';
+    renderRecentRefs();
+  }else{
+    panel.style.display = 'none';
+  }
+}
+
+function clearRecentRefs(){
+  if(!confirm('确认清空全部最近文件？')) return;
+  localStorage.removeItem('speech_app_recent_refs');
+  renderRecentRefs();
+  showToast('已清空最近文件');
+}
+
+function formatRefTime(ts){
+  if(!ts) return '';
+  var d = new Date(ts);
+  var now = new Date();
+  var diff = now.getTime() - d.getTime();
+  var min = Math.floor(diff/60000);
+  if(min < 1) return '刚刚';
+  if(min < 60) return min + '分钟前';
+  var hr = Math.floor(min/60);
+  if(hr < 24) return hr + '小时前';
+  var day = Math.floor(hr/24);
+  if(day < 30) return day + '天前';
+  return (d.getMonth()+1) + '月' + d.getDate() + '日';
 }
 
 function updateRefWordCount(){
