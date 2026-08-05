@@ -343,6 +343,13 @@ body{
   -webkit-tap-highlight-color:transparent;
 }
 .history-del:active{background:rgba(204,0,0,0.08);}
+.history-check{
+  width:22px;height:22px;border:2px solid var(--border);
+  border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:0.8rem;color:#fff;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.history-check.checked{background:var(--primary);border-color:var(--primary);}
 .history-meta{
   display:flex;
   justify-content:space-between;
@@ -617,7 +624,14 @@ body{
 <!-- History Page -->
 <div class="page" id="page-history">
   <div class="card" id="historyCard">
-    <div class="section-title">历史发言</div>
+    <div class="section-title" style="display:flex;justify-content:space-between;align-items:center;">
+      <span>历史发言</span>
+      <button id="manageBtn" class="btn btn-outline btn-sm" onclick="toggleHistoryManage()" style="flex-shrink:0;">管理</button>
+    </div>
+    <div id="historyToolbar" style="display:none;gap:8px;margin:0 0 10px;align-items:center;">
+      <button id="selectAllBtn" class="btn btn-outline btn-sm" onclick="toggleSelectAll()" style="flex-shrink:0;">全选</button>
+      <button id="batchDelBtn" class="btn btn-outline btn-sm" onclick="batchDeleteHistory()" style="color:#c00;border-color:#c00;flex:1;">删除选中(0)</button>
+    </div>
     <div id="historyList">
       <div class="welcome">
         <div class="welcome-text">暂无历史记录</div>
@@ -738,6 +752,9 @@ var state = {
   meetingType:'',
   speechMode:'',
   topic:'',
+  historyManage:false,
+  selectedHistory:{},
+
   note:'',
   result:null,
   currentPage:'generate',
@@ -1050,6 +1067,10 @@ function renderHistory(){
   var data = loadData();
   var list = document.getElementById('historyList');
   if(!data.history || data.history.length === 0){
+    state.historyManage = false;
+    state.selectedHistory = {};
+    var mb = document.getElementById('manageBtn'); if(mb){mb.textContent = '管理';}
+    var tb = document.getElementById('historyToolbar'); if(tb){tb.style.display = 'none';}
     list.innerHTML = '<div class="welcome"><div class="welcome-text">暂无历史记录</div></div>';
     return;
   }
@@ -1060,15 +1081,88 @@ function renderHistory(){
     for(var j = 0; j < MEETING_TYPES.length; j++){
       if(MEETING_TYPES[j].id === h.type){typeName = MEETING_TYPES[j].name;break;}
     }
+    var isCheck = state.selectedHistory[h.id] ? ' checked' : '';
     html += '<div class="history-item">';
-    html += '<div class="history-item-main" onclick="viewHistory(' + i + ')">';
+    if(state.historyManage){
+      html += '<div class="history-check' + isCheck + '" onclick="toggleSelect(' + h.id + ')">' + (state.selectedHistory[h.id] ? '&#10003;' : '') + '</div>';
+      html += '<div class="history-item-main" onclick="toggleSelect(' + h.id + ')">';
+    }else{
+      html += '<div class="history-item-main" onclick="viewHistory(' + i + ')">';
+    }
     html += '<div class="history-meta"><span class="history-type">' + typeName + '</span><span class="history-time">' + h.time + '</span></div>';
     html += '<div class="history-topic">' + escapeHtml(h.topic) + '</div>';
     html += '</div>';
-    html += '<button class="history-del" onclick="event.stopPropagation();deleteHistory(' + i + ')">删除</button>';
+    if(!state.historyManage){
+      html += '<button class="history-del" onclick="event.stopPropagation();deleteHistory(' + i + ')">删除</button>';
+    }
     html += '</div>';
   }
   list.innerHTML = html;
+  updateSelectAllBtn();
+  updateDeleteBtn();
+}
+
+// ===== 历史记录批量管理 =====
+function toggleHistoryManage(){
+  state.historyManage = !state.historyManage;
+  state.selectedHistory = {};
+  var manageBtn = document.getElementById('manageBtn');
+  var toolbar = document.getElementById('historyToolbar');
+  if(manageBtn){manageBtn.textContent = state.historyManage ? '完成' : '管理';}
+  if(toolbar){toolbar.style.display = state.historyManage ? 'flex' : 'none';}
+  renderHistory();
+}
+
+function toggleSelect(id){
+  if(state.selectedHistory[id]){
+    delete state.selectedHistory[id];
+  }else{
+    state.selectedHistory[id] = true;
+  }
+  renderHistory();
+}
+
+function toggleSelectAll(){
+  var data = loadData();
+  var list = data.history || [];
+  var ids = [];
+  for(var i = 0; i < list.length; i++){ids.push(list[i].id);}
+  var allSelected = ids.length > 0 && ids.every(function(id){return !!state.selectedHistory[id];});
+  state.selectedHistory = {};
+  if(!allSelected){
+    for(var j = 0; j < ids.length; j++){state.selectedHistory[ids[j]] = true;}
+  }
+  renderHistory();
+}
+
+function batchDeleteHistory(){
+  var n = Object.keys(state.selectedHistory).length;
+  if(n === 0){ showToast('请先勾选要删除的记录'); return; }
+  if(!confirm('确认删除选中的 ' + n + ' 条历史记录？此操作不可恢复。')) return;
+  var data = loadData();
+  var ids = {};
+  for(var k in state.selectedHistory){ids[k] = true;}
+  data.history = data.history.filter(function(h){ return !ids[h.id]; });
+  saveData(data);
+  state.selectedHistory = {};
+  renderHistory();
+  showToast('已删除 ' + n + ' 条记录');
+}
+
+function updateSelectAllBtn(){
+  var data = loadData();
+  var list = data.history || [];
+  var ids = [];
+  for(var i = 0; i < list.length; i++){ids.push(list[i].id);}
+  var allSelected = ids.length > 0 && ids.every(function(id){return !!state.selectedHistory[id];});
+  var btn = document.getElementById('selectAllBtn');
+  if(btn){btn.textContent = allSelected ? '取消全选' : '全选';}
+}
+
+function updateDeleteBtn(){
+  var n = Object.keys(state.selectedHistory).length;
+  var btn = document.getElementById('batchDelBtn');
+  if(btn){btn.textContent = '删除选中(' + n + ')';}
 }
 
 function viewHistory(index){
