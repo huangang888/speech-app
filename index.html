@@ -554,6 +554,8 @@ body{
   <div class="card" id="card-type">
     <div class="section-title">选择会议类型</div>
     <div class="type-grid" id="typeGrid"></div>
+    <div class="section-title" style="margin-top:6px;">本次发言目的 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（可选，自动判断更省心）</span></div>
+    <div class="type-grid" id="modeGrid"></div>
   </div>
 
   <!-- Step 2: Topic -->
@@ -717,9 +719,24 @@ var MEETING_TYPES = [
   {id:'tigang',name:'发言方向提纲',icon:'纲'}
 ];
 
+// ===== 发言目的（结构模式，源自《提高会议发言水平的9个公式》） =====
+var SPEECH_MODES = [
+  {id:'',      name:'自动判断',   icon:'智', struct:''},
+  {id:'jixi',     name:'即席发言',   icon:'即', struct:'【发言任务：即席发言，结论先行】\n  1. 亮明观点：第一句话就亮出最核心最鲜明的观点，压缩成一句话，不绕弯\n  2. 说清理由：用2-3条简短有力的理由支撑，每句有分量\n  3. 举出实例：用一个具体鲜活的实例印证，让观点落地'},
+  {id:'huibao',   name:'工作汇报',   icon:'报', struct:'【发言任务：工作汇报，完整清晰】\n  1. 交代背景：先讲清面对什么情况、什么任务背景\n  2. 讲清行动：再说做了什么、怎么做的\n  3. 亮出结果：给出具体可量化的结果和成效\n  4. 点出不足：坦诚指出问题不足，并提出下一步打算'},
+  {id:'xietiao',  name:'请求配合协调', icon:'协', struct:'【发言任务：跨部门协调，消除对立】\n  1. 明确目标：先拉近距离，强调我们有一个共同的目标\n  2. 陈述事实：摆出客观事实，不指责不推诿\n  3. 提出请求：清晰提出需要对方配合的具体事项'},
+  {id:'jianyi',   name:'提出建议',   icon:'议', struct:'【发言任务：提出建议，问题导向】\n  1. 指出痛点：先点出真实存在的问题和痛点，这是建议的根基\n  2. 给出方案：给出具体可操作的解决方案，说清怎么落地\n  3. 说明好处：讲清楚采纳建议能带来什么好处、解决什么问题'},
+  {id:'jingcai',  name:'讲得精彩',   icon:'彩', struct:'【发言任务：讲得精彩，点线面结合】\n  1. 引用数据：用精确的数据作为"点"，增强说服力\n  2. 讲述案例：讲一个有起承转合的故事作为"线"，营造画面感\n  3. 提炼金句：用高度概括的金句作为"面"，升华主题，让人记住'},
+  {id:'biaotai',  name:'表态发言',   icon:'表', struct:'【发言任务：表态发言，既有态度又有行动】\n  1. 肯定上级：真诚认可上级精神，不谄媚不空洞\n  2. 结合自身：把上级精神与自身实际结合，体现听进去了\n  3. 表态落实：给出具体可落地的行动承诺，让领导看到你懂了、会做'},
+  {id:'yaoziyuan', name:'争取资源支持', icon:'源', struct:'【发言任务：争取资源，带着方案去】\n  1. 说明困难：讲清真实困难，用数据让人感同身受\n  2. 提出方案：带着解决方案去要，说明方案怎么落地、具体需要什么支持\n  3. 争取支持：站在合作角度，强调共同目标，让对方愿意支持'},
+  {id:'mingan',   name:'敏感事项决策', icon:'慎', struct:'【发言任务：敏感事项，风险前置】\n  1. 评估风险：先讲清可能的风险和各方反应，谋胜先谋败\n  2. 提出预案：给出应对预案和备选方案\n  3. 请示决策：把决策权交给领导，责任边界清晰，不推诿不越位'},
+  {id:'zhuchi',   name:'会议主持收口', icon:'主', struct:'【发言任务：会议主持收口】\n  1. 倾听归纳：从各方发言中提炼共识和要害\n  2. 归纳共识：给出大家服气的结论，明确达成的共识\n  3. 推动落实：明确谁做什么、何时完成，推动往前走'}
+];
+
 // ===== 状态 =====
 var state = {
   meetingType:'',
+  speechMode:'',
   topic:'',
   note:'',
   result:null,
@@ -958,6 +975,31 @@ function renderTypeGrid(){
   grid.innerHTML = html;
 }
 
+function renderModeGrid(){
+  var grid = document.getElementById('modeGrid');
+  var html = '';
+  for(var i = 0; i < SPEECH_MODES.length; i++){
+    var t = SPEECH_MODES[i];
+    var key = t.id === '' ? 'auto' : t.id;
+    var sel = state.speechMode === t.id ? ' selected' : '';
+    html += '<button class="type-btn mode-btn' + sel + '" onclick="selectMode(\'' + key + '\')" data-mode="' + key + '">' + t.name + '</button>';
+  }
+  grid.innerHTML = html;
+}
+
+function selectMode(key){
+  state.speechMode = (key === 'auto') ? '' : key;
+  var btns = document.querySelectorAll('.mode-btn');
+  for(var i = 0; i < btns.length; i++){
+    var btn = btns[i];
+    if(btn.getAttribute('data-mode') === key){
+      btn.classList.add('selected');
+    }else{
+      btn.classList.remove('selected');
+    }
+  }
+}
+
 function selectType(typeId){
   // 切换会议类型时清除参考资料
   if(state.meetingType && state.meetingType !== typeId){
@@ -1143,6 +1185,20 @@ function buildPrompt(){
     if(MEETING_TYPES[i].id === state.meetingType){typeName = MEETING_TYPES[i].name;break;}
   }
 
+  // 发言目的结构模式
+  var structText = '';
+  var modeName = '';
+  for(var si = 0; si < SPEECH_MODES.length; si++){
+    if(SPEECH_MODES[si].id === state.speechMode){
+      modeName = SPEECH_MODES[si].name;
+      structText = SPEECH_MODES[si].struct;
+      break;
+    }
+  }
+  if(modeName){
+    structText = '本次发言任务：' + modeName + '。\n' + structText;
+  }
+
   var noteText = state.note ? '\n补充说明：' + state.note : '';
   var audienceText = document.getElementById('audienceInput').value.trim();
   var audienceSection = audienceText ? '\n与会听众：' + audienceText : '';
@@ -1210,8 +1266,9 @@ function buildPrompt(){
       '【写作要求——请逐条遵循】\n\n' +
       '一、标题：必须用比喻或拟人手法，对仗工整，让人过目不忘。\n\n' +
       '二、开头：根据听众信息，先对与会人员进行真诚自然的问候，营造现场感和带入感，让人心入身入。然后一两句话切入主题。\n' +
-      '三、正文：自然分为三个层次（感受→认识→建议），不用"一、二、三"标注，用空行自然过渡。\n' +
-      '   每个层次提炼一个核心观点，用排比句或对仗句作为点睛之笔。\n\n' +
+      '三、正文：' + (structText
+        ? '严格按以下结构主线组织发言，作为逻辑主干，但不要用"1、2、3"标注，用空行自然过渡，语言保持鲜活有文采：\n' + structText
+        : '自然分为三个层次（感受→认识→建议），不用"一、二、三"标注，用空行自然过渡。\n   每个层次提炼一个核心观点，用排比句或对仗句作为点睛之笔。') + '\n\n' +
       '四、语言：\n' +
       '   · 多用排比句、对仗句、四字短语，节奏铿锵有力\n' +
       '   · 每200字左右插入一句金句（自创的或化用的）\n' +
@@ -1288,8 +1345,9 @@ function buildPrompt(){
     '一、标题：必须用比喻或拟人手法，对仗工整，如"以文铸魂，以文化人""根深叶茂，源远流长"。\n' +
     '   标题要让人过目不忘，有自己的创造，不要套用常见句式。\n\n' +
     '二、开头：' + (audienceText ? '先对与会人员进行真诚亲切的问候，营造现场感和带入感，让人心入身入。问候要自然温暖，不生硬不客套，像老朋友见面般亲切。然后一两句话切入主题。' : '开门见山，真诚自然，一两句话切入主题，不铺垫不客套。') + '\n\n' +
-    '三、正文：自然分为三个层次（感受→认识→建议），不用"一、二、三"标注，用空行自然过渡。\n' +
-    '   每个层次提炼一个核心观点，用一句精炼的排比句或对仗句作为该层次的点睛之笔。\n\n' +
+    '三、正文：' + (structText
+      ? '严格按以下结构主线组织发言，作为逻辑主干，但不要用"1、2、3"标注，用空行自然过渡，语言保持鲜活有文采：\n' + structText
+      : '自然分为三个层次（感受→认识→建议），不用"一、二、三"标注，用空行自然过渡。\n   每个层次提炼一个核心观点，用一句精炼的排比句或对仗句作为该层次的点睛之笔。') + '\n\n' +
     '四、语言：\n' +
     '   · 多用排比句、对仗句、四字短语，节奏铿锵有力\n' +
     '   · 每200字左右插入一句金句（自创的或化用的，不要堆砌名言）\n' +
@@ -1374,7 +1432,7 @@ function callAI(apiKey){
   var body = JSON.stringify({
     model:state.model || 'deepseek-reasoner',
     messages:[
-      {role:'system',content:'你是一位顶级发言撰稿人和思想顾问。你能根据不同会议类型和发言人身份，撰写高质量的会议发言稿或提炼发言方向提纲。你的核心理念：大秘的逻辑、诗人的情怀、专家的严谨、学者的钻研。标题比喻化对仗工整，观点深刻独到，语言简洁有力，金句自然点睛。根据任务要求灵活切换角色——有时是黄主任的专属撰稿人，有时是通用场景的高级撰稿人，有时是提炼观点的思想顾问。'},
+      {role:'system',content:'你是一位顶级发言撰稿人和思想顾问。你能根据不同会议类型和发言人身份，撰写高质量的会议发言稿或提炼发言方向提纲。你的核心理念：大秘的逻辑、诗人的情怀、专家的严谨、学者的钻研。标题比喻化对仗工整，观点深刻独到，语言简洁有力，金句自然点睛。根据任务要求灵活切换角色——有时是黄主任的专属撰稿人，有时是通用场景的高级撰稿人，有时是提炼观点的思想顾问。当用户指出本次发言目的时，需按对应的结构逻辑组织发言（结论先行、问题导向、风险前置、交换思维等），让发言有理有据、重点突出。'},
       {role:'user',content:prompt}
     ],
     temperature:0.5,
@@ -1678,6 +1736,7 @@ function formatDate(){
 // ===== 初始化 =====
 function init(){
   renderTypeGrid();
+  renderModeGrid();
   loadSettings();
   renderRecentRefs();
 
