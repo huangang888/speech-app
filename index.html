@@ -486,6 +486,7 @@ body{
 </style>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js"></script>
 </head>
 <body>
 
@@ -513,11 +514,18 @@ body{
     <div class="type-grid" id="typeGrid"></div>
     <div class="section-title" style="margin-top:6px;">发言目的 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（可选，自动判断更省心）</span></div>
     <div class="type-grid" id="modeGrid"></div>
+    <label style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
+      <input type="checkbox" id="wenhuaToggle" onchange="toggleWenhua()" style="width:16px;height:16px;accent-color:var(--primary);"> 加强文史素材（湘军故里、龙山文化、湄江风光等）
+    </label>
   </div>
 
   <!-- Step 2: Topic -->
   <div class="card" id="card-topic">
     <div class="section-title">发言主题</div>
+    <div style="display:flex;gap:6px;margin-bottom:8px;align-items:center;">
+      <button class="btn btn-outline btn-sm" onclick="saveTemplate()" style="flex-shrink:0;">存为模板</button>
+      <select id="templateSelect" class="text-input" onchange="applyTemplate(this.value)" style="flex:1;min-width:0;"><option value="">我的模板</option></select>
+    </div>
     <div class="input-group">
       <label class="input-label">会议主题或关键词 <span class="input-hint">（如"文化传承与创新"）</span></label>
       <input type="text" class="text-input" id="topicInput" placeholder="请输入发言主题...">
@@ -540,6 +548,8 @@ body{
       </div>
 <textarea class="text-input" id="refText" placeholder="或直接粘贴参考资料内容..." style="margin-top:8px;min-height:80px;resize:vertical;" oninput="updateRefWordCount()"></textarea>
       <span class="input-hint" id="refWordCount" style="margin-top:2px;display:block;">已输入 0 字</span>
+      <input type="text" class="text-input" id="keyDataInput" placeholder="可选：填几个关键数据，如 投入2.3亿、新增就业1200人、同比增长18%..." style="margin-top:8px;" oninput="updateKeyData()">
+      <span class="input-hint" style="margin-top:2px;display:block;">关键数据会真实融入发言，避免空话和编造</span>
     </div>
     <button class="btn btn-primary" id="generateBtn" onclick="handleGenerate()">
       开始生成发言稿
@@ -560,10 +570,20 @@ body{
       <span id="wordCount" style="font-size:0.8rem;color:var(--text-light);"></span>
       <span id="apiUsage" style="font-size:0.8rem;color:var(--text-light);"></span>
     </div>
+    <button id="expandBtn" class="btn btn-primary btn-sm" onclick="expandOutline()" style="display:none;width:100%;margin-bottom:8px;">将提纲扩写成完整发言稿</button>
     <div class="action-bar">
       <button class="btn btn-outline btn-sm" onclick="copySpeech()">复制全文</button>
+      <button class="btn btn-outline btn-sm" onclick="exportDocx()">导出Word</button>
       <button class="btn btn-outline btn-sm" onclick="handleGenerate()">重新生成</button>
-      <button class="btn btn-outline btn-sm" onclick="likeSpeech()" style="color:#2e7d32;border-color:#2e7d32;">满意，保存为范文</button>
+      <button class="btn btn-outline btn-sm" onclick="likeSpeech()" style="color:#2e7d32;border-color:#2e7d32;">满意，存范文</button>
+    </div>
+    <div class="refine-bar" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px;padding-top:8px;border-top:1px dashed var(--border);">
+      <span style="font-size:0.78rem;color:var(--text-light);">精修：</span>
+      <button class="btn btn-outline btn-sm" onclick="quickRefine('精简到六百字左右')">精简</button>
+      <button class="btn btn-outline btn-sm" onclick="quickRefine('换一个更有诗意的比喻标题')">换标题</button>
+      <button class="btn btn-outline btn-sm" onclick="quickRefine('加强情感，增强现场感染力')">加强情感</button>
+      <button class="btn btn-outline btn-sm" onclick="quickRefine('多融入具体数据和实例')">加数据</button>
+      <button class="btn btn-outline btn-sm" onclick="quickRefine('改为更书面、更庄重的语气')">书面语气</button>
     </div>
 
   </div>
@@ -580,6 +600,10 @@ body{
     <div id="historyToolbar" style="display:none;gap:8px;margin:0 0 10px;align-items:center;">
       <button id="selectAllBtn" class="btn btn-outline btn-sm" onclick="toggleSelectAll()" style="flex-shrink:0;">全选</button>
       <button id="batchDelBtn" class="btn btn-outline btn-sm" onclick="batchDeleteHistory()" style="color:#c00;border-color:#c00;flex:1;">删除选中(0)</button>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;">
+      <input type="text" class="text-input" id="historySearch" placeholder="搜索发言主题..." style="flex:1;" oninput="renderHistory()">
+      <select class="text-input" id="historyTypeFilter" onchange="renderHistory()" style="width:auto;flex-shrink:0;max-width:110px;"><option value="">全部类型</option></select>
     </div>
     <div id="historyList">
       <div class="welcome">
@@ -651,6 +675,14 @@ body{
     </div>
     <div id="exportInfo" style="font-size:0.78rem;color:var(--text-light);margin-top:8px;"></div>
   </div>
+
+  <!-- 我的范文 -->
+  <div class="card" id="card-liked">
+    <div class="section-title">我的范文</div>
+    <div id="likedList">
+      <div class="welcome" style="padding:12px;text-align:center;">暂无范文，生成满意后点"满意，存范文"即可收藏</div>
+    </div>
+  </div>
 </div>
 
 <!-- Footer -->
@@ -707,8 +739,20 @@ var state = {
   note:'',
   result:null,
   currentPage:'generate',
-  model:'deepseek-v4-pro'
+  model:'deepseek-v4-pro',
+  refine:'',
+  streamUsage:null,
+  keyData:'',
+  wenhuaStrengthen:false
 };
+
+var SYSTEM_PROMPT = '你是一位顶级发言撰稿人和思想顾问。你能根据不同会议类型和发言人身份，撰写高质量的会议发言稿或提炼发言方向提纲。你的核心理念：大秘的逻辑、诗人的情怀、专家的严谨、学者的钻研。标题比喻化对仗工整，观点深刻独到，语言简洁有力，金句自然点睛。根据任务要求灵活切换角色——有时是黄主任的专属撰稿人，有时是通用场景的高级撰稿人，有时是提炼观点的思想顾问。当用户指出发言目的时，需按对应的结构逻辑组织发言（结论先行、问题导向、风险前置、交换思维等），让发言有理有据、重点突出。';
+var COST_PER_MIL = { 'deepseek-v4-pro': 6, 'deepseek-v4-flash': 1.2 };
+var typeTemps = { 'wenhua':0.8, 'qingdian':0.85, 'kaocha':0.5, 'xuexi':0.4, 'dongyuan':0.6, 'diaoyan':0.5, 'jiandu':0.4, 'biaotai':0.3, 'qita':0.5, 'tigang':0.5 };
+function getScenarioTemp(){
+  return typeTemps[state.meetingType] || 0.5;
+}
+function estimateTokens(text){ return Math.round(text.length / 1.5) + 200; }
 
 // ===== 数据存储 =====
 function loadData(){
@@ -1015,6 +1059,8 @@ function clearRefFile(){
 function renderHistory(){
   var data = loadData();
   var list = document.getElementById('historyList');
+  var kw = (document.getElementById('historySearch') ? document.getElementById('historySearch').value : '').trim().toLowerCase();
+  var tf = document.getElementById('historyTypeFilter') ? document.getElementById('historyTypeFilter').value : '';
   if(!data.history || data.history.length === 0){
     state.historyManage = false;
     state.selectedHistory = {};
@@ -1023,9 +1069,21 @@ function renderHistory(){
     list.innerHTML = '<div class="welcome"><div class="welcome-text">暂无历史记录</div></div>';
     return;
   }
-  var html = '';
+  var filtered = [];
   for(var i = 0; i < data.history.length; i++){
     var h = data.history[i];
+    if(tf && h.type !== tf) continue;
+    if(kw && (h.topic || '').toLowerCase().indexOf(kw) === -1) continue;
+    filtered.push({orig: i, h: h});
+  }
+  if(filtered.length === 0){
+    list.innerHTML = '<div class="welcome" style="padding:20px;text-align:center;">当前条件没有匹配的记录</div>';
+    return;
+  }
+  var html = '';
+  for(var i = 0; i < filtered.length; i++){
+    var orig = filtered[i].orig;
+    var h = filtered[i].h;
     var typeName = h.type;
     for(var j = 0; j < MEETING_TYPES.length; j++){
       if(MEETING_TYPES[j].id === h.type){typeName = MEETING_TYPES[j].name;break;}
@@ -1036,19 +1094,29 @@ function renderHistory(){
       html += '<div class="history-check' + isCheck + '" onclick="toggleSelect(' + h.id + ')">' + (state.selectedHistory[h.id] ? '&#10003;' : '') + '</div>';
       html += '<div class="history-item-main" onclick="toggleSelect(' + h.id + ')">';
     }else{
-      html += '<div class="history-item-main" onclick="viewHistory(' + i + ')">';
+      html += '<div class="history-item-main" onclick="viewHistory(' + orig + ')">';
     }
     html += '<div class="history-meta"><span class="history-type">' + typeName + '</span><span class="history-time">' + h.time + '</span></div>';
     html += '<div class="history-topic">' + escapeHtml(h.topic) + '</div>';
     html += '</div>';
     if(!state.historyManage){
-      html += '<button class="history-del" onclick="event.stopPropagation();deleteHistory(' + i + ')">删除</button>';
+      html += '<button class="history-del" onclick="event.stopPropagation();deleteHistory(' + orig + ')">删除</button>';
     }
     html += '</div>';
   }
   list.innerHTML = html;
   updateSelectAllBtn();
   updateDeleteBtn();
+}
+
+function initHistoryFilter(){
+  var sel = document.getElementById('historyTypeFilter');
+  if(!sel) return;
+  var html = '<option value="">全部类型</option>';
+  for(var i = 0; i < MEETING_TYPES.length; i++){
+    html += '<option value="' + MEETING_TYPES[i].id + '">' + MEETING_TYPES[i].name + '</option>';
+  }
+  sel.innerHTML = html;
 }
 
 // ===== 历史记录批量管理 =====
@@ -1189,7 +1257,7 @@ function switchTab(page){
   for(var j = 0; j < tabs.length; j++) tabs[j].classList.remove('active');
   document.querySelector('[data-page="' + page + '"]').classList.add('active');
   if(page === 'history') renderHistory();
-  if(page === 'settings') renderStats();
+  if(page === 'settings'){ renderStats(); renderLiked(); }
 }
 
 // ===== 生成 =====
@@ -1264,6 +1332,19 @@ function buildPrompt(){
 
   // ===== 发言方向提纲（特殊模式） =====
   if(state.meetingType === 'tigang'){
+    if(state.refine === '扩写'){
+      return '你是一位顶级发言撰稿人。请根据以下发言方向提纲，扩写为一篇完整、有血有肉的会议发言稿。\n\n' +
+      '【原始提纲】\n' + (state.result || state.topic) + '\n\n' +
+      '【扩写要求】\n' +
+      '1. 保持原提纲的核心观点不变，不要删改观点主旨\n' +
+      '2. 为每个观点补充充分的论述、具体事例、数据支撑和生动语言\n' +
+      '3. 结构完整：标题、开场、正文、结尾一应俱全\n' +
+      '4. 多用排比句、对仗句、四字短语，节奏铿锵有力\n' +
+      '5. 每200字左右插入一句金句，升华主题\n' +
+      '6. 不写正确的废话，让人记住一个观点、一句金句、一种感受\n\n' +
+      '【输出格式】\n' +
+      '纯文本，不要markdown符号。第一行是标题（不加书名号），空行后开始正文，段落间空行分隔。';
+    }
     var tigangFeedbackCtx = getFeedbackContext();
     return '你是一位顶级发言撰稿人和思想顾问，擅长为各类会议发言提炼核心观点和金句。\n\n' +
       '═══════════════════════════════════\n' +
@@ -1406,83 +1487,112 @@ function buildPrompt(){
 
 function callAI(apiKey){
   var prompt = buildPrompt();
+  if(state.refine){ prompt += '\n\n【精修要求】用户要求本次重点：' + state.refine; }
+  if(state.keyData){ prompt += '\n\n【关键数据（必须真实融入，不得虚构）】' + state.keyData; }
+  if(state.wenhuaStrengthen){ prompt += '\n\n【文史素材加强】请自然融入湘军故里、龙山文化、湄江风光、涟源风土人情等文史元素，增强文化纵深和历史厚重感。'; }
+  var model = state.model || 'deepseek-v4-pro';
+  var temp = getScenarioTemp();
 
-  var xhr = new XMLHttpRequest();
-  xhr.open('POST', API_URL, true);
-  xhr.setRequestHeader('Content-Type','application/json');
-  xhr.setRequestHeader('Authorization','Bearer ' + apiKey);
-  xhr.timeout = 90000;
+  document.getElementById('loading').classList.add('active');
+  document.getElementById('card-result').style.display = 'block';
+  document.getElementById('resultContent').innerHTML = '<div style="color:var(--text-light);padding:20px;text-align:center;">正在生成，逐字呈现中...</div>';
+  document.getElementById('generateBtn').disabled = true;
 
-  xhr.onload = function(){
-    document.getElementById('loading').classList.remove('active');
-    document.getElementById('generateBtn').disabled = false;
-
-    if(xhr.status === 200){
-      try{
-        var data = JSON.parse(xhr.responseText);
-        var choices = data.choices || [];
-        var first = choices.length > 0 ? choices[0] : null;
-        var msg = first ? (first.message || {}) : {};
-        var content = (msg && msg.content) || '';
-        if(content){
-          state.result = content;
-          // 捕获 API 用量
-          var usage = data.usage || {};
-          var pt = usage.prompt_tokens || 0;
-          var ct = usage.completion_tokens || 0;
-          var total = usage.total_tokens || (pt + ct);
-          var cost = (total / 1000000 * 6).toFixed(4); // V4 Pro: 6元/百万token
-          state.lastUsage = {tokens:total, cost:cost};
-          // 累计使用追踪
-          var cumData = loadData();
-          cumData.cumUsage = cumData.cumUsage || {totalTokens:0, totalCost:0, history:[]};
-          cumData.cumUsage.totalTokens += total;
-          cumData.cumUsage.totalCost += parseFloat(cost);
-          cumData.cumUsage.history.push({time:new Date().toISOString(),tokens:total,cost:parseFloat(cost),type:state.meetingType,topic:state.topic});
-          if(cumData.cumUsage.history.length > 100) cumData.cumUsage.history.shift();
-          saveData(cumData);
-          updateMemory(state.meetingType, state.topic);
-          saveHistory(content);
-          showResult(content);
-        }else{
-          showToast('AI 返回为空，请重试');
-        }
-      }catch(e){
-        showToast('解析结果失败');
-      }
-    }else if(xhr.status === 401){
-      showToast('API Key 无效，请检查设置');
-      switchTab('settings');
-    }else if(xhr.status === 429){
-      showToast('请求过于频繁，请稍后再试');
-    }else{
-      showToast('生成失败: ' + xhr.status);
+  fetch(API_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer ' + apiKey},
+    body: JSON.stringify({
+      model:model,
+      messages:[{role:'system',content:SYSTEM_PROMPT},{role:'user',content:prompt}],
+      temperature:temp,
+      max_tokens:8192,
+      stream:true
+    })
+  }).then(function(resp){
+    if(!resp.ok){
+      document.getElementById('loading').classList.remove('active');
+      document.getElementById('generateBtn').disabled = false;
+      if(resp.status===401){showToast('API Key 无效，请检查设置');switchTab('settings');}
+      else if(resp.status===429){showToast('请求过于频繁，请稍后再试');}
+      else{showToast('生成失败: '+resp.status);}
+      return null;
     }
-  };
-
-  xhr.onerror = function(){
+    return resp.body.getReader();
+  }).then(function(reader){
+    if(!reader) return;
+    var decoder = new TextDecoder();
+    var buffer = '';
+    var full = '';
+    var lastRender = 0;
+    function pump(){
+      reader.read().then(function(result){
+        if(result.done){
+          finishStream(full);
+          return;
+        }
+        buffer += decoder.decode(result.value, {stream:true});
+        var lines = buffer.split('\n');
+        buffer = lines.pop();
+        for(var i=0;i<lines.length;i++){
+          var line = lines[i].trim();
+          if(!line || line.indexOf('data:')!==0) continue;
+          var data = line.substring(5).trim();
+          if(data==='[DONE]') continue;
+          try{
+            var json = JSON.parse(data);
+            var delta = json.choices && json.choices[0] ? json.choices[0].delta : null;
+            if(json.usage && json.usage.total_tokens){ state.streamUsage = json.usage; }
+            if(delta && delta.content){ full += delta.content; }
+          }catch(e){}
+        }
+        var now = Date.now();
+        if(now - lastRender > 120 || full.length < 200){
+          lastRender = now;
+          updateStreamResult(full);
+        }
+        pump();
+      }).catch(function(){
+        document.getElementById('loading').classList.remove('active');
+        document.getElementById('generateBtn').disabled = false;
+        showToast('已接收部分内容');
+      });
+    }
+    pump();
+  }).catch(function(){
     document.getElementById('loading').classList.remove('active');
     document.getElementById('generateBtn').disabled = false;
     showToast('网络错误，请检查网络连接');
-  };
-
-  xhr.ontimeout = function(){
-    document.getElementById('loading').classList.remove('active');
-    document.getElementById('generateBtn').disabled = false;
-    showToast('请求超时，请重试');
-  };
-
-  var body = JSON.stringify({
-    model:state.model || 'deepseek-reasoner',
-    messages:[
-      {role:'system',content:'你是一位顶级发言撰稿人和思想顾问。你能根据不同会议类型和发言人身份，撰写高质量的会议发言稿或提炼发言方向提纲。你的核心理念：大秘的逻辑、诗人的情怀、专家的严谨、学者的钻研。标题比喻化对仗工整，观点深刻独到，语言简洁有力，金句自然点睛。根据任务要求灵活切换角色——有时是黄主任的专属撰稿人，有时是通用场景的高级撰稿人，有时是提炼观点的思想顾问。当用户指出发言目的时，需按对应的结构逻辑组织发言（结论先行、问题导向、风险前置、交换思维等），让发言有理有据、重点突出。'},
-      {role:'user',content:prompt}
-    ],
-    temperature:0.5,
-    max_tokens:8192
   });
+}
 
-  xhr.send(body);
+function updateStreamResult(text){
+  document.getElementById('loading').classList.remove('active');
+  document.getElementById('resultContent').innerHTML = parseSpeech(text);
+  document.getElementById('wordCount').textContent = '共 ' + text.replace(/\s/g,'').length + ' 字';
+}
+
+function finishStream(full){
+  document.getElementById('loading').classList.remove('active');
+  document.getElementById('generateBtn').disabled = false;
+  if(!full){ showToast('AI 返回为空，请重试'); return; }
+  state.result = full;
+  var usage = state.streamUsage || {};
+  var total = usage.total_tokens || estimateTokens(full);
+  var costPer = COST_PER_MIL[state.model || 'deepseek-v4-pro'] || 6;
+  var cost = (total / 1000000 * costPer).toFixed(4);
+  state.lastUsage = {tokens:total, cost:cost};
+  var cumData = loadData();
+  cumData.cumUsage = cumData.cumUsage || {totalTokens:0, totalCost:0, history:[]};
+  cumData.cumUsage.totalTokens += total;
+  cumData.cumUsage.totalCost += parseFloat(cost);
+  cumData.cumUsage.history.push({time:new Date().toISOString(),tokens:total,cost:parseFloat(cost),type:state.meetingType,topic:state.topic});
+  if(cumData.cumUsage.history.length > 100) cumData.cumUsage.history.shift();
+  saveData(cumData);
+  updateMemory(state.meetingType, state.topic);
+  saveHistory(full);
+  showResult(full);
+  state.refine = '';
+  state.streamUsage = null;
 }
 
 function showResult(content){
@@ -1503,6 +1613,8 @@ function showResult(content){
   }
   // 滚动
   document.getElementById('card-result').scrollIntoView({behavior:'smooth'});
+  var expandBtn = document.getElementById('expandBtn');
+  if(expandBtn) expandBtn.style.display = (state.meetingType === 'tigang') ? 'block' : 'none';
 }
 
 function parseSpeech(text){
@@ -1569,6 +1681,153 @@ function parseSpeech(text){
   }
   if(inParagraph){html += '</p>';}
   return html;
+}
+
+function quickRefine(kw){
+  if(!state.result){ showToast('请先生成发言稿，再点精修'); return; }
+  state.refine = kw;
+  showToast('正在按您的要求精修...');
+  handleGenerate();
+}
+
+function updateKeyData(){
+  state.keyData = document.getElementById('keyDataInput').value.trim();
+}
+
+function toggleWenhua(){
+  state.wenhuaStrengthen = document.getElementById('wenhuaToggle').checked;
+}
+
+// ===== 模板 =====
+function getTemplates(){ try{return JSON.parse(localStorage.getItem('speech_app_templates')||'[]');}catch(e){return [];} }
+function saveTemplates(t){ try{localStorage.setItem('speech_app_templates', JSON.stringify(t));}catch(e){} }
+function renderTemplateSelect(){
+  var sel = document.getElementById('templateSelect');
+  if(!sel) return;
+  var tpls = getTemplates();
+  var html = '<option value="">我的模板</option>';
+  for(var i=0;i<tpls.length;i++){ html += '<option value="'+i+'">'+escapeHtml(tpls[i].name)+'</option>'; }
+  sel.innerHTML = html;
+}
+function saveTemplate(){
+  if(!state.meetingType){ showToast('请先选择会议类型'); return; }
+  var name = (state.topic || '我的模板').substring(0,20);
+  var tpls = getTemplates();
+  tpls.unshift({name:name, meetingType:state.meetingType, speechMode:state.speechMode, topic:state.topic, note:state.note});
+  if(tpls.length > 30) tpls = tpls.slice(0,30);
+  saveTemplates(tpls);
+  renderTemplateSelect();
+  showToast('已保存为模板：' + name);
+}
+function applyTemplate(idx){
+  if(idx==='' || idx==='-1') return;
+  var tpls = getTemplates();
+  var t = tpls[parseInt(idx)];
+  if(!t) return;
+  state.meetingType = t.meetingType; selectType(t.meetingType);
+  selectMode(t.speechMode===''?'auto':t.speechMode);
+  document.getElementById('topicInput').value = t.topic || '';
+  document.getElementById('noteInput').value = t.note || '';
+  state.topic = t.topic || '';
+  showToast('已载入模板');
+}
+
+// ===== 提纲扩写 =====
+function expandOutline(){
+  if(!state.result){ showToast('请先生成发言方向提纲'); return; }
+  state.refine = '扩写';
+  showToast('正在扩写成完整发言稿...');
+  handleGenerate();
+}
+
+// ===== 我的范文管理 =====
+function renderLiked(){
+  var data = loadData();
+  var m = data.memory || {};
+  var liked = m.likedSpeeches || [];
+  var list = document.getElementById('likedList');
+  if(!list) return;
+  if(liked.length === 0){
+    list.innerHTML = '<div class="welcome" style="padding:12px;text-align:center;">暂无范文，生成满意后点"满意，存范文"即可收藏</div>';
+    return;
+  }
+  var html = '';
+  for(var i = 0; i < liked.length; i++){
+    var ls = liked[i];
+    var typeName = ls.type;
+    for(var j = 0; j < MEETING_TYPES.length; j++){ if(MEETING_TYPES[j].id === ls.type){ typeName = MEETING_TYPES[j].name; break; } }
+    html += '<div class="history-item">';
+    html += '<div class="history-item-main" onclick="viewLikedSpeech(' + i + ')">';
+    html += '<div class="history-meta"><span class="history-type">' + typeName + '</span><span class="history-time">' + ls.time + '</span></div>';
+    html += '<div class="history-topic">' + escapeHtml(ls.topic) + '</div>';
+    html += '</div>';
+    html += '<button class="history-del" onclick="event.stopPropagation();deleteLiked(' + i + ')">删除</button>';
+    html += '</div>';
+  }
+  list.innerHTML = html;
+}
+function viewLikedSpeech(i){
+  var data = loadData();
+  var liked = (data.memory && data.memory.likedSpeeches) || [];
+  var ls = liked[i];
+  if(!ls) return;
+  state.result = ls.speech;
+  showResult(ls.speech);
+  switchTab('generate');
+}
+function deleteLiked(i){
+  if(!confirm('确认删除这篇范文？')) return;
+  var data = loadData();
+  var liked = (data.memory && data.memory.likedSpeeches) || [];
+  if(i >= 0 && i < liked.length) liked.splice(i, 1);
+  data.memory = data.memory || {};
+  data.memory.likedSpeeches = liked;
+  saveData(data);
+  renderLiked();
+  showToast('已删除范文');
+}
+
+function exportDocx(){
+  if(!state.result){ showToast('请先生成发言稿'); return; }
+  if(typeof docx === 'undefined'){ showToast('Word导出库加载中，请稍后再试'); return; }
+  var lines = state.result.trim().split('\n');
+  var title = (lines[0] || '').replace(/^#+\s*/,'').trim() || '发言稿';
+  var children = [];
+  children.push(new docx.Paragraph({
+    alignment: docx.AlignmentType.CENTER,
+    spacing: {line:600},
+    children: [new docx.TextRun({text: title, font: '方正小标宋简体', size: 44})]
+  }));
+  children.push(new docx.Paragraph({spacing:{line:600}, children:[new docx.TextRun({text:''})]}));
+  for(var i = 1; i < lines.length; i++){
+    var line = lines[i].trim();
+    if(!line){ children.push(new docx.Paragraph({spacing:{line:600}, children:[new docx.TextRun({text:''})]})); continue; }
+    var isH = /^[一二三四五六七八九十]、/.test(line);
+    var isH2 = /^（[一二三四五六七八九十]）/.test(line);
+    var mbold = line.indexOf('【')===0 || line.indexOf('观点')===0;
+    var fname = isH ? '黑体' : (isH2 ? '楷体_GB2312' : '仿宋_GB2312');
+    children.push(new docx.Paragraph({
+      indent: {firstLine: 640},
+      spacing: {line:600},
+      children: [new docx.TextRun({text: line, font: fname, size: 32, bold: mbold})]
+    }));
+  }
+  var docobj = new docx.Document({
+    sections: [{
+      properties: { page: { margin: { top: 1440, bottom: 1440, left: 1440, right: 1440 } } },
+      children: children
+    }]
+  });
+  docx.Packer.toBlob(docobj).then(function(blob){
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = title + '.docx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+    showToast('已导出Word文档');
+  }).catch(function(){ showToast('导出失败，请重试'); });
 }
 
 function copySpeech(){
@@ -1781,6 +2040,8 @@ function init(){
   renderTypeGrid();
   renderModeGrid();
   loadSettings();
+  initHistoryFilter();
+  renderTemplateSelect();
 
   // Tab 切换
   var tabs = document.querySelectorAll('.tab');
