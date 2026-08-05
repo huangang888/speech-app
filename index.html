@@ -515,17 +515,13 @@ body{
     <div class="section-title" style="margin-top:6px;">发言目的 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（可选，自动判断更省心）</span></div>
     <div class="type-grid" id="modeGrid"></div>
     <label style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
-      <input type="checkbox" id="wenhuaToggle" onchange="toggleWenhua()" style="width:16px;height:16px;accent-color:var(--primary);"> 加强文史素材（湘军故里、龙山文化、湄江风光等）
+      <input type="checkbox" id="wenhuaToggle" onchange="toggleWenhua()" style="width:16px;height:16px;accent-color:var(--primary);"> 加强文史素材（围城文化、湘军故里、龙山文化等）
     </label>
   </div>
 
   <!-- Step 2: Topic -->
   <div class="card" id="card-topic">
     <div class="section-title">发言主题</div>
-    <div style="display:flex;gap:6px;margin-bottom:8px;align-items:center;">
-      <button class="btn btn-outline btn-sm" onclick="saveTemplate()" style="flex-shrink:0;">存为模板</button>
-      <select id="templateSelect" class="text-input" onchange="applyTemplate(this.value)" style="flex:1;min-width:0;"><option value="">我的模板</option></select>
-    </div>
     <div class="input-group">
       <label class="input-label">会议主题或关键词 <span class="input-hint">（如"文化传承与创新"）</span></label>
       <input type="text" class="text-input" id="topicInput" placeholder="请输入发言主题...">
@@ -584,6 +580,10 @@ body{
       <button class="btn btn-outline btn-sm" onclick="quickRefine('加强情感，增强现场感染力')">加强情感</button>
       <button class="btn btn-outline btn-sm" onclick="quickRefine('多融入具体数据和实例')">加数据</button>
       <button class="btn btn-outline btn-sm" onclick="quickRefine('改为更书面、更庄重的语气')">书面语气</button>
+      <button class="btn btn-outline btn-sm" onclick="quickRefine('改成更口语、更接地气的讲法')">更接地气</button>
+      <button class="btn btn-outline btn-sm" onclick="quickRefine('调整结构，让逻辑层次更清晰')">改结构</button>
+      <button class="btn btn-outline btn-sm" onclick="quickRefine('增强气势，多用排比和对仗')">增强气势</button>
+      <button class="btn btn-outline btn-sm" onclick="quickRefine('结尾升华，用金句收尾')">升华结尾</button>
     </div>
 
   </div>
@@ -674,14 +674,6 @@ body{
       <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importAllJson(event)">
     </div>
     <div id="exportInfo" style="font-size:0.78rem;color:var(--text-light);margin-top:8px;"></div>
-  </div>
-
-  <!-- 我的范文 -->
-  <div class="card" id="card-liked">
-    <div class="section-title">我的范文</div>
-    <div id="likedList">
-      <div class="welcome" style="padding:12px;text-align:center;">暂无范文，生成满意后点"满意，存范文"即可收藏</div>
-    </div>
   </div>
 </div>
 
@@ -1097,7 +1089,8 @@ function renderHistory(){
       html += '<div class="history-item-main" onclick="viewHistory(' + orig + ')">';
     }
     html += '<div class="history-meta"><span class="history-type">' + typeName + '</span><span class="history-time">' + h.time + '</span></div>';
-    html += '<div class="history-topic">' + escapeHtml(h.topic) + '</div>';
+    var liked = isLiked(h.speech);
+    html += '<div class="history-topic">' + (liked ? '\u2605 ' : '') + escapeHtml(h.topic) + '</div>';
     html += '</div>';
     if(!state.historyManage){
       html += '<button class="history-del" onclick="event.stopPropagation();deleteHistory(' + orig + ')">删除</button>';
@@ -1257,7 +1250,7 @@ function switchTab(page){
   for(var j = 0; j < tabs.length; j++) tabs[j].classList.remove('active');
   document.querySelector('[data-page="' + page + '"]').classList.add('active');
   if(page === 'history') renderHistory();
-  if(page === 'settings'){ renderStats(); renderLiked(); }
+  if(page === 'settings') renderStats();
 }
 
 // ===== 生成 =====
@@ -1489,7 +1482,7 @@ function callAI(apiKey){
   var prompt = buildPrompt();
   if(state.refine){ prompt += '\n\n【精修要求】用户要求本次重点：' + state.refine; }
   if(state.keyData){ prompt += '\n\n【关键数据（必须真实融入，不得虚构）】' + state.keyData; }
-  if(state.wenhuaStrengthen){ prompt += '\n\n【文史素材加强】请自然融入湘军故里、龙山文化、湄江风光、涟源风土人情等文史元素，增强文化纵深和历史厚重感。'; }
+  if(state.wenhuaStrengthen){ prompt += '\n\n【文史素材加强】请自然融入围城文化、湘军故里、龙山文化、湄江风光、涟源风土人情等文史元素，增强文化纵深和历史厚重感。'; }
   var model = state.model || 'deepseek-v4-pro';
   var temp = getScenarioTemp();
 
@@ -1698,93 +1691,18 @@ function toggleWenhua(){
   state.wenhuaStrengthen = document.getElementById('wenhuaToggle').checked;
 }
 
-// ===== 模板 =====
-function getTemplates(){ try{return JSON.parse(localStorage.getItem('speech_app_templates')||'[]');}catch(e){return [];} }
-function saveTemplates(t){ try{localStorage.setItem('speech_app_templates', JSON.stringify(t));}catch(e){} }
-function renderTemplateSelect(){
-  var sel = document.getElementById('templateSelect');
-  if(!sel) return;
-  var tpls = getTemplates();
-  var html = '<option value="">我的模板</option>';
-  for(var i=0;i<tpls.length;i++){ html += '<option value="'+i+'">'+escapeHtml(tpls[i].name)+'</option>'; }
-  sel.innerHTML = html;
-}
-function saveTemplate(){
-  if(!state.meetingType){ showToast('请先选择会议类型'); return; }
-  var name = (state.topic || '我的模板').substring(0,20);
-  var tpls = getTemplates();
-  tpls.unshift({name:name, meetingType:state.meetingType, speechMode:state.speechMode, topic:state.topic, note:state.note});
-  if(tpls.length > 30) tpls = tpls.slice(0,30);
-  saveTemplates(tpls);
-  renderTemplateSelect();
-  showToast('已保存为模板：' + name);
-}
-function applyTemplate(idx){
-  if(idx==='' || idx==='-1') return;
-  var tpls = getTemplates();
-  var t = tpls[parseInt(idx)];
-  if(!t) return;
-  state.meetingType = t.meetingType; selectType(t.meetingType);
-  selectMode(t.speechMode===''?'auto':t.speechMode);
-  document.getElementById('topicInput').value = t.topic || '';
-  document.getElementById('noteInput').value = t.note || '';
-  state.topic = t.topic || '';
-  showToast('已载入模板');
-}
-
 // ===== 提纲扩写 =====
+function isLiked(speech){
+  var data = loadData();
+  var liked = (data.memory && data.memory.likedSpeeches) || [];
+  for(var i = 0; i < liked.length; i++){ if(liked[i].speech === speech) return true; }
+  return false;
+}
 function expandOutline(){
   if(!state.result){ showToast('请先生成发言方向提纲'); return; }
   state.refine = '扩写';
   showToast('正在扩写成完整发言稿...');
   handleGenerate();
-}
-
-// ===== 我的范文管理 =====
-function renderLiked(){
-  var data = loadData();
-  var m = data.memory || {};
-  var liked = m.likedSpeeches || [];
-  var list = document.getElementById('likedList');
-  if(!list) return;
-  if(liked.length === 0){
-    list.innerHTML = '<div class="welcome" style="padding:12px;text-align:center;">暂无范文，生成满意后点"满意，存范文"即可收藏</div>';
-    return;
-  }
-  var html = '';
-  for(var i = 0; i < liked.length; i++){
-    var ls = liked[i];
-    var typeName = ls.type;
-    for(var j = 0; j < MEETING_TYPES.length; j++){ if(MEETING_TYPES[j].id === ls.type){ typeName = MEETING_TYPES[j].name; break; } }
-    html += '<div class="history-item">';
-    html += '<div class="history-item-main" onclick="viewLikedSpeech(' + i + ')">';
-    html += '<div class="history-meta"><span class="history-type">' + typeName + '</span><span class="history-time">' + ls.time + '</span></div>';
-    html += '<div class="history-topic">' + escapeHtml(ls.topic) + '</div>';
-    html += '</div>';
-    html += '<button class="history-del" onclick="event.stopPropagation();deleteLiked(' + i + ')">删除</button>';
-    html += '</div>';
-  }
-  list.innerHTML = html;
-}
-function viewLikedSpeech(i){
-  var data = loadData();
-  var liked = (data.memory && data.memory.likedSpeeches) || [];
-  var ls = liked[i];
-  if(!ls) return;
-  state.result = ls.speech;
-  showResult(ls.speech);
-  switchTab('generate');
-}
-function deleteLiked(i){
-  if(!confirm('确认删除这篇范文？')) return;
-  var data = loadData();
-  var liked = (data.memory && data.memory.likedSpeeches) || [];
-  if(i >= 0 && i < liked.length) liked.splice(i, 1);
-  data.memory = data.memory || {};
-  data.memory.likedSpeeches = liked;
-  saveData(data);
-  renderLiked();
-  showToast('已删除范文');
 }
 
 function exportDocx(){
@@ -2041,7 +1959,6 @@ function init(){
   renderModeGrid();
   loadSettings();
   initHistoryFilter();
-  renderTemplateSelect();
 
   // Tab 切换
   var tabs = document.querySelectorAll('.tab');
