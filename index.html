@@ -573,17 +573,19 @@ body{
       <button class="btn btn-outline btn-sm" onclick="handleGenerate()">重新生成</button>
       <button class="btn btn-outline btn-sm" onclick="likeSpeech()" style="color:#2e7d32;border-color:#2e7d32;">满意，存范文</button>
     </div>
-    <div class="refine-bar" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:10px;padding-top:8px;border-top:1px dashed var(--border);">
-      <span style="font-size:0.78rem;color:var(--text-light);">精修：</span>
-      <button class="btn btn-outline btn-sm" onclick="quickRefine('精简到六百字左右')">精简</button>
-      <button class="btn btn-outline btn-sm" onclick="quickRefine('换一个更有诗意的比喻标题')">换标题</button>
-      <button class="btn btn-outline btn-sm" onclick="quickRefine('加强情感，增强现场感染力')">加强情感</button>
-      <button class="btn btn-outline btn-sm" onclick="quickRefine('多融入具体数据和实例')">加数据</button>
-      <button class="btn btn-outline btn-sm" onclick="quickRefine('改为更书面、更庄重的语气')">书面语气</button>
-      <button class="btn btn-outline btn-sm" onclick="quickRefine('改成更口语、更接地气的讲法')">更接地气</button>
-      <button class="btn btn-outline btn-sm" onclick="quickRefine('调整结构，让逻辑层次更清晰')">改结构</button>
-      <button class="btn btn-outline btn-sm" onclick="quickRefine('增强气势，多用排比和对仗')">增强气势</button>
-      <button class="btn btn-outline btn-sm" onclick="quickRefine('结尾升华，用金句收尾')">升华结尾</button>
+    <div class="refine-bar" style="margin-top:10px;padding-top:8px;border-top:1px dashed var(--border);">
+      <div style="font-size:0.78rem;color:var(--text-light);margin-bottom:6px;">精修：点一下按需重新生成</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
+        <button class="btn btn-outline btn-sm" onclick="quickRefine('精简到六百字左右')">精简</button>
+        <button class="btn btn-outline btn-sm" onclick="quickRefine('换一个更有诗意的比喻标题')">换标题</button>
+        <button class="btn btn-outline btn-sm" onclick="quickRefine('加强情感，增强现场感染力')">加强情感</button>
+        <button class="btn btn-outline btn-sm" onclick="quickRefine('多融入具体数据和实例')">加数据</button>
+        <button class="btn btn-outline btn-sm" onclick="quickRefine('改为更书面、更庄重的语气')">书面语气</button>
+        <button class="btn btn-outline btn-sm" onclick="quickRefine('改成更口语、更接地气的讲法')">更接地气</button>
+        <button class="btn btn-outline btn-sm" onclick="quickRefine('调整结构，让逻辑层次更清晰')">改结构</button>
+        <button class="btn btn-outline btn-sm" onclick="quickRefine('增强气势，多用排比和对仗')">增强气势</button>
+        <button class="btn btn-outline btn-sm" onclick="quickRefine('结尾升华，用金句收尾')">升华结尾</button>
+      </div>
     </div>
 
   </div>
