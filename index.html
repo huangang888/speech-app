@@ -476,79 +476,6 @@ body{
 .page{display:none;}
 .page.active{display:block;}
 
-/* Recent Refs */
-.recent-ref-title{
-  font-size:0.84rem;
-  color:var(--primary);
-  font-weight:600;
-  margin-bottom:6px;
-  display:flex;
-  align-items:center;
-  gap:4px;
-}
-.recent-ref-clear{
-  font-size:0.72rem;
-  color:var(--text-light);
-  font-weight:400;
-  cursor:pointer;
-  padding:1px 6px;
-  border:1px solid var(--border);
-  border-radius:4px;
-  -webkit-tap-highlight-color:transparent;
-}
-.recent-ref-clear:active{background:rgba(204,0,0,0.08);color:#c00;border-color:#c00;}
-.recent-ref-time{
-  font-size:0.7rem;
-  color:#b0a08a;
-  margin-left:6px;
-}
-.recent-ref-empty{
-  font-size:0.78rem;
-  color:var(--text-light);
-  padding:8px 4px;
-}
-.recent-ref-item{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:8px 10px;
-  background:linear-gradient(135deg,rgba(139,26,26,0.03) 0%,rgba(201,169,110,0.05) 100%);
-  border:1px solid var(--border);
-  border-radius:var(--radius-sm);
-  margin-bottom:6px;
-  cursor:pointer;
-  -webkit-tap-highlight-color:transparent;
-  user-select:none;
-}
-.recent-ref-item:active{background:rgba(139,26,26,0.06);}
-.recent-ref-name{
-  flex:1;
-  font-size:0.82rem;
-  color:var(--text);
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-.recent-ref-del{
-  font-size:0.7rem;
-  color:#c00;
-  padding:2px 6px;
-  border:1px solid rgba(204,0,0,0.3);
-  border-radius:4px;
-  flex-shrink:0;
-  background:transparent;
-  -webkit-tap-highlight-color:transparent;
-}
-.recent-ref-del:active{background:rgba(204,0,0,0.08);}
-.recent-ref-preview{
-  font-size:0.75rem;
-  color:var(--text-light);
-  margin-top:2px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-
 /* Responsive */
 .type-grid{grid-template-columns:1fr 1fr;}
 @media(min-width:400px){.type-grid{grid-template-columns:1fr 1fr;}}
@@ -584,7 +511,7 @@ body{
   <div class="card" id="card-type">
     <div class="section-title">选择会议类型</div>
     <div class="type-grid" id="typeGrid"></div>
-    <div class="section-title" style="margin-top:6px;">本次发言目的 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（可选，自动判断更省心）</span></div>
+    <div class="section-title" style="margin-top:6px;">发言目的 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（可选，自动判断更省心）</span></div>
     <div class="type-grid" id="modeGrid"></div>
   </div>
 
@@ -608,13 +535,8 @@ body{
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
         <input type="file" id="fileInput" accept=".txt,.docx,.pdf,.doc" style="display:none;" onchange="handleFileUpload(event)">
         <button class="btn btn-outline btn-sm" onclick="document.getElementById('fileInput').click()" style="flex-shrink:0;">选择文件</button>
-        <button class="btn btn-outline btn-sm" onclick="toggleRecentPanel()" style="flex-shrink:0;">最近文件</button>
         <span id="fileName" style="font-size:0.82rem;color:var(--text-light);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">未选择文件</span>
         <button id="clearFileBtn" class="btn btn-outline btn-sm" onclick="clearRefFile()" style="flex-shrink:0;display:none;color:#c00;border-color:#c00;">清除</button>
-      </div>
-      <div id="recentRefPanel" style="margin-top:8px;">
-        <div class="recent-ref-title">最近文件 <span id="recentCount"></span><span style="flex:1;"></span><span class="recent-ref-clear" onclick="clearRecentRefs()">清空</span></div>
-        <div id="recentRefList"></div>
       </div>
 <textarea class="text-input" id="refText" placeholder="或直接粘贴参考资料内容..." style="margin-top:8px;min-height:80px;resize:vertical;" oninput="updateRefWordCount()"></textarea>
       <span class="input-hint" id="refWordCount" style="margin-top:2px;display:block;">已输入 0 字</span>
@@ -1553,7 +1475,7 @@ function callAI(apiKey){
   var body = JSON.stringify({
     model:state.model || 'deepseek-reasoner',
     messages:[
-      {role:'system',content:'你是一位顶级发言撰稿人和思想顾问。你能根据不同会议类型和发言人身份，撰写高质量的会议发言稿或提炼发言方向提纲。你的核心理念：大秘的逻辑、诗人的情怀、专家的严谨、学者的钻研。标题比喻化对仗工整，观点深刻独到，语言简洁有力，金句自然点睛。根据任务要求灵活切换角色——有时是黄主任的专属撰稿人，有时是通用场景的高级撰稿人，有时是提炼观点的思想顾问。当用户指出本次发言目的时，需按对应的结构逻辑组织发言（结论先行、问题导向、风险前置、交换思维等），让发言有理有据、重点突出。'},
+      {role:'system',content:'你是一位顶级发言撰稿人和思想顾问。你能根据不同会议类型和发言人身份，撰写高质量的会议发言稿或提炼发言方向提纲。你的核心理念：大秘的逻辑、诗人的情怀、专家的严谨、学者的钻研。标题比喻化对仗工整，观点深刻独到，语言简洁有力，金句自然点睛。根据任务要求灵活切换角色——有时是黄主任的专属撰稿人，有时是通用场景的高级撰稿人，有时是提炼观点的思想顾问。当用户指出发言目的时，需按对应的结构逻辑组织发言（结论先行、问题导向、风险前置、交换思维等），让发言有理有据、重点突出。'},
       {role:'user',content:prompt}
     ],
     temperature:0.5,
@@ -1859,7 +1781,6 @@ function init(){
   renderTypeGrid();
   renderModeGrid();
   loadSettings();
-  renderRecentRefs();
 
   // Tab 切换
   var tabs = document.querySelectorAll('.tab');
@@ -1971,7 +1892,6 @@ function saveRecentRef(name, content){
   refs.unshift({ name: name, content: content, time: Date.now() });
   if(refs.length > 30) refs = refs.slice(0, 30);
   saveRecentRefData(refs);
-  renderRecentRefs();
 }
 
 function deleteRecentRef(index){
@@ -1979,7 +1899,6 @@ function deleteRecentRef(index){
   if(index >= 0 && index < refs.length){
     refs.splice(index, 1);
     saveRecentRefData(refs);
-    renderRecentRefs();
     showToast('已删除');
   }
 }
@@ -1994,61 +1913,6 @@ function loadRecentRef(index){
     updateRefWordCount();
     showToast('已载入：' + ref.name);
   }
-}
-
-function renderRecentRefs(){
-  var refs = getRecentRefs();
-  var list = document.getElementById('recentRefList');
-  var cnt = document.getElementById('recentCount');
-  if(cnt) cnt.textContent = '(' + refs.length + ')';
-  if(!refs || refs.length === 0){
-    if(list) list.innerHTML = '<div class="recent-ref-empty">暂无最近文件。上传文件或粘贴资料后会自动记录，下次点一下即可载入。</div>';
-    return;
-  }
-  var html = '';
-  for(var i = 0; i < refs.length; i++){
-    var r = refs[i];
-    var preview = (r.content || '').substring(0, 40).replace(/[\n\r]/g, ' ');
-    var timeText = formatRefTime(r.time);
-    html += '<div class="recent-ref-item" onclick="loadRecentRef(' + i + ')">';
-    html += '<div style="flex:1;overflow:hidden;"><div class="recent-ref-name">' + escapeHtml(r.name) + '</div>';
-    html += '<div class="recent-ref-preview">' + escapeHtml(preview) + (timeText ? '<span class="recent-ref-time">' + timeText + '</span>' : '') + '</div></div>';
-    html += '<button class="recent-ref-del" onclick="event.stopPropagation();deleteRecentRef(' + i + ')" style="margin-left:8px;">删除</button>';
-    html += '</div>';
-  }
-  list.innerHTML = html;
-}
-
-function toggleRecentPanel(){
-  var panel = document.getElementById('recentRefPanel');
-  if(panel.style.display === 'none'){
-    panel.style.display = 'block';
-    renderRecentRefs();
-  }else{
-    panel.style.display = 'none';
-  }
-}
-
-function clearRecentRefs(){
-  if(!confirm('确认清空全部最近文件？')) return;
-  localStorage.removeItem('speech_app_recent_refs');
-  renderRecentRefs();
-  showToast('已清空最近文件');
-}
-
-function formatRefTime(ts){
-  if(!ts) return '';
-  var d = new Date(ts);
-  var now = new Date();
-  var diff = now.getTime() - d.getTime();
-  var min = Math.floor(diff/60000);
-  if(min < 1) return '刚刚';
-  if(min < 60) return min + '分钟前';
-  var hr = Math.floor(min/60);
-  if(hr < 24) return hr + '小时前';
-  var day = Math.floor(hr/24);
-  if(day < 30) return day + '天前';
-  return (d.getMonth()+1) + '月' + d.getDate() + '日';
 }
 
 function updateRefWordCount(){
