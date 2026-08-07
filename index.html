@@ -1489,8 +1489,7 @@ function callAI(apiKey){
   var temp = getScenarioTemp();
 
   document.getElementById('loading').classList.add('active');
-  document.getElementById('card-result').style.display = 'block';
-  document.getElementById('resultContent').innerHTML = '<div style="color:var(--text-light);padding:20px;text-align:center;">正在生成，逐字呈现中...</div>';
+  document.getElementById('card-result').style.display = 'none';
   document.getElementById('generateBtn').disabled = true;
 
   fetch(API_URL, {
@@ -1561,7 +1560,7 @@ function callAI(apiKey){
 }
 
 function updateStreamResult(text){
-  document.getElementById('loading').classList.remove('active');
+  document.getElementById('card-result').style.display = 'block';
   document.getElementById('resultContent').innerHTML = parseSpeech(text);
   document.getElementById('wordCount').textContent = '共 ' + text.replace(/\s/g,'').length + ' 字';
 }
