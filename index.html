@@ -1816,7 +1816,7 @@ function parseSpeech(text){
     // 整段朱红色黑体显示，突出观点层次
     if(/^[一二三四五六七八九十]、/.test(line) || /^第[一二三四五六七八九十]/.test(line) || /^(首先|其次|再次|最后)/.test(line)){
       if(inParagraph){html += '</p>'; inParagraph = false;}
-      html += '<p style="font-weight:700;font-family:var(--font-heading);font-size:1.05rem;color:var(--primary);text-indent:0;margin:18px 0 8px 0;padding:6px 0 6px 12px;border-left:3px solid var(--gold);">' + line + '</p>';
+      html += '<p style="font-family:var(--font-heading);font-size:1rem;color:var(--primary);text-indent:0;margin:14px 0 6px 0;padding:4px 0 4px 12px;border-left:3px solid var(--gold);">' + line + '</p>';
       continue;
     }
     // 小标题：短句开头
