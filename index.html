@@ -1576,6 +1576,8 @@ function buildPrompt(){
 }
 
 function searchMaterials(apiKey, topic, typeName, callback){
+  var called = false;
+  function safeCallback(result){ if(called) return; called = true; callback(result); }
   // 构造搜索词
   var searchQuery = topic;
   if(typeName && typeName !== '其他会议场景' && typeName !== '发言方向提纲'){
@@ -1596,13 +1598,13 @@ function searchMaterials(apiKey, topic, typeName, callback){
   }).then(function(resp){
     if(!resp.ok){
       console.log('Search failed: ' + resp.status);
-      callback('');
-      return;
+      safeCallback('');
+      return null;
     }
     return resp.json();
   }).then(function(data){
     if(!data){
-      callback('');
+      safeCallback('');
       return;
     }
     var searchResult = '';
@@ -1614,10 +1616,10 @@ function searchMaterials(apiKey, topic, typeName, callback){
     }else if(data.content){
       searchResult = data.content;
     }
-    callback(searchResult);
+    safeCallback(searchResult);
   }).catch(function(err){
     console.log('Search error: ' + err);
-    callback('');
+    safeCallback('');
   });
 }
 
