@@ -521,6 +521,9 @@ body{
     <label style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
       <input type="checkbox" id="wenhuaToggle" onchange="toggleWenhua()" style="width:16px;height:16px;accent-color:var(--primary);"> 加强文史素材（围城文化、湘军故里、龙山文化、湄江风光等）
     </label>
+    <label style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
+      <input type="checkbox" id="webSearchToggle" onchange="toggleWebSearch()" style="width:16px;height:16px;accent-color:var(--primary);" checked> 联网搜索最新素材（写作前先搜索相关政策、数据、案例）
+    </label>
   </div>
 
   <!-- Step 2: Topic -->
@@ -559,7 +562,7 @@ body{
   <!-- Loading -->
   <div class="loading" id="loading">
     <div class="spinner"></div>
-    <div class="loading-text">正在为您精心撰写发言稿...</div>
+    <div class="loading-text" id="loadingText">正在为您精心撰写发言稿...</div>
   </div>
 
   <!-- Result -->
@@ -579,16 +582,15 @@ body{
     </div>
     <div class="refine-bar" style="margin-top:10px;padding-top:8px;border-top:1px dashed var(--border);">
       <div style="font-size:0.78rem;color:var(--text-light);margin-bottom:6px;">精修：点一下按需重新生成</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;">
-        <button class="btn btn-outline btn-sm" onclick="quickRefine('精简到六百字左右')">精简</button>
-        <button class="btn btn-outline btn-sm" onclick="quickRefine('换一个更有诗意的比喻标题')">换标题</button>
-        <button class="btn btn-outline btn-sm" onclick="quickRefine('加强情感，增强现场感染力')">加强情感</button>
-        <button class="btn btn-outline btn-sm" onclick="quickRefine('多融入具体数据和实例')">加数据</button>
-        <button class="btn btn-outline btn-sm" onclick="quickRefine('改为更书面、更庄重的语气')">书面语气</button>
-        <button class="btn btn-outline btn-sm" onclick="quickRefine('改成更口语、更接地气的讲法')">更接地气</button>
-        <button class="btn btn-outline btn-sm" onclick="quickRefine('调整结构，让逻辑层次更清晰')">改结构</button>
-        <button class="btn btn-outline btn-sm" onclick="quickRefine('增强气势，多用排比和对仗')">增强气势</button>
-        <button class="btn btn-outline btn-sm" onclick="quickRefine('结尾升华，用金句收尾')">升华结尾</button>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+        <button class="btn btn-outline btn-sm" onclick="quickRefine('精简到六百字左右，保留核心观点和金句')">精简</button>
+        <button class="btn btn-outline btn-sm" onclick="quickRefine('结尾升华，用金句收尾，呼应开头')">升华结尾</button>
+        <button class="btn btn-outline btn-sm" onclick="quickRefine('改成更口语、更接地气的讲法，多用短句')">更接地气</button>
+        <button class="btn btn-outline btn-sm" onclick="quickRefine('增强气势，多用排比和对仗，每层加一组排比')">增强气势</button>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:6px;">
+        <input type="text" class="text-input" id="customRefineInput" placeholder="其他修改要求，如：换标题、加数据、改结构..." style="flex:1;font-size:0.85rem;padding:8px 10px;">
+        <button class="btn btn-outline btn-sm" onclick="customRefine()" style="flex-shrink:0;">执行</button>
       </div>
     </div>
 
@@ -685,7 +687,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言
+  <span class="brand">讲话助手</span> · 黄主任专属 · v13 联网搜索 · 用心写好每一次发言
 </div>
 
 </div>
@@ -697,6 +699,7 @@ body{
 // ===== 常量 =====
 var STORAGE_KEY = 'speech_app_data';
 var API_URL = 'https://api.deepseek.com/chat/completions';
+var RESPONSES_URL = 'https://api.deepseek.com/responses';
 
 // ===== 会议类型 =====
 var MEETING_TYPES = [
@@ -750,10 +753,51 @@ var state = {
   refine:'',
   streamUsage:null,
   keyData:'',
-  wenhuaStrengthen:false
+  wenhuaStrengthen:false,
+  webSearch:false,
+  searchContext:''
 };
 
-var SYSTEM_PROMPT = '你是一位顶级发言撰稿人和思想顾问。你能根据不同会议类型和发言人身份，撰写高质量的会议发言稿或提炼发言方向提纲。你的核心理念：大秘的逻辑、诗人的情怀、专家的严谨、学者的钻研。标题比喻化对仗工整，观点深刻独到，语言简洁有力，金句自然点睛。根据任务要求灵活切换角色——有时是黄主任的专属撰稿人，有时是通用场景的高级撰稿人，有时是提炼观点的思想顾问。当用户指出发言目的时，需按对应的结构逻辑组织发言（结论先行、问题导向、风险前置、交换思维等），让发言有理有据、重点突出。';
+var SYSTEM_PROMPT = '你是一位顶级发言撰稿人和思想顾问。你的核心理念：大秘的逻辑、诗人的情怀、专家的严谨、学者的钻研。\n' +
+  '发言的核心在于：逻辑清晰、重点突出、表达高效。体现有高度、有深度、有温度。\n' +
+  '你写的是人话，但是大领导、大文豪、大专家说的人话。\n' +
+  '标题用比喻或拟人，对仗工整。观点深刻独到。语言简洁有力，多用短句、排比、金句。\n' +
+  '结构上用总（亮明观点）-分（第一、第二、第三分点阐述）-总（总结收尾，呼应开头）。\n' +
+  '组词造句不生搬硬套，多用比喻、拟人等写法。所有数据和事例必须源自参考资料或联网搜索，绝不胡编捏造。';
+// ===== 写作标准（六条硬指标，所有场景共用）=====
+var WRITING_STANDARDS = '\n\n【写作标准——六条硬指标，逐条对照执行】\n\n' +
+  '一、结构：总-分-总\n' +
+  '  · 总：开头亮明核心观点，一两句话定调，让听众知道你要讲什么\n' +
+  '  · 分：用"第一""第二""第三"或"首先""其次""最后"明确分层，每层一个核心观点\n' +
+  '    观点标题用8-12字短句概括，后接阐述。让听众听得清"讲了几个意思"\n' +
+  '  · 总：结尾呼应开头，升华主题，收束有力\n' +
+  '  · 不要用空行代替分层，该标注就标注，层次感要强\n\n' +
+  '二、短句：整句要短，能断就断\n' +
+  '  · 每句不超过20字，多用逗号和句号断句，少用长句和从句\n' +
+  '  · 好的节奏：三四句短句铺陈，一句稍长收束，再几句短句推进\n' +
+  '  · 像领导讲话一样，一句一顿，掷地有声\n\n' +
+  '三、排比：每个层次至少一组排比（三句以上）\n' +
+  '  · 递进式：从现象到本质，从过去到现在到未来\n' +
+  '  · 并列式：三个维度并列，如"有高度、有深度、有温度"\n' +
+  '  · 排比要有实质内容，不是"我们要"的空排比\n\n' +
+  '四、金句：从内容中长出来，不是插进去的装饰\n' +
+  '  · 全文至少两处金句，是自创的判断，不是名言引用\n' +
+  '  · 比喻型："涟源的山，是会说话的山"\n' +
+  '  · 判断型："千难万难，干了就不难"\n' +
+  '  · 对仗型："根深才能叶茂，源远方能流长"\n' +
+  '  · 金句必须和上下文浑然一体，不能突兀插入\n\n' +
+  '五、语言：讲人话，但讲的是有水平的人话\n' +
+  '  · 像大领导：站得高，看得远，开口就能定调\n' +
+  '  · 像大文豪：善用比喻和拟人，把抽象道理讲得有画面感\n' +
+  '  · 像大专家：数据和逻辑扎实，每个判断都有依据\n' +
+  '  · 多用比喻、拟人。把"发展"说成"生长"，把"困难"说成"爬坡过坎"\n' +
+  '  · 不要生搬硬套，要自然贴切\n\n' +
+  '六、事实底线：不编不造\n' +
+  '  · 所有数据和事例必须基于用户提供的参考资料或联网搜索结果\n' +
+  '  · 参考资料和搜索结果中没有的数据，用"据了解""据统计"等模糊表述\n' +
+  '  · 绝不编造具体数字和案例\n' +
+  '  · 如果没有参考资料，只做方向性论述，不举具体数据';
+
 var COST_PER_MIL = { 'deepseek-v4-pro': 6, 'deepseek-v4-flash': 1.2 };
 var typeTemps = { 'wenhua':0.8, 'qingdian':0.85, 'kaocha':0.5, 'xuexi':0.4, 'dongyuan':0.6, 'diaoyan':0.5, 'jiandu':0.4, 'biaotai':0.3, 'qita':0.5, 'tigang':0.5 };
 function getScenarioTemp(){
@@ -1391,10 +1435,11 @@ function buildPrompt(){
       '【扩写要求】\n' +
       '1. 保持原提纲的核心观点不变，不要删改观点主旨\n' +
       '2. 为每个观点补充充分的论述、具体事例、数据支撑和生动语言\n' +
-      '3. 结构完整：标题、开场、正文、结尾一应俱全\n' +
-      '4. 多用排比句、对仗句、四字短语，节奏铿锵有力\n' +
-      '5. 每200字左右插入一句金句，升华主题\n' +
-      '6. 不写正确的废话，让人记住一个观点、一句金句、一种感受\n\n' +
+      '3. 结构完整：标题、开场、正文、结尾一应俱全。正文用"第一""第二""第三"分层\n' +
+      '4. 多用短句，每句不超过20字。多用排比（三句以上一组），有实质内容\n' +
+      '5. 全文至少两处金句，从内容中自然生长，不是硬插入的\n' +
+      '6. 多用比喻、拟人，把抽象道理讲得有画面感\n' +
+      '7. 不写正确的废话，让人记住一个观点、一句金句、一种感受\n\n' +
       '【输出格式】\n' +
       '纯文本，不要markdown符号。第一行是标题（不加书名号），空行后开始正文，段落间空行分隔。';
     }
@@ -1442,20 +1487,15 @@ function buildPrompt(){
       audienceSection + refSection + qitaFeedbackCtx + '\n\n' +
       '【写作要求——请逐条遵循】\n\n' +
       '一、标题：必须用比喻或拟人手法，对仗工整，让人过目不忘。\n\n' +
-      '二、开头：根据听众信息，先对与会人员进行真诚自然的问候，营造现场感和带入感，让人心入身入。然后一两句话切入主题。\n' +
-      '三、正文：' + (structText
-        ? '严格按以下结构主线组织发言，作为逻辑主干，但不要用"1、2、3"标注，用空行自然过渡，语言保持鲜活有文采：\n' + structText
-        : '自然分为三个层次（感受→认识→建议），不用"一、二、三"标注，用空行自然过渡。\n   每个层次提炼一个核心观点，用排比句或对仗句作为点睛之笔。') + '\n\n' +
-      '四、语言：\n' +
-      '   · 多用排比句、对仗句、四字短语，节奏铿锵有力\n' +
-      '   · 每200字左右插入一句金句（自创的或化用的）\n' +
-      '   · 权威引用（如习近平总书记重要论述）如需引用，一处足矣，自然融入不刻意\n\n' +
-      '五、深度：不要停留在表面，要往深处想一层，讲出别人讲不出的道理。\n' +
-      '   好发言的标准是：听完后让人记住至少一个观点、一句金句、一种感受。\n\n' +
-      '六、每句话都要有分量，不写正确的废话。\n\n' +
+      '二、开头：根据听众信息，先对与会人员进行真诚自然的问候。然后一两句话亮明核心观点，定下全文基调。\n' +
+      '三、正文（核心结构）：' + (structText
+        ? '严格按以下结构主线组织发言，作为逻辑主干。用"第一""第二""第三"明确分层，每层提炼一个核心观点，观点标题用8-12字短句概括：\n' + structText
+        : '采用"总-分-总"结构。开头亮明观点，正文用"第一""第二""第三"分三层阐述，每层提炼一个核心观点。结尾呼应开头，升华收束。') + '\n\n' +
+      WRITING_STANDARDS + '\n\n' +
+      '七、每句话都要有分量，不写正确的废话。\n\n' +
       '【输出格式】\n' +
       '纯文本，不要markdown符号。第一行是标题（不加书名号），空行后开始正文，段落间空行分隔。\n' +
-      '禁止任何标注说明，直接给出完整的发言稿。';
+      '正文分层用"第一""第二""第三"标注。直接给出完整的发言稿。';
   }
 
   // ===== 默认模式（黄主任专属，含听众问候） =====
@@ -1521,21 +1561,61 @@ function buildPrompt(){
     '【写作要求——请逐条遵循】\n\n' +
     '一、标题：必须用比喻或拟人手法，对仗工整，如"以文铸魂，以文化人""根深叶茂，源远流长"。\n' +
     '   标题要让人过目不忘，有自己的创造，不要套用常见句式。\n\n' +
-    '二、开头：' + (audienceText ? '先对与会人员进行真诚亲切的问候，营造现场感和带入感，让人心入身入。问候要自然温暖，不生硬不客套，像老朋友见面般亲切。然后一两句话切入主题。' : '开门见山，真诚自然，一两句话切入主题，不铺垫不客套。') + '\n\n' +
-    '三、正文：' + (structText
-      ? '严格按以下结构主线组织发言，作为逻辑主干，但不要用"1、2、3"标注，用空行自然过渡，语言保持鲜活有文采：\n' + structText
-      : '自然分为三个层次（感受→认识→建议），不用"一、二、三"标注，用空行自然过渡。\n   每个层次提炼一个核心观点，用一句精炼的排比句或对仗句作为该层次的点睛之笔。') + '\n\n' +
-    '四、语言：\n' +
-    '   · 多用排比句、对仗句、四字短语，节奏铿锵有力\n' +
-    '   · 每200字左右插入一句金句（自创的或化用的，不要堆砌名言）\n' +
-    '   · 习近平金句如需引用，一处足矣，自然融入不刻意\n' +
-    '   · 涟源元素根据主题自然关联，没有合适切入点就不硬加\n\n' +
-    '五、深度：不要停留在表面，要往深处想一层，讲出别人讲不出的道理。\n' +
-    '   好发言的标准是：听完后让人记住至少一个观点、一句金句、一种感受。\n\n' +
-    '六、' + (isShort ? '庆典/表态类发言，自然流畅，不分层次标注，如即兴发言般真挚。控制在500字，3分钟讲完。' : '控制在' + (userWordReq || '1000') + '字左右，' + (userWordReq ? '' : '5分钟讲完。') + '每句话都要有分量，不写正确的废话。') + '\n\n' +
+    '二、开头：' + (audienceText ? '先对与会人员进行真诚亲切的问候，营造现场感和带入感，让人心入身入。问候要自然温暖，不生硬不客套，像老朋友见面般亲切。然后一两句话亮明核心观点，定下全文基调。' : '开门见山，真诚自然，一两句话亮明核心观点，定下全文基调。') + '\n\n' +
+    '三、正文（核心结构）：' + (structText
+      ? '严格按以下结构主线组织发言，作为逻辑主干。用"第一""第二""第三"明确分层，每层提炼一个核心观点，观点标题用8-12字短句概括：\n' + structText
+      : '采用"总-分-总"结构。开头亮明观点，正文用"第一""第二""第三"分三层阐述（感受、认识、建议），每层提炼一个核心观点，用8-12字短句作观点标题。结尾呼应开头，升华收束。') + '\n\n' +
+    WRITING_STANDARDS + '\n\n' +
+    '七、' + (isShort ? '庆典/表态类发言可不分层标注，如即兴发言般真挚。控制在500字，3分钟讲完。' : '控制在' + (userWordReq || '1000') + '字左右，' + (userWordReq ? '' : '5分钟讲完。') + '每句话都要有分量，不写正确的废话。') + '\n\n' +
     '【输出格式】\n' +
     '纯文本，不要markdown符号。第一行是标题（不加书名号），空行后开始正文，段落间空行分隔。\n' +
-    '禁止任何标注说明（如"标题：""正文：""一、二、三"等），直接给出完整的发言稿。';
+    '正文分层用"第一""第二""第三"标注，让听众听得清层次。直接给出完整的发言稿。';
+}
+
+function searchMaterials(apiKey, topic, typeName, callback){
+  // 构造搜索词
+  var searchQuery = topic;
+  if(typeName && typeName !== '其他会议场景' && typeName !== '发言方向提纲'){
+    searchQuery = typeName + ' ' + topic;
+  }
+  var searchData = JSON.stringify({
+    model: 'deepseek-v4-pro',
+    messages: [{role:'user', content:'请搜索以下主题的最新政策精神、典型案例、权威数据和领导讲话要点，整理成简洁的素材摘要（不超过800字）。只搜索官方渠道和权威网站的信息。\n\n主题：' + searchQuery}],
+    enable_web_search: true,
+    max_tokens: 2048,
+    stream: false
+  });
+
+  fetch(RESPONSES_URL, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer ' + apiKey},
+    body: searchData
+  }).then(function(resp){
+    if(!resp.ok){
+      console.log('Search failed: ' + resp.status);
+      callback('');
+      return;
+    }
+    return resp.json();
+  }).then(function(data){
+    if(!data){
+      callback('');
+      return;
+    }
+    var searchResult = '';
+    // Responses API 返回格式兼容处理
+    if(data.choices && data.choices[0]){
+      searchResult = data.choices[0].message ? data.choices[0].message.content : (data.choices[0].text || '');
+    }else if(data.output){
+      searchResult = typeof data.output === 'string' ? data.output : JSON.stringify(data.output);
+    }else if(data.content){
+      searchResult = data.content;
+    }
+    callback(searchResult);
+  }).catch(function(err){
+    console.log('Search error: ' + err);
+    callback('');
+  });
 }
 
 function callAI(apiKey){
@@ -1543,6 +1623,7 @@ function callAI(apiKey){
   if(state.refine){ prompt += '\n\n【精修要求】用户要求本次重点：' + state.refine; }
   if(state.keyData){ prompt += '\n\n【关键数据（必须真实融入，不得虚构）】' + state.keyData; }
   if(state.wenhuaStrengthen){ prompt += '\n\n【文史素材加强】请自然融入围城文化、湘军故里、龙山文化、湄江风光、涟源风土人情等文史元素，增强文化纵深和历史厚重感。'; }
+
   var model = state.model || 'deepseek-v4-pro';
   var temp = getScenarioTemp();
 
@@ -1550,6 +1631,28 @@ function callAI(apiKey){
   document.getElementById('card-result').style.display = 'none';
   document.getElementById('generateBtn').disabled = true;
 
+  // 联网搜索：先搜素材，再生成发言稿
+  if(state.webSearch){
+    var topic = state.topic;
+    var typeName = state.meetingType;
+    for(var ti = 0; ti < MEETING_TYPES.length; ti++){
+      if(MEETING_TYPES[ti].id === state.meetingType){typeName = MEETING_TYPES[ti].name;break;}
+    }
+    document.getElementById('loadingText').textContent = '正在联网搜索相关素材...';
+    searchMaterials(apiKey, topic, typeName, function(searchResult){
+      if(searchResult){
+        prompt += '\n\n【联网搜索素材——请结合以下素材撰写，数据和事例优先采用】\n' + searchResult.substring(0, 2000);
+        state.searchContext = searchResult.substring(0, 500);
+      }
+      document.getElementById('loadingText').textContent = '正在为您精心撰写发言稿...';
+      doGenerate(apiKey, prompt, model, temp);
+    });
+  }else{
+    doGenerate(apiKey, prompt, model, temp);
+  }
+}
+
+function doGenerate(apiKey, prompt, model, temp){
   fetch(API_URL, {
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer ' + apiKey},
@@ -1702,8 +1805,8 @@ function parseSpeech(text){
       html += '<p style="font-weight:700;font-size:0.88rem;color:var(--gold);margin:10px 0 4px 0;">' + line + '</p>';
       continue;
     }
-    // 一级标题：一、二、三（加粗，缩进2字符）
-    if(/^[一二三四五六七八九十]、/.test(line)){
+    // 一级标题：一、二、三 / 第一、第二、第三（加粗，缩进2字符）
+    if(/^[一二三四五六七八九十]、/.test(line) || /^第[一二三四五六七八九十]/.test(line) || /^(首先|其次|再次|最后)/.test(line)){
       if(inParagraph){html += '</p>'; inParagraph = false;}
       html += '<p style="font-weight:700;font-size:1rem;color:var(--primary);text-indent:2em;margin:14px 0 6px 0;">' + line + '</p>';
       continue;
@@ -1742,12 +1845,27 @@ function quickRefine(kw){
   handleGenerate();
 }
 
+function customRefine(){
+  if(!state.result){ showToast('请先生成发言稿，再点精修'); return; }
+  var input = document.getElementById('customRefineInput');
+  var kw = input.value.trim();
+  if(!kw){ showToast('请输入修改要求'); return; }
+  state.refine = kw;
+  input.value = '';
+  showToast('正在按您的要求精修...');
+  handleGenerate();
+}
+
 function updateKeyData(){
   state.keyData = document.getElementById('keyDataInput').value.trim();
 }
 
 function toggleWenhua(){
   state.wenhuaStrengthen = document.getElementById('wenhuaToggle').checked;
+}
+
+function toggleWebSearch(){
+  state.webSearch = document.getElementById('webSearchToggle').checked;
 }
 
 // ===== 提纲扩写 =====
@@ -2019,6 +2137,7 @@ function init(){
   renderSubJixiGrid();
   loadSettings();
   initHistoryFilter();
+  state.webSearch = true;
 
   // Tab 切换
   var tabs = document.querySelectorAll('.tab');
