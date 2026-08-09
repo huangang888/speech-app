@@ -515,7 +515,7 @@ body{
     <div class="section-title" style="margin-top:6px;">发言目的 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（可选，自动判断更省心）</span></div>
     <div class="type-grid" id="modeGrid"></div>
     <div id="subJixiBox" style="margin-top:8px;display:none;">
-      <div class="section-title" style="font-size:0.8rem;color:var(--text-light);">即兴应答问法 <span style="font-size:0.7rem;color:var(--text-light);">（选"即席发言"后可选具体问法，默认通用）</span></div>
+      <div class="section-title" style="font-size:0.8rem;color:var(--text-light);">即兴应答问法 <span style="font-size:0.7rem;color:var(--text-light);">（选"即席发言"后可点选具体问法，不选则按通用即兴）</span></div>
       <div class="type-grid" id="subJixiGrid"></div>
     </div>
     <label style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
@@ -730,7 +730,6 @@ var SUB_JIXI_MODES = [
   {id:'',      name:'通用即兴',   icon:'通', struct:'【发言任务：即席发言，结论先行】\n  思维方式：人的大脑喜欢先知道结果再听原因，像报纸先有大标题吸引人，才愿意往下看。开口就说结论，不会有人嫌你说话太直接。领导最烦绕来绕去没说到重点，第一句话有没有观点，直接决定领导对你的看法。\n  1. 亮明观点：第一句话就亮出最核心最鲜明的观点，压缩成一句话，不绕弯\n  2. 说清理由：用2-3条简短有力的理由支撑，每句有分量\n  3. 举出实例：用一个具体鲜活的实例印证，让观点落地'},
   {id:'fangan',   name:'方案看法',   icon:'案', struct:'【发言任务：即兴应答，领导问你对某方案怎么看】\n  思维方式：结构化万能表达，把散乱想法连成一条别人能接住的逻辑链。先给正面反馈，再补价值，最后表态，三个递进层次让人看到你既认同又有思考。\n  1. 肯定价值：先真诚肯定方案的亮点和价值，态度积极不敷衍\n  2. 补充细节：再从自身角度补充一两个具体细节或可完善之处，体现认真思考过\n  3. 表态落实：最后明确表态愿意配合落实，给出行动方向'},
   {id:'wenti',    name:'问题解决',   icon:'解', struct:'【发言任务：即兴应答，领导问这个问题怎么解决】\n  思维方式：先坦诚承认问题赢得信任，再用分步措施展现思路，最后承诺结果给领导吃定心丸。承诺必须贴合实际，不夸海口。\n  1. 承认问题：坦诚承认问题存在，态度诚恳，不回避不辩解\n  2. 分步措施：给出清晰可落地的分步解决措施，体现思路和担当\n  3. 承诺结果：承诺一个切实可达到的结果和时间，不脱离实际夸海口'},
-  {id:'jinzhan',  name:'进展汇报',   icon:'进', struct:'【发言任务：即兴应答，领导问工作进展如何】\n  思维方式：完成情况要准确，关键数据要突出重点，需要支持事项要明确具体。不要只提问题就结束，一定要把需要领导支持的事项讲清楚。\n  1. 完成情况：简要讲清工作推进到什么程度、完成什么\n  2. 关键数据：用一到两个关键数据支撑，突出重点\n  3. 需支持事项：明确具体提出需要领导支持或协调的事项'},
   {id:'wenjian',  name:'文件理解',   icon:'文', struct:'【发言任务：即兴应答，领导问你对某文件或政策有什么想法】\n  思维方式：既要谈理解，又要谈应用。文件核心要抓准，结合本单位要贴切，落地计划要可行。体现上接天线、下接地气。\n  1. 政策核心：准确概括文件或政策的核心要义，体现读懂吃透\n  2. 结合本单位：把文件要求与本单位、本县区实际结合，讲出贴切的切入点\n  3. 落地计划：给出具体可行的落地打算，让人看到能落实'},
   {id:'zongjie',  name:'会议总结',   icon:'总', struct:'【发言任务：即兴应答，被领导点名做会议总结】\n  思维方式：被突然点名做总结，不胆怯不紧张。先感谢机会，再用三点总结把整场会议的精华收拢，最后表态跟进。\n  1. 感谢机会：真诚感谢领导给机会发言，顺势开场\n  2. 三点总结：提炼整场会议最要紧的三点共识或收获，条理清晰\n  3. 表态跟进：表态今后如何落实，收束有力'}
 ];
@@ -1010,6 +1009,7 @@ function renderSubJixiGrid(){
   var html = '';
   for(var i = 0; i < SUB_JIXI_MODES.length; i++){
     var t = SUB_JIXI_MODES[i];
+    if(t.id === ''){ continue; }
     var key = t.id === '' ? 'auto' : t.id;
     var sel = state.subMode === t.id ? ' selected' : '';
     html += '<button class="type-btn sub-mode-btn' + sel + '" onclick="selectSubMode(\'' + key + '\')" data-submode="' + key + '">' + t.name + '</button>';
