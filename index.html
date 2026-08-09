@@ -1578,16 +1578,22 @@ function buildPrompt(){
 function searchMaterials(apiKey, topic, typeName, callback){
   var called = false;
   function safeCallback(result){ if(called) return; called = true; callback(result); }
-  // 构造搜索词
   var searchQuery = topic;
   if(typeName && typeName !== '其他会议场景' && typeName !== '发言方向提纲'){
     searchQuery = typeName + ' ' + topic;
   }
+  // DeepSeek Responses API 格式：
+  // - 仅支持 deepseek-v4-flash
+  // - 用 input + instructions 而非 messages
+  // - 联网搜索通过 tools: [{type:'web_search'}]
+  // - 用 max_output_tokens 而非 max_tokens
   var searchData = JSON.stringify({
-    model: 'deepseek-v4-pro',
-    messages: [{role:'user', content:'请搜索以下主题的最新政策精神、典型案例、权威数据和领导讲话要点，整理成简洁的素材摘要（不超过800字）。只搜索官方渠道和权威网站的信息。\n\n主题：' + searchQuery}],
-    enable_web_search: true,
-    max_tokens: 2048,
+    model: 'deepseek-v4-flash',
+    instructions: '你是一个素材搜索助手。请联网搜索官方渠道和权威网站的信息，整理成简洁的素材摘要。',
+    input: '请搜索以下主题的最新政策精神、典型案例、权威数据和领导讲话要点，整理成简洁的素材摘要（不超过800字）。\n\n主题：' + searchQuery,
+    tools: [{type: 'web_search'}],
+    tool_choice: {type: 'web_search'},
+    max_output_tokens: 2048,
     stream: false
   });
 
@@ -1598,8 +1604,11 @@ function searchMaterials(apiKey, topic, typeName, callback){
   }).then(function(resp){
     if(!resp.ok){
       console.log('Search failed: ' + resp.status);
-      safeCallback('');
-      return null;
+      return resp.text().then(function(txt){
+        console.log('Search error body: ' + txt.substring(0, 300));
+        safeCallback('');
+        return null;
+      });
     }
     return resp.json();
   }).then(function(data){
@@ -1608,13 +1617,20 @@ function searchMaterials(apiKey, topic, typeName, callback){
       return;
     }
     var searchResult = '';
-    // Responses API 返回格式兼容处理
-    if(data.choices && data.choices[0]){
-      searchResult = data.choices[0].message ? data.choices[0].message.content : (data.choices[0].text || '');
-    }else if(data.output){
-      searchResult = typeof data.output === 'string' ? data.output : JSON.stringify(data.output);
-    }else if(data.content){
-      searchResult = data.content;
+    // Responses API 返回 output 数组
+    if(data.output_text){
+      searchResult = data.output_text;
+    }else if(data.output && Array.isArray(data.output)){
+      for(var oi = 0; oi < data.output.length; oi++){
+        var item = data.output[oi];
+        if(item.type === 'message' && item.content){
+          for(var ci = 0; ci < item.content.length; ci++){
+            if(item.content[ci].text){
+              searchResult += item.content[ci].text;
+            }
+          }
+        }
+      }
     }
     safeCallback(searchResult);
   }).catch(function(err){
