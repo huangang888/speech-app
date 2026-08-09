@@ -771,7 +771,10 @@ var WRITING_STANDARDS = '\n\n【写作标准——六条硬指标，逐条对照
   '  · 分：用"第一""第二""第三"或"首先""其次""最后"明确分层，每层一个核心观点\n' +
   '    观点标题用8-12字短句概括，后接阐述。让听众听得清"讲了几个意思"\n' +
   '  · 总：结尾呼应开头，升华主题，收束有力\n' +
-  '  · 不要用空行代替分层，该标注就标注，层次感要强\n\n' +
+  '  · 不要用空行代替分层，该标注就标注，层次感要强\n' +
+  '  · 各层观点标题必须对仗统一：字数相同、句式相同、风格相同\n' +
+  '    例如第一用"以文铸魂"，第二就用"以文化人"，第三就用"以文育人"\n' +
+  '    绝不能第一个观点是四字短语、第二个变成叙述句、第三个又换成问句\n\n' +
   '二、短句：整句要短，能断就断\n' +
   '  · 每句不超过20字，多用逗号和句号断句，少用长句和从句\n' +
   '  · 好的节奏：三四句短句铺陈，一句稍长收束，再几句短句推进\n' +
@@ -1494,7 +1497,7 @@ function buildPrompt(){
       WRITING_STANDARDS + '\n\n' +
       '七、每句话都要有分量，不写正确的废话。\n\n' +
       '【输出格式】\n' +
-      '纯文本，不要markdown符号。第一行是标题（不加书名号），空行后开始正文，段落间空行分隔。\n' +
+      '纯文本，绝对不要任何markdown符号（不要**、#、-、*等）。第一行是标题（不加书名号），空行后开始正文，段落间空行分隔。\n' +
       '正文分层用"第一""第二""第三"标注。直接给出完整的发言稿。';
   }
 
@@ -1568,7 +1571,7 @@ function buildPrompt(){
     WRITING_STANDARDS + '\n\n' +
     '七、' + (isShort ? '庆典/表态类发言可不分层标注，如即兴发言般真挚。控制在500字，3分钟讲完。' : '控制在' + (userWordReq || '1000') + '字左右，' + (userWordReq ? '' : '5分钟讲完。') + '每句话都要有分量，不写正确的废话。') + '\n\n' +
     '【输出格式】\n' +
-    '纯文本，不要markdown符号。第一行是标题（不加书名号），空行后开始正文，段落间空行分隔。\n' +
+    '纯文本，绝对不要任何markdown符号（不要**、#、-、*等）。第一行是标题（不加书名号），空行后开始正文，段落间空行分隔。\n' +
     '正文分层用"第一""第二""第三"标注，让听众听得清层次。直接给出完整的发言稿。';
 }
 
@@ -1784,6 +1787,8 @@ function parseSpeech(text){
       if(inParagraph){html += '</p>'; inParagraph = false;}
       continue;
     }
+    // 清除markdown残留符号（**、*、#、- 等）
+    line = line.replace(/^\*+/,'').replace(/\*+$/,'').replace(/^#+\s*/,'').replace(/^[-*]\s+/,'').trim();
     // 跳过标题行（第一行，已单独显示）
     if(i === 0 && line.indexOf('尊敬的') === -1 && line.indexOf('各位') === -1){
       continue;
@@ -1807,10 +1812,11 @@ function parseSpeech(text){
       html += '<p style="font-weight:700;font-size:0.88rem;color:var(--gold);margin:10px 0 4px 0;">' + line + '</p>';
       continue;
     }
-    // 一级标题：一、二、三 / 第一、第二、第三（加粗，缩进2字符）
+    // 分层标题：第一、第二、第三 / 一、二、三 / 首先、其次、最后
+    // 整段朱红色黑体显示，突出观点层次
     if(/^[一二三四五六七八九十]、/.test(line) || /^第[一二三四五六七八九十]/.test(line) || /^(首先|其次|再次|最后)/.test(line)){
       if(inParagraph){html += '</p>'; inParagraph = false;}
-      html += '<p style="font-weight:700;font-size:1rem;color:var(--primary);text-indent:2em;margin:14px 0 6px 0;">' + line + '</p>';
+      html += '<p style="font-weight:700;font-family:var(--font-heading);font-size:1.05rem;color:var(--primary);text-indent:0;margin:18px 0 8px 0;padding:6px 0 6px 12px;border-left:3px solid var(--gold);">' + line + '</p>';
       continue;
     }
     // 小标题：短句开头
