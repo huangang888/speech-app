@@ -1721,7 +1721,9 @@ function doGenerate(apiKey, prompt, model, temp){
 }
 
 function updateStreamResult(text){
-  document.getElementById('card-result').style.display = 'block';
+  // 流式输出期间只更新内容，不改变card-result的display
+  // card-result保持display:none，由finishStream中的showResult统一显示
+  // 这样loading转圈全程可见，不抖动
   document.getElementById('resultContent').innerHTML = parseSpeech(text);
   document.getElementById('wordCount').textContent = '共 ' + text.replace(/\s/g,'').length + ' 字';
 }
