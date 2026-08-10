@@ -510,7 +510,7 @@ body{
 
   <!-- Step 1: Meeting Type -->
   <div class="card" id="card-type">
-    <div class="section-title">选择会议类型</div>
+    <div class="section-title">会议类型</div>
     <div class="type-grid" id="typeGrid"></div>
     <div class="section-title" style="margin-top:6px;">发言目的 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（可选，自动判断更省心）</span></div>
     <div class="type-grid" id="modeGrid"></div>
@@ -705,14 +705,14 @@ var RESPONSES_URL = 'https://api.deepseek.com/responses';
 var MEETING_TYPES = [
   {id:'wenhua',name:'文化交流会',icon:'文'},
   {id:'diaoyan',name:'调研座谈会',icon:'研'},
-  {id:'dongyuan',name:'工作动员部署会',icon:'动'},
+  {id:'dongyuan',name:'动员部署会',icon:'动'},
   {id:'kaocha',name:'考察座谈会',icon:'考'},
   {id:'xuexi',name:'学习研讨会',icon:'学'},
   {id:'jiandu',name:'监督协商会',icon:'协'},
-  {id:'qingdian',name:'庆典宴会致词',icon:'庆'},
-  {id:'biaotai',name:'会议表态发言',icon:'表'},
+  {id:'qingdian',name:'宴会致词',icon:'庆'},
+  {id:'yanjiang',name:'演讲发言',icon:'讲'},
   {id:'qita',name:'其他会议场景',icon:'他'},
-  {id:'tigang',name:'发言方向提纲',icon:'纲'}
+  {id:'tigang',name:'拟草思路提纲',icon:'纲'}
 ];
 
 // ===== 发言目的（结构模式，源自《提高会议发言水平的9个公式》） =====
@@ -818,7 +818,7 @@ var WRITING_STANDARDS = '\n\n【写作标准——八条硬指标，逐条对照
   '  · 发言要紧扣会议报告或主题的实际内容，不能脱离报告空谈';
 
 var COST_PER_MIL = { 'deepseek-v4-pro': 6, 'deepseek-v4-flash': 1.2 };
-var typeTemps = { 'wenhua':0.8, 'qingdian':0.85, 'kaocha':0.5, 'xuexi':0.4, 'dongyuan':0.6, 'diaoyan':0.5, 'jiandu':0.4, 'biaotai':0.3, 'qita':0.5, 'tigang':0.5 };
+var typeTemps = { 'wenhua':0.8, 'qingdian':0.85, 'kaocha':0.5, 'xuexi':0.4, 'dongyuan':0.6, 'diaoyan':0.5, 'jiandu':0.4, 'yanjiang':0.7, 'qita':0.5, 'tigang':0.5 };
 function getScenarioTemp(){
   return typeTemps[state.meetingType] || 0.5;
 }
@@ -1138,7 +1138,11 @@ function selectType(typeId){
   }else if(typeId === 'tigang'){
     noteInput.placeholder = '可选，补充讲话身份、重点方向等';
     topicInput.placeholder = '请输入需要提炼观点的会议主题...';
-    genBtn.textContent = '生成发言方向提纲';
+    genBtn.textContent = '生成拟草思路提纲';
+  }else if(typeId === 'yanjiang'){
+    noteInput.placeholder = '可选，补充演讲场合、听众、时长等';
+    topicInput.placeholder = '请输入演讲主题，如：青春追梦、不负韶华...';
+    genBtn.textContent = '开始生成演讲稿';
   }else if(typeId === 'dongyuan'){
     noteInput.placeholder = '建议写明讲话人身份，如：县长、局长、党委书记...';
     topicInput.placeholder = '请输入动员部署的具体主题，如：全县招商引资工作...';
@@ -1446,10 +1450,10 @@ function buildPrompt(){
     if(wm) userWordReq = parseInt(wm[1]);
   }
 
-  // ===== 发言方向提纲（特殊模式） =====
+  // ===== 拟草思路提纲（特殊模式） =====
   if(state.meetingType === 'tigang'){
     if(state.refine === '扩写'){
-      return '你是一位顶级发言撰稿人。请根据以下发言方向提纲，扩写为一篇完整、有血有肉的会议发言稿。\n\n' +
+      return '你是一位顶级发言撰稿人。请根据以下拟草思路提纲，扩写为一篇完整、有血有肉的会议发言稿。\n\n' +
       '【原始提纲】\n' + (state.result || state.topic) + '\n\n' +
       '【扩写要求】\n' +
       '1. 保持原提纲的核心观点不变，不要删改观点主旨\n' +
@@ -1465,12 +1469,12 @@ function buildPrompt(){
     var tigangFeedbackCtx = getFeedbackContext();
     return '你是一位顶级发言撰稿人和思想顾问，擅长为各类会议发言提炼核心观点和金句。\n\n' +
       '═══════════════════════════════════\n' +
-      '任务模式：发言方向提纲\n' +
+      '任务模式：拟草思路提纲\n' +
       '会议主题：' + state.topic + '\n' +
       audienceSection + noteText + refSection + tigangFeedbackCtx + '\n' +
       '═══════════════════════════════════\n\n' +
       '【任务要求】\n' +
-      '针对上述会议主题，提炼出至少3个主要观点的方向提纲。\n\n' +
+      '针对上述会议主题，提炼出至少3个主要观点的思路提纲。\n\n' +
       '每个观点要求：\n' +
       '1. 观点标题：8-16字，新颖鲜明、掷地有声，用比喻/对仗/拟人手法，让人过目不忘\n' +
       '2. 观点阐述：200-300字，讲清楚这个观点的核心逻辑和独特思考角度\n' +
@@ -1482,7 +1486,7 @@ function buildPrompt(){
       '• 如果有听众信息，开头先对与会人员致以亲切问候\n\n' +
       '【输出格式】\n' +
       '纯文本，不要markdown符号。格式如下：\n' +
-      '第一行：总标题（关于XX的发言方向提纲，16字以内）\n' +
+      '第一行：总标题（关于XX的拟草思路提纲，16字以内）\n' +
       '空行\n' +
       '观点一：XXXX\n（观点阐述200-300字）\n【金言金句】\n（300字以内）\n\n' +
       '观点二：XXXX\n（观点阐述200-300字）\n【金言金句】\n（300字以内）\n\n' +
@@ -1518,6 +1522,39 @@ function buildPrompt(){
       '正文分层用"第一""第二""第三"标注。每个观点标题独占一行，阐述内容另起一行。直接给出完整的发言稿。';
   }
 
+  // ===== 演讲发言（特殊模式） =====
+  if(state.meetingType === 'yanjiang'){
+    var yanjiangFeedbackCtx = getFeedbackContext();
+    var yanjiangMaxWords = userWordReq ? (userWordReq + '字（用户指定）') : '800-1200字';
+    var yanjiangAudience = audienceText ? '\n听众：' + audienceText : '';
+    return '你是一位顶级演讲稿撰稿人，正在为一场演讲撰写高质量演讲稿。\n\n' +
+      '**严禁在演讲中提及撰稿过程或AI辅助。演讲以第一人称"我"来写，自然、真诚、有感染力。**\n\n' +
+      '═══════════════════════════════════\n' +
+      '演讲主题：' + state.topic + '\n' +
+      '语调风格：' + tone + '\n' +
+      '字数限制：' + yanjiangMaxWords + '\n' +
+      yanjiangAudience + noteText + refSection + yanjiangFeedbackCtx + '\n' +
+      '═══════════════════════════════════\n\n' +
+      '【写作要求——请逐条遵循】\n\n' +
+      '一、标题：用比喻或拟人手法，对仗工整，有冲击力和画面感，让人一看就想听。\n\n' +
+      '二、开头：用一个故事、一个提问或一句反常识的话开场，3秒内抓住听众注意力。不讲客套话，不慢热。\n\n' +
+      '三、正文：分三个层次推进，每个层次用"故事 + 观点 + 金句"的结构：\n' +
+      '   · 先讲一个具体的故事或场景（有画面感、有细节）\n' +
+      '   · 再提炼出观点（从故事中长出来的，不硬贴）\n' +
+      '   · 用一句金句点睛（能单独拿出来传播的）\n\n' +
+      '四、节奏：长短句交替，排比句推高潮，短句收束。像音乐一样有快有慢有停顿。\n\n' +
+      '五、结尾：回扣开头的故事或提问，形成闭环。最后一句话必须是"金句中的金句"，让人听完还在回味，忍不住想鼓掌。\n\n' +
+      '六、语言要求：\n' +
+      '   · 金句密度高，每200字至少一句可以单独拿出来传播的金句\n' +
+      '   · 多用排比句、对仗句，增强节奏感和气势\n' +
+      '   · 多用比喻、拟人，把抽象道理讲得有画面感\n' +
+      '   · 不写正确的废话，每句话都要有分量\n\n' +
+      '七、字数：' + yanjiangMaxWords + '，3-5分钟讲完，适合站立演讲。\n\n' +
+      '【输出格式】\n' +
+      '纯文本，不要markdown符号。第一行是标题（不加书名号），空行后开始正文，段落间空行分隔。\n' +
+      '禁止任何标注说明，直接给出完整的演讲稿。';
+  }
+
   // ===== 默认模式（黄主任专属，含听众问候） =====
   var typeTones = {
     'wenhua': '文雅诗意，引经据典，有文化纵深和人文温度',
@@ -1527,11 +1564,11 @@ function buildPrompt(){
     'xuexi': '严谨深刻，理论联系实际，学思践悟有理论高度',
     'jiandu': '真诚坦率，监督有力度协商有温度，指出问题也提出方案',
     'qingdian': '喜庆热烈，温暖真挚，有仪式感和感染力，如祝酒词般自然',
-    'biaotai': '态度鲜明掷地有声，干脆利落有执行力，展现决心和担当'
+    'yanjiang': '激情澎湃又收放自如，以故事开场抓人，以金句收束燃人，有起承转合的节奏感，让人听完想鼓掌、想行动'
   };
 
   var tone = typeTones[state.meetingType] || typeTones['diaoyan'];
-  var isShort = (state.meetingType === 'qingdian' || state.meetingType === 'biaotai');
+  var isShort = (state.meetingType === 'qingdian');
   var maxWords;
   if(userWordReq){
     maxWords = userWordReq + '字（用户指定）';
@@ -1616,7 +1653,7 @@ function searchMaterials(apiKey, topic, typeName, callback){
   var called = false;
   function safeCallback(result){ if(called) return; called = true; callback(result); }
   var searchQuery = topic;
-  if(typeName && typeName !== '其他会议场景' && typeName !== '发言方向提纲'){
+  if(typeName && typeName !== '其他会议场景' && typeName !== '拟草思路提纲'){
     searchQuery = typeName + ' ' + topic;
   }
   // DeepSeek Responses API 格式：
@@ -1939,7 +1976,7 @@ function isLiked(speech){
   return false;
 }
 function expandOutline(){
-  if(!state.result){ showToast('请先生成发言方向提纲'); return; }
+  if(!state.result){ showToast('请先生成拟草思路提纲'); return; }
   state.refine = '扩写';
   showToast('正在扩写成完整发言稿...');
   handleGenerate();
