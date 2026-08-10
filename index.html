@@ -687,7 +687,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · v24 排版升级 · 用心写好每一次发言
+  <span class="brand">讲话助手</span> · 黄主任专属 · v25 摘要标签优化 · 用心写好每一次发言
 </div>
 
 </div>
@@ -1969,7 +1969,16 @@ function parseSpeech(text){
         window.__speechTitle = sl.replace(/^标题[：:]\s*/, '').trim();
         continue;
       }
-      html += '<p style="font-family:var(--font-heading);font-weight:700;color:var(--primary);text-indent:2em;margin:2px 0;">' + esc + '</p>';
+      var labelMatch = sl.match(/^(主题词|写作思路|发言预期)[：:]/);
+      if(labelMatch){
+        var lblEsc = labelMatch[0].replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        var restEsc = sl.substring(labelMatch[0].length).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        html += '<p style="text-indent:2em;margin:2px 0;">' +
+          '<span style="font-family:var(--font-heading);font-weight:700;color:var(--primary);">' + lblEsc + '</span>' +
+          restEsc + '</p>';
+      }else{
+        html += '<p style="text-indent:2em;margin:2px 0;">' + esc + '</p>';
+      }
     }
     html += '<div style="border-top:1px dashed var(--border);margin:10px 0;"></div>';
   }
