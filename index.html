@@ -551,8 +551,7 @@ body{
       </div>
 <textarea class="text-input" id="refText" placeholder="或直接粘贴参考资料内容..." style="margin-top:8px;min-height:80px;resize:vertical;" oninput="updateRefWordCount()"></textarea>
       <span class="input-hint" id="refWordCount" style="margin-top:2px;display:block;">已输入 0 字</span>
-      <input type="text" class="text-input" id="keyDataInput" placeholder="可选：填几个关键数据，如 投入2.3亿、新增就业1200人、同比增长18%..." style="margin-top:8px;" oninput="updateKeyData()">
-      <span class="input-hint" style="margin-top:2px;display:block;">关键数据会真实融入发言，避免空话和编造</span>
+      <input type="hidden" id="keyDataInput" value="">
     </div>
     <button class="btn btn-primary" id="generateBtn" onclick="handleGenerate()">
       开始生成发言稿
@@ -687,7 +686,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · v28 风险防范三查 · 用心写好每一次发言
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v29
 </div>
 
 </div>
@@ -765,7 +764,7 @@ var SYSTEM_PROMPT = '你是一位顶级党政文稿撰稿人，深谙机关公�
   '禁止使用不规范口语：热乎劲儿、心里涌上来、暖人心窝、像回家一样等乡俗表达。\n' +
   '短句、排比、金句要用，但必须在党政语言框架内使用，不能为了修辞牺牲严肃性。\n' +
   '结构上用总（亮明观点）-分（第一、第二、第三分点阐述）-总（总结收尾，呼应开头）。\n' +
-  '所有数据和事例必须源自参考资料或联网搜索，绝不胡编捏造。\n' +
+  '所有数据和事例必须源自参考资料或联网搜索，绝不胡编捏造。尤其历史人物、家书、名言、事件细节，资料中没有的一律用“×××”占位或留白，宁可空着也不虚构。\n' +
   '═══════ 灵魂要求：让发言“走心接地气” ═══════\n' +
   '一、脚下有泥土：内容贴近实际、有生活气息，讲具体的人和事，不悬在半空。\n' +
   '二、眼里要有人：心里装着听众，体现对人的关怀和理解。\n' +
@@ -833,11 +832,12 @@ var WRITING_STANDARDS = '\n\n【写作标准——八条硬指标，逐条对照
   '  · 全文至少两处金句，是自创的判断，不是名言引用\n' +
   '  · 金句要符合党政语境，如"发展是硬道理，落实是真功夫"\n' +
   '  · 金句必须和上下文浑然一体，不能突兀插入\n\n' +
-  '六、事实底线：不编不造\n' +
-  '  · 所有数据和事例必须基于用户提供的参考资料或联网搜索结果\n' +
-  '  · 参考资料和搜索结果中没有的数据，不写具体数字\n' +
-  '  · 绝不编造具体数字和案例\n' +
-  '  · 联网搜索的素材必须紧扣发言主题，不能脱离实际\n\n' +
+  '六、事实底线：零虚构（最高红线，必须遵守）\n' +
+  '  · 所有具体事实——人名、时间、地点、数字、引文、事件——必须来自参考资料或联网搜索，资料中没有的一律不得出现\n' +
+  '  · 参考资料和搜索结果中没有的数据，不写具体数字，可用“×××”占位或笼统表述\n' +
+  '  · 绝不编造人物、家书、名言、历史事件、具体案例；历史人物、文史典故尤其严格，宁缺毋滥，宁可留白不可虚构\n' +
+  '  · 联网搜索不到的素材，明确注明“需补充核实”，不得自行想象填充\n' +
+  '  · 联网搜索的素材必须紧扣发言主题，不能脱离实际\n' +
   '七、身份意识：认清发言场合\n' +
   '  · 党政会议上发言人是机关干部，不是文史研究者\n' +
   '  · 不要主动提及文史编书、文史研究等身份信息\n' +
@@ -1343,6 +1343,10 @@ function viewHistory(index){
   state.meetingType = h.type;
   state.topic = h.topic;
   state.result = h.speech;
+  // 同步表单，便于直接精修（主题+会议类型自动恢复）
+  var tInput = document.getElementById('topicInput');
+  if(tInput) tInput.value = h.topic;
+  try{ selectMode(h.type); }catch(e){}
   showResult(h.speech);
   switchTab('generate');
 }
@@ -2065,9 +2069,9 @@ function parseSpeech(text){
     }
     // 分层标题：第一、第二、第三 / 一、二、三 / 首先、其次、最后
     // 整段朱红色黑体显示，突出观点层次
-    if(/^[一二三四五六七八九十]、/.test(line) || /^第[一二三四五六七八九十]/.test(line) || /^(首先|其次|再次|最后)/.test(line)){
+    if(/^[一二三四五六七八九十]、/.test(line) || /^第[一二三四五六七八九十]/.test(line) || /^(首先|其次|再次|最后)/.test(line) || /^(其一|其二|其三|其四)/.test(line)){
       if(inParagraph){html += '</p>'; inParagraph = false;}
-      html += '<p style="font-family:var(--font-heading);font-size:1rem;color:var(--primary);text-indent:0;margin:14px 0 6px 0;padding:4px 0 4px 12px;border-left:3px solid var(--gold);">' + line + '</p>';
+      html += '<p style="font-family:var(--font-heading);font-weight:700;font-size:1.05rem;color:var(--primary);text-indent:0;margin:16px 0 8px 0;padding:6px 0 6px 12px;border-left:4px solid var(--gold);background:rgba(201,169,110,0.08);">' + line + '</p>';
       continue;
     }
     // 小标题：短句开头
@@ -2115,9 +2119,7 @@ function customRefine(){
   handleGenerate();
 }
 
-function updateKeyData(){
-  state.keyData = document.getElementById('keyDataInput').value.trim();
-}
+function updateKeyData(){}
 
 function toggleWenhua(){
   state.wenhuaStrengthen = document.getElementById('wenhuaToggle').checked;
