@@ -686,7 +686,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v30 标题范式升级
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v31
 </div>
 
 </div>
@@ -796,7 +796,7 @@ var SYSTEM_PROMPT = '你是一位顶级党政文稿撰稿人，深谙机关公�
   '输出必须分两部分，顺序固定、不得遗漏：\n' +
   '第一部分【摘要与主题词】：主题词3-5个、写作思路一句话、发言预期一句话（供撰稿人学习参考）。\n' +
   '第二部分【正式发言稿】：标题+正文。\n' +
-  '两部分之间用═══════════════分隔线隔开。';
+  '两部分之间用═══════════════分隔线隔开。全程使用纯文本，严禁出现*、**、#、-等任何markdown符号。';
 // ===== 写作标准（六条硬指标，所有场景共用）=====
 var WRITING_STANDARDS = '\n\n【写作标准——八条硬指标，逐条对照执行】\n\n' +
   '一、结构：总-分-总\n' +
@@ -2095,14 +2095,15 @@ function parseSpeech(text){
       html += '<div class="result-point"><strong>' + line + '</strong></div>';
       continue;
     }
-    // 普通段落
+    // 普通段落（**加粗转真加粗，清理残留星号，保证清爽排版）
+    var boldLine = line.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/\*+/g, '');
     if(!inParagraph){
       html += '<p style="text-indent:2em;">';
       inParagraph = true;
     }else{
       html += '<br>';
     }
-    html += line;
+    html += boldLine;
   }
   if(inParagraph){html += '</p>';}
   return html;
