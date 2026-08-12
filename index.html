@@ -686,7 +686,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v31
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v32 排版兜底
 </div>
 
 </div>
@@ -796,7 +796,7 @@ var SYSTEM_PROMPT = '你是一位顶级党政文稿撰稿人，深谙机关公�
   '输出必须分两部分，顺序固定、不得遗漏：\n' +
   '第一部分【摘要与主题词】：主题词3-5个、写作思路一句话、发言预期一句话（供撰稿人学习参考）。\n' +
   '第二部分【正式发言稿】：标题+正文。\n' +
-  '两部分之间用═══════════════分隔线隔开。全程使用纯文本，严禁出现*、**、#、-等任何markdown符号。';
+  '两部分之间用═══════════════分隔线隔开。全程使用纯文本，严禁出现*、**、#、-等任何markdown符号。正文中的观点标题（第一、第二等）必须独占一行，标题与阐述内容分行，不得混排。';
 // ===== 写作标准（六条硬指标，所有场景共用）=====
 var WRITING_STANDARDS = '\n\n【写作标准——八条硬指标，逐条对照执行】\n\n' +
   '一、结构：总-分-总\n' +
@@ -2051,6 +2051,21 @@ function parseSpeech(text){
     }
     // 清除markdown残留符号（**、*、#、- 等）
     line = line.replace(/^\*+/,'').replace(/\*+$/,'').replace(/^#+\s*/,'').replace(/^[-*]\s+/,'').trim();
+    // 摘要区特征行（智能识别，不依赖分隔线，保证排版稳定）
+    if(/^(标题|主题词|写作思路|发言预期)[：:]/.test(line)){
+      if(inParagraph){html += '</p>'; inParagraph = false;}
+      if(line.indexOf('标题') === 0){
+        window.__speechTitle = line.replace(/^标题[：:]\s*/, '').trim();
+        continue;
+      }
+      var lm = line.match(/^(主题词|写作思路|发言预期)[：:]/);
+      if(lm){
+        var lblS = lm[0].replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        var restS = line.substring(lm[0].length).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        html += '<p style="text-indent:2em;margin:2px 0;"><span style="font-family:var(--font-heading);font-weight:700;color:var(--primary);">' + lblS + '</span>' + restS + '</p>';
+      }
+      continue;
+    }
     // 跳过标题行（第一行，已单独显示）
     if(i === 0 && line.indexOf('尊敬的') === -1 && line.indexOf('各位') === -1){
       continue;
