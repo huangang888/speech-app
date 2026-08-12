@@ -686,7 +686,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v32 排版兜底
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v34 标题修复
 </div>
 
 </div>
@@ -796,7 +796,7 @@ var SYSTEM_PROMPT = '你是一位顶级党政文稿撰稿人，深谙机关公�
   '输出必须分两部分，顺序固定、不得遗漏：\n' +
   '第一部分【摘要与主题词】：主题词3-5个、写作思路一句话、发言预期一句话（供撰稿人学习参考）。\n' +
   '第二部分【正式发言稿】：标题+正文。\n' +
-  '两部分之间用═══════════════分隔线隔开。全程使用纯文本，严禁出现*、**、#、-等任何markdown符号。正文中的观点标题（第一、第二等）必须独占一行，标题与阐述内容分行，不得混排。';
+  '两部分之间用═══════════════分隔线隔开。全程使用纯文本，严禁出现*、**、#、-等任何markdown符号。正文中的观点标题必须单独成行，格式为“第一，标题内容。”独占一行，换行后再写阐述内容；严禁标题与阐述内容写在同一行。';
 // ===== 写作标准（六条硬指标，所有场景共用）=====
 var WRITING_STANDARDS = '\n\n【写作标准——八条硬指标，逐条对照执行】\n\n' +
   '一、结构：总-分-总\n' +
@@ -2066,8 +2066,8 @@ function parseSpeech(text){
       }
       continue;
     }
-    // 跳过标题行（第一行，已单独显示）
-    if(i === 0 && line.indexOf('尊敬的') === -1 && line.indexOf('各位') === -1){
+    // 跳过标题行（仅当第一行是独立短标题时；观点标题、称呼、长行不跳，避免误伤）
+    if(i === 0 && line.length <= 20 && line.indexOf('尊敬的') === -1 && line.indexOf('各位') === -1 && !/^第[一二三四五六七八九十]/.test(line) && !/^[一二三四五六七八九十]、/.test(line) && !/^(首先|其次|再次|最后)/.test(line)){
       continue;
     }
     // 开场白
@@ -2090,10 +2090,22 @@ function parseSpeech(text){
       continue;
     }
     // 分层标题：第一、第二、第三 / 一、二、三 / 首先、其次、最后
-    // 整段朱红色黑体显示，突出观点层次
+    // 整段朱红色黑体显示，突出观点层次；若标题与正文混排同行，自动按句号拆分
     if(/^[一二三四五六七八九十]、/.test(line) || /^第[一二三四五六七八九十]/.test(line) || /^(首先|其次|再次|最后)/.test(line) || /^(其一|其二|其三|其四)/.test(line)){
       if(inParagraph){html += '</p>'; inParagraph = false;}
-      html += '<p style="font-family:var(--font-heading);font-weight:700;font-size:1.05rem;color:var(--primary);text-indent:0;margin:16px 0 8px 0;padding:6px 0 6px 12px;border-left:4px solid var(--gold);background:rgba(201,169,110,0.08);">' + line + '</p>';
+      var hTitle = line, hBody = '';
+      if(line.length > 30){
+        var hDot = line.indexOf('。');
+        if(hDot > 2 && hDot <= 26){
+          hTitle = line.substring(0, hDot + 1);
+          hBody = line.substring(hDot + 1).trim();
+        }
+      }
+      html += '<p style="font-family:var(--font-heading);font-weight:700;font-size:1.05rem;color:var(--primary);text-indent:0;margin:16px 0 8px 0;padding:6px 0 6px 12px;border-left:4px solid var(--gold);background:rgba(201,169,110,0.08);">' + hTitle + '</p>';
+      if(hBody){
+        var hBodyBold = hBody.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/\*+/g, '');
+        html += '<p style="text-indent:2em;">' + hBodyBold + '</p>';
+      }
       continue;
     }
     // 小标题：短句开头
