@@ -686,7 +686,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v34 标题修复
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v35 五步修改法
 </div>
 
 </div>
@@ -869,7 +869,13 @@ var WRITING_STANDARDS = '\n\n【写作标准——八条硬指标，逐条对照
   '十二、画面感：\n' +
   '  · 多用比喻、谚语、群众语言，把抽象道理讲得具体生动\n' +
   '  · 如“缺钙软骨病”“两条蛇赛跑，跑得快的切尾巴、跑得慢的切脑袋”这类让人过目不忘的比喻\n' +
-  '  · 用身边人说身边事，用实例证明观点，效果妙趣横生、说服力强';
+  '  · 用身边人说身边事，用实例证明观点，效果妙趣横生、说服力强\n\n' +
+  '十三、五步修改法（初稿即按此标准写，不做废稿）：\n' +
+  '  · 删：紧扣主线，删掉一切稀释主题的废话，不贪多求全，无用的文字只会稀释质感\n' +
+  '  · 调：写后默读，调整语序节奏，读起来朗朗上口、错落有致\n' +
+  '  · 替：用看得见、摸得着的细节、数据、画面替代空泛形容词，禁用“很温暖、很感动、很扎实”这类空洞表达\n' +
+  '  · 破：长句拆短句，长短交错，让文字有呼吸感，每句不超过20字\n' +
+  '  · 留：结尾有余味，不强行升华、不喊口号，用场景或画面收束，让人回味\n';
 
 var COST_PER_MIL = { 'deepseek-v4-pro': 6, 'deepseek-v4-flash': 1.2 };
 var typeTemps = { 'wenhua':0.8, 'qingdian':0.85, 'kaocha':0.5, 'xuexi':0.4, 'dongyuan':0.6, 'diaoyan':0.5, 'jiandu':0.4, 'zhengqiu':0.4, 'yanjiang':0.7, 'qita':0.5, 'tigang':0.5 };
@@ -1849,7 +1855,7 @@ function searchMaterials(apiKey, topic, typeName, callback){
 
 function callAI(apiKey){
   var prompt = buildPrompt();
-  if(state.refine){ prompt += '\n\n【精修要求】用户要求本次重点：' + state.refine; }
+  if(state.refine){ prompt += '\n\n【精修要求】用户要求本次重点：' + state.refine + '。请运用“删调替破留”五步修改法精修：删去繁就简、调理顺语序、替具象落地、破拆分长句、留结尾余味，改出有文采、有画面、有节奏的文字，读起来朗朗上口。'; }
   if(state.keyData){ prompt += '\n\n【关键数据（必须真实融入，不得虚构）】' + state.keyData; }
   if(state.wenhuaStrengthen){ prompt += '\n\n【文史素材加强】请自然融入本地文化元素（如围城文化、湘军故里、龙山药王文化、湄江风光等），增强文化纵深和历史厚重感；若为异地交流场合，则侧重讲共同的文化根脉（如湘军文化是涟源、湘乡、双峰共同的遗产），尊重主场文化，宾主有礼。'; }
 
