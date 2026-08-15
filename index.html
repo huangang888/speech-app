@@ -557,6 +557,9 @@ body{
       <span class="input-hint" id="refWordCount" style="margin-top:2px;display:block;">已输入 0 字</span>
       <input type="hidden" id="keyDataInput" value="">
     </div>
+    <input type="hidden" id="modeGrid"><input type="hidden" id="subJixiBox"><input type="hidden" id="subJixiGrid">
+    <input type="hidden" id="feedbackInput"><input type="hidden" id="feedbackHistory"><input type="hidden" id="feedbackList">
+    <input type="hidden" id="modeArrow">
     <button class="btn btn-primary" id="generateBtn" onclick="handleGenerate()">
       开始生成发言稿
     </button>
@@ -688,7 +691,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v38 场景结构内核版
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v38.1 修复版
 </div>
 
 </div>
@@ -1211,6 +1214,7 @@ function toggleKernel(){
 
 function renderModeGrid(){
   var grid = document.getElementById('modeGrid');
+  if(!grid) return;
   var html = '';
   for(var i = 0; i < SPEECH_MODES.length; i++){
     var t = SPEECH_MODES[i];
@@ -1223,6 +1227,7 @@ function renderModeGrid(){
 
 function renderSubJixiGrid(){
   var grid = document.getElementById('subJixiGrid');
+  if(!grid) return;
   var html = '';
   for(var i = 0; i < SUB_JIXI_MODES.length; i++){
     var t = SUB_JIXI_MODES[i];
