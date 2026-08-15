@@ -705,7 +705,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v38.9 标题规范版
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v39.0 结构醒目版
 </div>
 
 </div>
@@ -2274,6 +2274,12 @@ function parseSpeech(text){
     if(line === '【金言金句】' || line.indexOf('【金言金句】') === 0){
       if(inParagraph){html += '</p>'; inParagraph = false;}
       html += '<p style="font-weight:700;font-size:0.88rem;color:var(--gold);margin:10px 0 4px 0;">' + line + '</p>';
+      continue;
+    }
+    // 结构标题（结构一·总分式等多结构章节提示，黑体深金色醒目显示）
+    if(/^结构[一二三四五六七八九十]/.test(line)){
+      if(inParagraph){html += '</p>'; inParagraph = false;}
+      html += '<p style="font-family:var(--font-heading);font-weight:700;font-size:1.1rem;color:#B8860B;text-indent:0;margin:18px 0 10px 0;padding:8px 0 8px 12px;border-left:5px solid #B8860B;background:rgba(184,134,11,0.1);">' + line + '</p>';
       continue;
     }
     // 分层标题：第一、第二、第三 / 一、二、三 / 首先、其次、最后
