@@ -512,18 +512,21 @@ body{
   <div class="card" id="card-type">
     <div class="section-title">会议类型</div>
     <div class="type-grid" id="typeGrid"></div>
-    <div class="section-title" style="margin-top:6px;">发言目的 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（可选，自动判断更省心）</span></div>
-    <div class="type-grid" id="modeGrid"></div>
+    <div class="section-title" style="margin-top:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;" onclick="toggleMode()">发言目的 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（不选则自动判断）</span> <span id="modeArrow" style="font-size:0.8rem;color:var(--text-light);">▸</span></div>
+    <div class="type-grid" id="modeGrid" style="display:none;"></div>
     <div id="subJixiBox" style="margin-top:8px;display:none;">
       <div class="section-title" style="font-size:0.8rem;color:var(--text-light);">即兴应答问法 <span style="font-size:0.7rem;color:var(--text-light);">（选"点名发言"后可点选具体问法，不选则按通用即兴）</span></div>
       <div class="type-grid" id="subJixiGrid"></div>
     </div>
-    <label style="display:flex;align-items:center;gap:6px;margin-top:10px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
-      <input type="checkbox" id="wenhuaToggle" onchange="toggleWenhua()" style="width:16px;height:16px;accent-color:var(--primary);"> 加强文史素材（围城文化、湘军故里、龙山文化、湄江风光等）
-    </label>
-    <label style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
-      <input type="checkbox" id="webSearchToggle" onchange="toggleWebSearch()" style="width:16px;height:16px;accent-color:var(--primary);" checked> 联网搜索最新素材（写作前先搜索相关政策、数据、案例）
-    </label>
+    <div class="section-title" style="margin-top:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;" onclick="toggleAdv()">高级选项 <span id="advArrow" style="font-size:0.8rem;color:var(--text-light);">▸</span></div>
+    <div id="advBox" style="display:none;">
+      <label style="display:flex;align-items:center;gap:6px;margin-top:4px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
+        <input type="checkbox" id="wenhuaToggle" onchange="toggleWenhua()" style="width:16px;height:16px;accent-color:var(--primary);"> 加强文史素材
+      </label>
+      <label style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
+        <input type="checkbox" id="webSearchToggle" onchange="toggleWebSearch()" style="width:16px;height:16px;accent-color:var(--primary);" checked> 联网搜索最新素材
+      </label>
+    </div>
   </div>
 
   <!-- Step 2: Topic -->
@@ -654,8 +657,6 @@ body{
       <div class="stat-card"><div class="stat-num" id="statFav">-</div><div class="stat-label">常用会议</div></div>
     </div>
     <div class="stats-row" style="margin-top:0;">
-      <div class="stat-card"><div class="stat-num" id="statCumTokens">0</div><div class="stat-label">累计消耗token</div></div>
-      <div class="stat-card"><div class="stat-num" id="statCumCost">¥0.00</div><div class="stat-label">累计费用</div></div>
       <div class="stat-card"><div class="stat-num" id="statBalance">请设置</div><div class="stat-label">剩余余额</div></div>
     </div>
     <div class="input-group" style="margin-top:12px;">
@@ -686,7 +687,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v35 五步修改法
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v36 界面清爽版
 </div>
 
 </div>
@@ -1386,10 +1387,8 @@ function renderStats(){
     var timeStr = d.getMonth()+1 + '/' + d.getDate() + ' ' + d.getHours() + ':' + String(d.getMinutes()).padStart(2,'0');
     document.getElementById('statFav').textContent = getFavType() + ' | ' + timeStr;
   }
-  // 累计使用统计
+  // 累计使用统计（token/费用统计已精简，保留余额逻辑）
   var cum = data.cumUsage || {totalTokens:0, totalCost:0};
-  document.getElementById('statCumTokens').textContent = cum.totalTokens.toLocaleString();
-  document.getElementById('statCumCost').textContent = '¥' + cum.totalCost.toFixed(2);
   // 估算余额
   var savedBalance = data.balanceInput || 0;
   if(savedBalance > 0){
@@ -2161,6 +2160,21 @@ function customRefine(){
 }
 
 function updateKeyData(){}
+
+function toggleMode(){
+  var g = document.getElementById('modeGrid');
+  var a = document.getElementById('modeArrow');
+  if(!g || !a) return;
+  if(g.style.display === 'none'){ g.style.display = 'grid'; a.textContent = '▾'; }
+  else { g.style.display = 'none'; a.textContent = '▸'; }
+}
+function toggleAdv(){
+  var b = document.getElementById('advBox');
+  var a = document.getElementById('advArrow');
+  if(!b || !a) return;
+  if(b.style.display === 'none'){ b.style.display = 'block'; a.textContent = '▾'; }
+  else { b.style.display = 'none'; a.textContent = '▸'; }
+}
 
 function toggleWenhua(){
   state.wenhuaStrengthen = document.getElementById('wenhuaToggle').checked;
