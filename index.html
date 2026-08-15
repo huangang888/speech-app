@@ -532,8 +532,7 @@ body{
     <div class="type-grid" id="logicGrid"></div>
     <div class="section-title" style="margin-top:10px;">高级</div>
     <div id="kernelBox">
-      <div class="type-grid" id="kernelGrid"></div>
-      <div style="font-size:0.75rem;color:var(--text-light);margin-top:6px;line-height:1.6;">内核说明（点选往深里写，不选AI自动把握）：历史＝讲来龙去脉 · 理论＝讲清道理 · 实践＝讲能落地 · 辩证＝把矛盾讲透 · 价值＝为了谁</div>
+      <div style="font-size:0.8rem;color:var(--text);margin-top:2px;line-height:1.6;">写作高级感已默认拉满：历史纵深 · 理论依据 · 实践落地 · 辩证视角 · 价值温度</div>
       <div class="type-grid" id="advGrid" style="margin-top:8px;"></div>
       <label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
         <input type="checkbox" id="wenhuaToggle" onchange="toggleWenhua()" style="width:16px;height:16px;accent-color:var(--primary);"> 加强文史素材
@@ -720,7 +719,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v38.5 精简选项版
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v38.6 高级感默认版
 </div>
 
 </div>
@@ -844,6 +843,13 @@ var SYSTEM_PROMPT = '你是一位顶级党政文稿撰稿人，深谙机关公�
   '三、层次要清：提出问题、分析问题、解决问题层层递进，叙事、论理、结论环环相扣。\n' +
   '四、深想一层：每个观点都往深处挖一层，从现象到根源到本质，不停留在表面。\n' +
   '五、结论前置：开口第一句就是核心判断，不铺垫、不绕弯。\n' +
+  '═══════ 高级感要求（每次生成必须默认满足，不需用户选择） ═══════\n' +
+  '一、历史纵深：适当讲清来龙去脉、发展脉络，让内容有纵深感，不凭空而来\n' +
+  '二、理论依据：讲清背后的道理和逻辑，让内容有学理支撑，不浮于表面\n' +
+  '三、实践落地：给出具体路径和做法，让内容务实可操作，不停留口号\n' +
+  '四、辩证视角：善用对立统一看问题（无与有、危与机、虚与实），让内容有思想深度\n' +
+  '五、价值温度：落点“为了谁”，体现以人民为中心，让内容有温度、有情怀\n' +
+  '以上五点自然融入、浑然一体，不刻意堆砌，让每篇讲话都有高级感、经得起推敲\n\n' +
   '═══════ 高情商表达 ═══════\n' +
   '一、先扬后抑：提建议前先真诚肯定，对事不对人，维护氛围。\n' +
   '二、只提方案不抛难题：摆出卡点同时给出对策，把选择题交给领导，不当“问题传递者”。\n' +
@@ -2626,7 +2632,6 @@ function formatDate(){
 function init(){
   renderTypeGrid();
   renderLogicGrid();
-  renderKernelGrid();
   renderModeGrid();
   renderSubJixiGrid();
   loadSettings();
