@@ -121,12 +121,13 @@ body{
   gap:10px;
 }
 .type-btn{
-  padding:12px 8px;
+  padding:14px 8px;
+  min-height:46px;
   border:2px solid var(--border);
   border-radius:var(--radius-sm);
   background:var(--card);
   font-family:var(--font-body);
-  font-size:0.82rem;
+  font-size:0.85rem;
   color:var(--text);
   cursor:pointer;
   transition:all 0.2s;
@@ -483,6 +484,16 @@ body{
   .type-grid{grid-template-columns:1fr 1fr 1fr 1fr;}
   .header-title{font-size:1.8rem;}
 }
+#logicGrid{grid-template-columns:1fr 1fr;}
+#kernelGrid{grid-template-columns:1fr 1fr 1fr;}
+.quick-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center;}
+.quick-tags span{font-size:0.8rem;color:var(--text-light);}
+.quick-tag{
+  padding:5px 10px;border:1px solid var(--border);border-radius:14px;
+  background:var(--card);font-size:0.78rem;color:var(--text);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.quick-tag:active{background:var(--gold-light);}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
@@ -517,13 +528,11 @@ body{
     <div class="type-grid" id="lifeGrid"></div>
     <div class="section-title" style="margin-top:10px;">内容结构 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（不选则自动判断）</span></div>
     <div class="type-grid" id="logicGrid"></div>
-    <div class="section-title" style="margin-top:10px;cursor:pointer;-webkit-tap-highlight-color:transparent;" onclick="toggleKernel()">内容内核 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（可多选，往深里写）</span> <span id="kernelArrow" style="font-size:0.8rem;color:var(--text-light);">▸</span></div>
-    <div id="kernelBox" style="display:none;">
+    <div class="section-title" style="margin-top:10px;">高级</div>
+    <div id="kernelBox">
       <div class="type-grid" id="kernelGrid"></div>
-    </div>
-    <div class="section-title" style="margin-top:8px;">高级选项</div>
-    <div id="advBox">
-      <div class="type-grid" id="advGrid"></div>
+      <div style="font-size:0.75rem;color:var(--text-light);margin-top:6px;line-height:1.6;">内核说明（点选往深里写，不选AI自动把握）：历史＝讲来龙去脉 · 理论＝讲清道理 · 实践＝讲能落地 · 辩证＝把矛盾讲透 · 价值＝为了谁</div>
+      <div class="type-grid" id="advGrid" style="margin-top:8px;"></div>
       <label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
         <input type="checkbox" id="wenhuaToggle" onchange="toggleWenhua()" style="width:16px;height:16px;accent-color:var(--primary);"> 加强文史素材
       </label>
@@ -541,10 +550,27 @@ body{
     <div class="input-group">
       <label class="input-label">补充说明 <span class="input-hint">（可选，如身份、特殊要求等）</span></label>
       <input type="text" class="text-input" id="noteInput" placeholder="例如：作为政协委员代表发言...">
+      <div class="quick-tags"><span>发言人身份：</span>
+        <button class="quick-tag" onclick="quickFill('note','市领导')">市领导</button>
+        <button class="quick-tag" onclick="quickFill('note','部门负责人')">部门负责人</button>
+        <button class="quick-tag" onclick="quickFill('note','政协委员')">政协委员</button>
+        <button class="quick-tag" onclick="quickFill('note','基层干部')">基层干部</button>
+        <button class="quick-tag" onclick="quickFill('note','专家')">专家</button>
+        <button class="quick-tag" onclick="quickFill('note','主持人')">主持人</button>
+        <button class="quick-tag" onclick="quickFill('note','普通人')">普通人</button>
+      </div>
     </div>
     <div class="input-group">
       <label class="input-label">与会听众 <span class="input-hint">（如：市领导、部门负责人、企业代表等，便于开头问好）</span></label>
       <input type="text" class="text-input" id="audienceInput" placeholder="请输入与会听众，如：各位领导、各位委员、同志们...">
+      <div class="quick-tags"><span>听众点选：</span>
+        <button class="quick-tag" onclick="quickFill('aud','市领导')">市领导</button>
+        <button class="quick-tag" onclick="quickFill('aud','部门负责人')">部门负责人</button>
+        <button class="quick-tag" onclick="quickFill('aud','企业代表')">企业代表</button>
+        <button class="quick-tag" onclick="quickFill('aud','基层群众')">基层群众</button>
+        <button class="quick-tag" onclick="quickFill('aud','政协委员')">政协委员</button>
+        <button class="quick-tag" onclick="quickFill('aud','全体人员')">全体人员</button>
+      </div>
     </div>
     <div class="input-group">
       <label class="input-label">参考资料 <span class="input-hint">（上传会议通知、汇报材料等，支持txt/docx）</span></label>
@@ -692,7 +718,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v38.3 分类优化版
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v38.4 通俗易用版
 </div>
 
 </div>
@@ -717,7 +743,7 @@ var MEETING_TYPES = [
   {id:'jiandu',name:'监督协商会',icon:'协',cat:'work'},
   {id:'zhengqiu',name:'征求意见会',icon:'征',cat:'work'},
   {id:'huibao',name:'工作汇报会',icon:'报',cat:'work'},
-  {id:'huiyi',name:'其他发言',icon:'言',cat:'work'},
+  {id:'huiyi',name:'其他会议发言',icon:'言',cat:'work'},
   // 生活类
   {id:'yanjiang',name:'演讲发言',icon:'讲',cat:'life'},
   {id:'hunli',name:'婚礼致辞',icon:'囍',cat:'life'},
@@ -730,10 +756,10 @@ var MEETING_TYPES = [
 // ===== 内容结构（四大逻辑） =====
 var LOGICS = [
   {id:'',name:'自动判断',icon:'智'},
-  {id:'zongfen',name:'总-分-总',icon:'总'},
-  {id:'shishen',name:'是什么-做什么-怎么做',icon:'知'},
-  {id:'wenti',name:'问题-分析-解决',icon:'问'},
-  {id:'shijiao',name:'从某某看',icon:'看'}
+  {id:'zongfen',name:'总分式',icon:'总'},
+  {id:'shishen',name:'认知式',icon:'知'},
+  {id:'wenti',name:'问题式',icon:'问'},
+  {id:'shijiao',name:'角度式',icon:'看'}
 ];
 
 // ===== 内容内核（五大内核，多选） =====
@@ -1200,6 +1226,14 @@ function selectKernel(key){
     if(idx > -1){ state.kernels.splice(idx, 1); } else { state.kernels.push(key); }
   }
   renderKernelGrid();
+}
+function quickFill(target, val){
+  var id = (target === 'note') ? 'noteInput' : 'audienceInput';
+  var input = document.getElementById(id);
+  if(!input) return;
+  var cur = input.value.trim();
+  input.value = cur ? cur + '；' + val : val;
+  input.focus();
 }
 function toggleKernel(){
   var b = document.getElementById('kernelBox');
