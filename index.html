@@ -720,7 +720,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v38.4 通俗易用版
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v38.5 精简选项版
 </div>
 
 </div>
@@ -757,7 +757,6 @@ var MEETING_TYPES = [
 
 // ===== 内容结构（四大逻辑） =====
 var LOGICS = [
-  {id:'',name:'自动判断',icon:'智'},
   {id:'zongfen',name:'总分式',icon:'总'},
   {id:'shishen',name:'认知式',icon:'知'},
   {id:'wenti',name:'问题式',icon:'问'},
@@ -766,7 +765,6 @@ var LOGICS = [
 
 // ===== 内容内核（五大内核，多选） =====
 var KERNELS = [
-  {id:'',name:'自动',icon:'智'},
   {id:'lishi',name:'历史',icon:'史',desc:'讲清来龙去脉、发展脉络，让内容有纵深感'},
   {id:'lilun',name:'理论',icon:'论',desc:'讲清理论依据、内在道理，让内容有学理性'},
   {id:'shijian',name:'实践',icon:'践',desc:'讲清具体路径、操作办法，让内容能落地'},
@@ -1197,9 +1195,8 @@ function renderLogicGrid(){
   var html = '';
   for(var i = 0; i < LOGICS.length; i++){
     var t = LOGICS[i];
-    var key = t.id === '' ? 'auto' : t.id;
     var sel = state.logic === t.id ? ' selected' : '';
-    html += '<button class="type-btn' + sel + '" onclick="selectLogic(\'' + key + '\')" data-logic="' + key + '">' + t.name + '</button>';
+    html += '<button class="type-btn' + sel + '" onclick="selectLogic(\'' + t.id + '\')" data-logic="' + t.id + '">' + t.name + '</button>';
   }
   grid.innerHTML = html;
 }
@@ -1208,13 +1205,12 @@ function renderKernelGrid(){
   var grid = document.getElementById('kernelGrid');
   if(!grid) return;
   var html = '';
+  var karr = state.kernels || [];
   for(var i = 0; i < KERNELS.length; i++){
     var t = KERNELS[i];
-    var key = t.id === '' ? 'auto' : t.id;
-    var karr = state.kernels || [];
-    var sel = (key === 'auto') ? (karr.length === 0 ? ' selected' : '') : (karr.indexOf(t.id) > -1 ? ' selected' : '');
+    var sel = karr.indexOf(t.id) > -1 ? ' selected' : '';
     var tip = t.desc ? ' title="' + t.desc + '"' : '';
-    html += '<button class="type-btn' + sel + '"' + tip + ' onclick="selectKernel(\'' + key + '\')" data-kernel="' + key + '">' + t.name + '</button>';
+    html += '<button class="type-btn' + sel + '"' + tip + ' onclick="selectKernel(\'' + t.id + '\')" data-kernel="' + t.id + '">' + t.name + '</button>';
   }
   grid.innerHTML = html;
 }
