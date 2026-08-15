@@ -540,7 +540,7 @@ body{
     <div class="section-title">发言主题</div>
     <div class="input-group">
       <label class="input-label">会议主题或关键词 <span class="input-hint">（如"文化传承与创新"）</span></label>
-      <input type="text" class="text-input" id="topicInput" placeholder="请输入发言主题...">
+      <input type="text" class="text-input" id="topicInput" placeholder="请输入发言主题..." oninput="updateAudTags()">
     </div>
     <div class="input-group">
       <label class="input-label">补充说明 <span class="input-hint">（可选，如身份、特殊要求等）</span></label>
@@ -549,16 +549,7 @@ body{
     <div class="input-group">
       <label class="input-label">与会听众 <span class="input-hint">（如：市领导、部门负责人、企业代表等，便于开头问好）</span></label>
       <input type="text" class="text-input" id="audienceInput" placeholder="请输入与会听众，如：各位领导、各位委员、同志们...">
-      <div class="quick-tags"><span>听众点选：</span>
-        <button class="quick-tag" onclick="quickFill('aud','市领导')">市领导</button>
-        <button class="quick-tag" onclick="quickFill('aud','部门负责人')">部门负责人</button>
-        <button class="quick-tag" onclick="quickFill('aud','企业代表')">企业代表</button>
-        <button class="quick-tag" onclick="quickFill('aud','基层群众')">基层群众</button>
-        <button class="quick-tag" onclick="quickFill('aud','政协委员')">政协委员</button>
-        <button class="quick-tag" onclick="quickFill('aud','家人')">家人</button>
-        <button class="quick-tag" onclick="quickFill('aud','亲朋好友')">亲朋好友</button>
-        <button class="quick-tag" onclick="quickFill('aud','全体人员')">全体人员</button>
-      </div>
+      <div class="quick-tags" id="audTags"></div>
     </div>
     <div class="input-group">
       <label class="input-label">参考资料 <span class="input-hint">（上传会议通知、汇报材料等，支持txt/docx）</span></label>
@@ -706,7 +697,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v39.7 场景大全版
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v39.8 智能听众版
 </div>
 
 </div>
@@ -1241,6 +1232,65 @@ function selectKernel(key){
   }
   renderKernelGrid();
 }
+// ===== 听众点选自动生成（按场景+主题） =====
+var AUD_MAP = {
+  wenhua:['文化学者','文史爱好者','群众代表','相关部门'],
+  diaoyan:['调研组成员','部门负责人','基层代表','企业代表'],
+  kaocha:['考察组成员','被考察单位','负责人','一线人员'],
+  xuexi:['学习组成员','党员干部','理论骨干'],
+  dongyuan:['全体干部职工','部门负责人','基层单位'],
+  jiandu:['政协委员','部门负责人','特邀监督员'],
+  zhengqiu:['专家','部门负责人','基层代表'],
+  huibao:['领导','班子成员','上级部门'],
+  jingyan:['同行单位','与会代表','参会人员'],
+  dangke:['全体党员','干部职工','入党积极分子'],
+  zhishu:['领导班子','干部职工','考核组'],
+  zuzhi:['支部党员','支委成员','列席代表'],
+  huanying:['来宾','代表团','客商'],
+  zhaoshang:['企业家','客商','投资机构'],
+  xieshang:['政协委员','相关部门','界别群众'],
+  kaimu:['来宾','与会代表','新闻媒体'],
+  bimu:['来宾','与会代表','参会人员'],
+  peixun:['参训学员','业务骨干','干部职工'],
+  yanjiang:['现场观众','与会来宾','大众'],
+  hunli:['新人亲友','双方父母','宾客'],
+  shengri:['寿星亲友','家人','挚友'],
+  jiating:['家人','亲戚','长辈'],
+  rensheng:['同学','朋友','听众'],
+  dushu:['书友','读者','同事'],
+  huojiang:['领导','同事','评委'],
+  yanyan:['来宾','宾朋','领导'],
+  qiaoqian:['亲友','邻居','家人'],
+  shengxue:['师长','亲友','同学'],
+  weiwen:['病人','家属','医护人员'],
+  daoci:['逝者亲友','生前同事','各界人士']
+};
+function updateAudTags(){
+  var box = document.getElementById('audTags');
+  if(!box) return;
+  var list = AUD_MAP[state.meetingType] || ['领导','同事','与会人员'];
+  var topic = state.topic || '';
+  var extra = [];
+  if(topic.indexOf('教育') > -1){ extra.push('校长','教师','学生家长'); }
+  if(topic.indexOf('医疗') > -1 || topic.indexOf('卫生') > -1){ extra.push('医护人员','患者代表'); }
+  if(topic.indexOf('招商') > -1 || topic.indexOf('投资') > -1 || topic.indexOf('产业') > -1){ extra.push('企业家','客商','投资机构'); }
+  if(topic.indexOf('乡村') > -1 || topic.indexOf('农业') > -1){ extra.push('村干部','农民代表'); }
+  if(topic.indexOf('青年') > -1){ extra.push('青年代表'); }
+  if(topic.indexOf('文化') > -1){ extra.push('文化工作者','非遗传承人'); }
+  if(topic.indexOf('营商') > -1){ extra.push('市场主体','办事群众'); }
+  if(topic.indexOf('旅游') > -1 || topic.indexOf('文旅') > -1){ extra.push('游客代表','文旅企业'); }
+  if(topic.indexOf('退役') > -1){ extra.push('退役军人','军属'); }
+  list = list.concat(extra);
+  var seen = {}, uniq = [];
+  for(var i = 0; i < list.length; i++){
+    if(!seen[list[i]]){ seen[list[i]] = 1; uniq.push(list[i]); }
+  }
+  var html = '<span>听众点选：</span>';
+  for(var j = 0; j < uniq.length; j++){
+    html += '<button class="quick-tag" onclick="quickFill(\'aud\',\'' + uniq[j] + '\')">' + uniq[j] + '</button>';
+  }
+  box.innerHTML = html;
+}
 function quickFill(target, val){
   var id = (target === 'note') ? 'noteInput' : 'audienceInput';
   var input = document.getElementById(id);
@@ -1322,6 +1372,7 @@ function selectType(typeId){
     clearRefFile();
   }
   state.meetingType = typeId;
+  updateAudTags();
   var btns = document.querySelectorAll('.type-btn');
   for(var i = 0; i < btns.length; i++){
     var btn = btns[i];
