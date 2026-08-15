@@ -508,11 +508,19 @@ body{
 <!-- Generate Page -->
 <div class="page active" id="page-generate">
 
-  <!-- Step 1: Meeting Type -->
+  <!-- Step 1: 场景 + 结构 + 内核 -->
   <div class="card" id="card-type">
-    <div class="section-title">场景 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（选一个即可，风格自动匹配）</span></div>
-    <div class="type-grid" id="typeGrid"></div>
-    <input type="hidden" id="modeGrid"><input type="hidden" id="subJixiBox">
+    <div class="section-title">场景</div>
+    <div class="cat-title">工作类</div>
+    <div class="type-grid" id="workGrid"></div>
+    <div class="cat-title" style="margin-top:8px;">生活类</div>
+    <div class="type-grid" id="lifeGrid"></div>
+    <div class="section-title" style="margin-top:10px;">内容结构 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（不选则自动判断）</span></div>
+    <div class="type-grid" id="logicGrid"></div>
+    <div class="section-title" style="margin-top:10px;cursor:pointer;-webkit-tap-highlight-color:transparent;" onclick="toggleKernel()">内容内核 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（可多选，往深里写）</span> <span id="kernelArrow" style="font-size:0.8rem;color:var(--text-light);">▸</span></div>
+    <div id="kernelBox" style="display:none;">
+      <div class="type-grid" id="kernelGrid"></div>
+    </div>
     <div class="section-title" style="margin-top:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;" onclick="toggleAdv()">高级选项 <span id="advArrow" style="font-size:0.8rem;color:var(--text-light);">▸</span></div>
     <div id="advBox" style="display:none;">
       <label style="display:flex;align-items:center;gap:6px;margin-top:4px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
@@ -680,7 +688,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v37 界面最简版
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v38 场景结构内核版
 </div>
 
 </div>
@@ -696,17 +704,50 @@ var RESPONSES_URL = 'https://api.deepseek.com/responses';
 
 // ===== 会议类型 =====
 var MEETING_TYPES = [
-  {id:'wenhua',name:'文化交流会',icon:'文'},
-  {id:'diaoyan',name:'调研座谈会',icon:'研'},
-  {id:'dongyuan',name:'动员部署会',icon:'动'},
-  {id:'kaocha',name:'考察座谈会',icon:'考'},
-  {id:'xuexi',name:'学习研讨会',icon:'学'},
-  {id:'jiandu',name:'监督协商会',icon:'协'},
-  {id:'zhengqiu',name:'征求意见会',icon:'征'},
-  {id:'qingdian',name:'宴会致词',icon:'庆'},
-  {id:'shenghuo',name:'生活致辞',icon:'生'},
-  {id:'yanjiang',name:'演讲发言',icon:'讲'},
-  {id:'tigang',name:'拟草思路提纲',icon:'纲'}
+  // 工作类
+  {id:'wenhua',name:'文化交流会',icon:'文',cat:'work'},
+  {id:'diaoyan',name:'调研座谈会',icon:'研',cat:'work'},
+  {id:'dongyuan',name:'动员部署会',icon:'动',cat:'work'},
+  {id:'kaocha',name:'考察座谈会',icon:'考',cat:'work'},
+  {id:'xuexi',name:'学习研讨会',icon:'学',cat:'work'},
+  {id:'jiandu',name:'监督协商会',icon:'协',cat:'work'},
+  {id:'zhengqiu',name:'征求意见会',icon:'征',cat:'work'},
+  {id:'huibao',name:'工作汇报',icon:'报',cat:'work'},
+  {id:'biaotai',name:'表态发言',icon:'表',cat:'work'},
+  {id:'jianyi',name:'议政建言',icon:'议',cat:'work'},
+  {id:'yaoziyuan',name:'争取支持',icon:'源',cat:'work'},
+  {id:'mingan',name:'敏感事项发言',icon:'慎',cat:'work'},
+  {id:'xietiao',name:'请求协调',icon:'联',cat:'work'},
+  {id:'zhuchi',name:'会议主持收口',icon:'主',cat:'work'},
+  {id:'jixi',name:'即兴发言',icon:'即',cat:'work'},
+  {id:'yanjiang',name:'演讲发言',icon:'讲',cat:'work'},
+  {id:'tigang',name:'拟草思路提纲',icon:'纲',cat:'work'},
+  // 生活类
+  {id:'hunli',name:'婚礼致辞',icon:'囍',cat:'life'},
+  {id:'shengri',name:'生日祝福',icon:'岁',cat:'life'},
+  {id:'jiating',name:'家庭聚会',icon:'家',cat:'life'},
+  {id:'dushu',name:'读书分享',icon:'书',cat:'life'},
+  {id:'huojiang',name:'获奖感言',icon:'誉',cat:'life'},
+  {id:'yanyan',name:'宴会致词',icon:'宴',cat:'life'}
+];
+
+// ===== 内容结构（四大逻辑） =====
+var LOGICS = [
+  {id:'',name:'自动判断',icon:'智'},
+  {id:'zongfen',name:'总-分-总',icon:'总'},
+  {id:'shishen',name:'是什么-做什么-怎么做',icon:'知'},
+  {id:'wenti',name:'问题-分析-解决',icon:'问'},
+  {id:'shijiao',name:'从某某看',icon:'看'}
+];
+
+// ===== 内容内核（五大内核，多选） =====
+var KERNELS = [
+  {id:'',name:'自动',icon:'智'},
+  {id:'lishi',name:'历史',icon:'史',desc:'讲清来龙去脉、发展脉络，让内容有纵深感'},
+  {id:'lilun',name:'理论',icon:'论',desc:'讲清理论依据、内在道理，让内容有学理性'},
+  {id:'shijian',name:'实践',icon:'践',desc:'讲清具体路径、操作办法，让内容能落地'},
+  {id:'bianzheng',name:'辩证',icon:'辨',desc:'用对立统一看问题，无与有、危与机，让内容有深度'},
+  {id:'jiazhi',name:'价值',icon:'心',desc:'落点为了谁、以人民为中心，让内容有温度有魂'}
 ];
 
 // ===== 发言目的（结构模式，源自《提高会议发言水平的9个公式》） =====
@@ -735,6 +776,8 @@ var SUB_JIXI_MODES = [
 var state = {
   meetingType:'',
   speechMode:'',
+  logic:'',
+  kernels:[],
   subMode:'',
   topic:'',
   historyManage:false,
@@ -1100,14 +1143,70 @@ function saveHistory(speech){
 
 // ===== 渲染 =====
 function renderTypeGrid(){
-  var grid = document.getElementById('typeGrid');
-  var html = '';
+  var wg = document.getElementById('workGrid');
+  var lg = document.getElementById('lifeGrid');
+  var wh = '', lh = '';
   for(var i = 0; i < MEETING_TYPES.length; i++){
     var t = MEETING_TYPES[i];
     var sel = state.meetingType === t.id ? ' selected' : '';
-    html += '<button class="type-btn' + sel + '" onclick="selectType(\'' + t.id + '\')" data-type="' + t.id + '">' + t.name + '</button>';
+    var btn = '<button class="type-btn' + sel + '" onclick="selectType(\'' + t.id + '\')" data-type="' + t.id + '">' + t.name + '</button>';
+    if(t.cat === 'life'){ lh += btn; } else { wh += btn; }
+  }
+  if(wg) wg.innerHTML = wh;
+  if(lg) lg.innerHTML = lh;
+}
+
+function renderLogicGrid(){
+  var grid = document.getElementById('logicGrid');
+  if(!grid) return;
+  var html = '';
+  for(var i = 0; i < LOGICS.length; i++){
+    var t = LOGICS[i];
+    var key = t.id === '' ? 'auto' : t.id;
+    var sel = state.logic === t.id ? ' selected' : '';
+    html += '<button class="type-btn' + sel + '" onclick="selectLogic(\'' + key + '\')" data-logic="' + key + '">' + t.name + '</button>';
   }
   grid.innerHTML = html;
+}
+
+function renderKernelGrid(){
+  var grid = document.getElementById('kernelGrid');
+  if(!grid) return;
+  var html = '';
+  for(var i = 0; i < KERNELS.length; i++){
+    var t = KERNELS[i];
+    var key = t.id === '' ? 'auto' : t.id;
+    var karr = state.kernels || [];
+    var sel = (key === 'auto') ? (karr.length === 0 ? ' selected' : '') : (karr.indexOf(t.id) > -1 ? ' selected' : '');
+    var tip = t.desc ? ' title="' + t.desc + '"' : '';
+    html += '<button class="type-btn' + sel + '"' + tip + ' onclick="selectKernel(\'' + key + '\')" data-kernel="' + key + '">' + t.name + '</button>';
+  }
+  grid.innerHTML = html;
+}
+
+function selectLogic(key){
+  state.logic = (key === 'auto') ? '' : key;
+  var btns = document.querySelectorAll('[data-logic]');
+  for(var i = 0; i < btns.length; i++){
+    btns[i].classList.toggle('selected', btns[i].getAttribute('data-logic') === key);
+  }
+}
+function selectKernel(key){
+  if(key === 'auto'){
+    state.kernels = [];
+  }else{
+    state.kernels = state.kernels || [];
+    var idx = state.kernels.indexOf(key);
+    if(idx > -1){ state.kernels.splice(idx, 1); } else { state.kernels.push(key); }
+  }
+  renderKernelGrid();
+}
+function toggleKernel(){
+  var b = document.getElementById('kernelBox');
+  var a = document.getElementById('kernelArrow');
+  if(!b || !a) return;
+  if(b.style.display === 'none'){ b.style.display = 'block'; a.textContent = '▾'; }
+  else { b.style.display = 'none'; a.textContent = '▸'; }
 }
 
 function renderModeGrid(){
@@ -1186,10 +1285,10 @@ function selectType(typeId){
   var noteInput = document.getElementById('noteInput');
   var topicInput = document.getElementById('topicInput');
   var genBtn = document.getElementById('generateBtn');
-  if(typeId === 'qita'){
-    noteInput.placeholder = '请写明讲话人的职务身份，如：市长、局长、企业董事长...';
-    topicInput.placeholder = '请输入具体会议主题或场景，如：全市经济工作会议...';
-    genBtn.textContent = '开始生成发言稿';
+  if(typeId === 'hunli' || typeId === 'shengri' || typeId === 'jiating' || typeId === 'dushu' || typeId === 'huojiang' || typeId === 'yanyan'){
+    noteInput.placeholder = '请写明具体场合，如：侄女婚礼、父亲六十大寿、家庭团圆饭...';
+    topicInput.placeholder = '请输入致辞主题或想表达的心意...';
+    genBtn.textContent = '开始生成致辞';
   }else if(typeId === 'tigang'){
     noteInput.placeholder = '可选，补充讲话身份、重点方向等';
     topicInput.placeholder = '请输入需要提炼观点的会议主题...';
@@ -1486,6 +1585,15 @@ function buildPrompt(){
       structText = '本次发言任务：' + modeName + '。\n' + structText;
     }
   }
+  // V38：场景自带打法——工作类新场景自动匹配结构化打法
+  if(!structText){
+    for(var mi = 0; mi < SPEECH_MODES.length; mi++){
+      if(SPEECH_MODES[mi].id === state.meetingType){
+        structText = SPEECH_MODES[mi].struct;
+        break;
+      }
+    }
+  }
 
   var noteText = state.note ? '\n补充说明：' + state.note : '';
   var audienceText = document.getElementById('audienceInput').value.trim();
@@ -1688,8 +1796,21 @@ function buildPrompt(){
     'jiandu': '真诚坦率，监督有力度协商有温度，指出问题也提出方案。先肯定成绩再指出问题（先扬后抑），每个问题配一条改进建议',
     'zhengqiu': '专业谦和，先扬后抑，意见有分量：先具体肯定再提意见，眼光准、意见实、有高度，姿态谦和观点鲜明，让人信服',
     'qingdian': '喜庆热烈，温暖真挚，有仪式感和感染力，如祝酒词般自然。用“一核四维”法：核词定调（温情选“答案、缘分”，大气选“风骨、格局”），四维锚定（夸长辈、送主角、祝生活，或讲禀赋、积淀、作为、方向），开篇点季节扣身份，结尾画面式收束',
-    'shenghuo': '温暖真挚、自然亲切，像拉家常一样说话，不端不装。根据补充说明中的具体场合自动判断（婚礼、生日、家庭聚会、获奖感言、读书分享等），选准称呼、讲清场合、融入真情，用身边小事讲大道理，结尾有温度有余味',
-    'yanjiang': '激情澎湃又收放自如，以故事开场抓人，以金句收束燃人，有起承转合的节奏感，让人听完想鼓掌、想行动'
+    'huibao': '条理清晰、数据说话，实事求是讲成绩、不回避讲不足。按“背景情况—所做工作—取得成效—不足打算”组织，语言朴实有据',
+    'biaotai': '态度鲜明、干脆利落，上接天线下接地气。先真诚领会精神，再结合自身实际，最后给出具体可落实的行动承诺，不喊口号',
+    'jianyi': '先扬后抑、对事不对人。先真诚肯定现有工作，再点出真实痛点，给出可操作方案，讲清采纳的好处',
+    'yaoziyuan': '带着方案去要资源，把选择题交给领导。讲清真实困难（有数据）、摆出解决方案、站在合作角度争取支持',
+    'mingan': '风险前置、谋胜先谋败。先讲清可能的风险和各方反应，再给应对预案，最后请示决策，话不说满、进退有度',
+    'xietiao': '先拉近距离、强调共同目标，再摆客观事实，最后提出需要配合的具体事项，不指责不推诿',
+    'zhuchi': '倾听归纳、推动落实。从各方发言中提炼共识和要害，给出大家服气的结论，明确谁做什么、何时完成',
+    'jixi': '结论先行、不绕弯。第一句亮出最核心观点，再用两三条简短理由支撑，举一个具体实例印证',
+    'yanjiang': '激情澎湃又收放自如，以故事开场抓人，以金句收束燃人，有起承转合的节奏感，让人听完想鼓掌、想行动',
+    'hunli': '喜庆温馨、真诚不套话。选准对新人的称呼，夸新人之美、谢父母之恩、祝未来之好，用一件小事讲出一份真情，结尾画面式祝福',
+    'shengri': '温情真诚、忆往昔赞今朝。按寿星身份选称呼（长辈则敬重感恩、同辈则亲切温暖），讲一两个难忘往事，送健康平安祝愿',
+    'jiating': '家常亲切、亲情温暖。像拉家常一样说话，讲家人之间的故事和感动，感恩包容理解，祝家庭和美',
+    'dushu': '书里书外、学以致用。先讲清书的核心内容，再联系现实生活，最后谈自己的启发和改变，不堆砌书摘',
+    'huojiang': '谦逊真诚、归功于众。先感谢（具体到人和事），再把成绩归功于集体和支持者，最后表态继续前行、不负期望',
+    'yanyan': '喜庆热烈、温暖真挚，有仪式感和感染力，如祝酒词般自然。用“一核四维”法：核词定调（温情选“答案、缘分”，大气选“风骨、格局”），四维锚定（夸长辈、送主角、祝生活，或讲禀赋、积淀、作为、方向），开篇点季节扣身份，结尾画面式收束'
   };
 
   var tone = typeTones[state.meetingType] || typeTones['diaoyan'];
@@ -1849,6 +1970,30 @@ function searchMaterials(apiKey, topic, typeName, callback){
 
 function callAI(apiKey){
   var prompt = buildPrompt();
+  // V38：内容结构（四大逻辑）
+  if(state.logic){
+    var logicGuide = {
+      'zongfen': '\n\n【内容结构——总-分-总】开头总起亮明核心观点，正文分三层展开（每层一个观点，有事例有数据，观点标题对仗工整），结尾总结升华、呼应开头。',
+      'shishen': '\n\n【内容结构——是什么-做什么-怎么做】先讲清是什么（形势判断、本质认识），再讲清做什么（重点任务、目标要求），最后讲怎么做（路径方法、保障措施）。',
+      'wenti': '\n\n【内容结构——问题-分析-解决】先提出真问题（具体可感，有冲击力），再深入分析原因（摆表现、析成因、看危害），最后给出对策（可操作、能落地、有责任）。',
+      'shijiao': '\n\n【内容结构——从某某看】从两到三个不同视角观察同一事物，每个视角有具体内容和独立判断（如从数据看、从服务看、从基层看），最后汇拢成整体认识。'
+    };
+    if(logicGuide[state.logic]){ prompt += logicGuide[state.logic]; }
+  }
+  // V38：内容内核（五大内核，多选）
+  var karr = state.kernels || [];
+  if(karr.length > 0){
+    var kernelGuide = {
+      'lishi': '\n\n【内容内核——历史】讲清来龙去脉、发展脉络，让内容有历史纵深。',
+      'lilun': '\n\n【内容内核——理论】讲清理论依据、内在道理，让内容有学理支撑。',
+      'shijian': '\n\n【内容内核——实践】讲清具体路径、操作办法，让内容务实可落地。',
+      'bianzheng': '\n\n【内容内核——辩证】用对立统一看问题（无与有、危与机、虚与实、短与长），增强思想深度。',
+      'jiazhi': '\n\n【内容内核——价值】落点“为了谁”，体现以人民为中心，让内容有温度、有情怀。'
+    };
+    for(var ki = 0; ki < karr.length; ki++){
+      if(kernelGuide[karr[ki]]){ prompt += kernelGuide[karr[ki]]; }
+    }
+  }
   if(state.refine){ prompt += '\n\n【精修要求】用户要求本次重点：' + state.refine + '。请运用“删调替破留”五步修改法精修：删去繁就简、调理顺语序、替具象落地、破拆分长句、留结尾余味，改出有文采、有画面、有节奏的文字，读起来朗朗上口。'; }
   if(state.keyData){ prompt += '\n\n【关键数据（必须真实融入，不得虚构）】' + state.keyData; }
   if(state.wenhuaStrengthen){ prompt += '\n\n【文史素材加强】请自然融入本地文化元素（如围城文化、湘军故里、龙山药王文化、湄江风光等），增强文化纵深和历史厚重感；若为异地交流场合，则侧重讲共同的文化根脉（如湘军文化是涟源、湘乡、双峰共同的遗产），尊重主场文化，宾主有礼。'; }
@@ -2444,6 +2589,8 @@ function formatDate(){
 // ===== 初始化 =====
 function init(){
   renderTypeGrid();
+  renderLogicGrid();
+  renderKernelGrid();
   renderModeGrid();
   renderSubJixiGrid();
   loadSettings();
