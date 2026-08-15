@@ -495,6 +495,7 @@ body{
   cursor:pointer;-webkit-tap-highlight-color:transparent;
 }
 .quick-tag:active{background:var(--gold-light);}
+.type-btn.span-full{grid-column:1 / -1;}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
@@ -1169,18 +1170,25 @@ function renderTypeGrid(){
   var wg = document.getElementById('workGrid');
   var lg = document.getElementById('lifeGrid');
   var ag = document.getElementById('advGrid');
-  var wh = '', lh = '', ah = '';
+  var wh = [], lh = [], ah = [];
   for(var i = 0; i < MEETING_TYPES.length; i++){
     var t = MEETING_TYPES[i];
     var sel = state.meetingType === t.id ? ' selected' : '';
     var btn = '<button class="type-btn' + sel + '" onclick="selectType(\'' + t.id + '\')" data-type="' + t.id + '">' + t.name + '</button>';
-    if(t.cat === 'life'){ lh += btn; }
-    else if(t.cat === 'adv'){ ah += btn; }
-    else { wh += btn; }
+    if(t.cat === 'life'){ lh.push(btn); }
+    else if(t.cat === 'adv'){ ah.push(btn); }
+    else { wh.push(btn); }
   }
-  if(wg) wg.innerHTML = wh;
-  if(lg) lg.innerHTML = lh;
-  if(ag) ag.innerHTML = ah;
+  // 奇数个时，最后一项拉满整行，排列整齐
+  if(wh.length % 2 === 1 && wh.length > 1){
+    wh[wh.length - 1] = wh[wh.length - 1].replace('class="type-btn', 'class="type-btn span-full');
+  }
+  if(lh.length % 2 === 1 && lh.length > 1){
+    lh[lh.length - 1] = lh[lh.length - 1].replace('class="type-btn', 'class="type-btn span-full');
+  }
+  if(wg) wg.innerHTML = wh.join('');
+  if(lg) lg.innerHTML = lh.join('');
+  if(ag) ag.innerHTML = ah.join('');
 }
 
 function renderLogicGrid(){
