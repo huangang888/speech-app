@@ -2153,7 +2153,7 @@ function callAI(apiKey){
     if(larr.length > 1){
       structDesc += '\n【多结构要求】本稿同时采用多个结构，请分别按每个所选结构各生成三个具体观点，观点要有鲜明标题和充实阐述；不同结构的观点之间用清晰的章节标题分隔（如“结构一·总分式”“结构二·辩证式”），各自独立成组，不得混同。\n';
     }
-    structDesc += '\n【字数要求】本稿字数不限，每个观点写充实、写透彻，宁长勿短，确保内容有分量。\n';
+    structDesc += '\n【字数要求】每个观点写200-300字，观点精炼有料、论述紧凑有力，全文篇幅适中、节奏明快，不做无谓铺陈。\n';
     prompt = '【最高写作指令】以下内容结构为强制要求，必须严格执行，全文严格按所选结构生成观点，场景默认写法服从本结构，只保留场景的语气姿态。\n' + structDesc + '\n' + prompt;
   }
   // V38：内容内核（五大内核，多选）
@@ -2230,7 +2230,7 @@ function doGenerate(apiKey, prompt, model, temp, isRetry){
       model:model,
       messages:[{role:'system',content:SYSTEM_PROMPT},{role:'user',content:prompt}],
       temperature:temp,
-      max_tokens:8192,
+      max_tokens:4096,
       stream:true
     }),
     signal: genController.signal
