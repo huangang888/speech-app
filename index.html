@@ -510,22 +510,15 @@ body{
 
   <!-- Step 1: Meeting Type -->
   <div class="card" id="card-type">
-    <div class="section-title">会议类型</div>
+    <div class="section-title">场景 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（选一个即可，风格自动匹配）</span></div>
     <div class="type-grid" id="typeGrid"></div>
-    <div class="section-title" style="margin-top:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;" onclick="toggleMode()">发言目的 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（不选则自动判断）</span> <span id="modeArrow" style="font-size:0.8rem;color:var(--text-light);">▸</span></div>
-    <div class="type-grid" id="modeGrid" style="display:none;"></div>
-    <div id="subJixiBox" style="margin-top:8px;display:none;">
-      <div class="section-title" style="font-size:0.8rem;color:var(--text-light);">即兴应答问法 <span style="font-size:0.7rem;color:var(--text-light);">（选"点名发言"后可点选具体问法，不选则按通用即兴）</span></div>
-      <div class="type-grid" id="subJixiGrid"></div>
-    </div>
+    <input type="hidden" id="modeGrid"><input type="hidden" id="subJixiBox">
     <div class="section-title" style="margin-top:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;" onclick="toggleAdv()">高级选项 <span id="advArrow" style="font-size:0.8rem;color:var(--text-light);">▸</span></div>
     <div id="advBox" style="display:none;">
       <label style="display:flex;align-items:center;gap:6px;margin-top:4px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
         <input type="checkbox" id="wenhuaToggle" onchange="toggleWenhua()" style="width:16px;height:16px;accent-color:var(--primary);"> 加强文史素材
       </label>
-      <label style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
-        <input type="checkbox" id="webSearchToggle" onchange="toggleWebSearch()" style="width:16px;height:16px;accent-color:var(--primary);" checked> 联网搜索最新素材
-      </label>
+      <input type="hidden" id="webSearchToggle" checked>
     </div>
   </div>
 
@@ -687,7 +680,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v36 界面清爽版
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v37 界面最简版
 </div>
 
 </div>
@@ -711,6 +704,7 @@ var MEETING_TYPES = [
   {id:'jiandu',name:'监督协商会',icon:'协'},
   {id:'zhengqiu',name:'征求意见会',icon:'征'},
   {id:'qingdian',name:'宴会致词',icon:'庆'},
+  {id:'shenghuo',name:'生活致辞',icon:'生'},
   {id:'yanjiang',name:'演讲发言',icon:'讲'},
   {id:'tigang',name:'拟草思路提纲',icon:'纲'}
 ];
@@ -754,7 +748,7 @@ var state = {
   streamUsage:null,
   keyData:'',
   wenhuaStrengthen:false,
-  webSearch:false,
+  webSearch:true,
   searchContext:''
 };
 
@@ -879,7 +873,7 @@ var WRITING_STANDARDS = '\n\n【写作标准——八条硬指标，逐条对照
   '  · 留：结尾有余味，不强行升华、不喊口号，用场景或画面收束，让人回味\n';
 
 var COST_PER_MIL = { 'deepseek-v4-pro': 6, 'deepseek-v4-flash': 1.2 };
-var typeTemps = { 'wenhua':0.8, 'qingdian':0.85, 'kaocha':0.5, 'xuexi':0.4, 'dongyuan':0.6, 'diaoyan':0.5, 'jiandu':0.4, 'zhengqiu':0.4, 'yanjiang':0.7, 'qita':0.5, 'tigang':0.5 };
+var typeTemps = { 'wenhua':0.8, 'qingdian':0.85, 'shenghuo':0.85, 'kaocha':0.5, 'xuexi':0.4, 'dongyuan':0.6, 'diaoyan':0.5, 'jiandu':0.4, 'zhengqiu':0.4, 'yanjiang':0.7, 'qita':0.5, 'tigang':0.5 };
 function getScenarioTemp(){
   return typeTemps[state.meetingType] || 0.5;
 }
@@ -1694,6 +1688,7 @@ function buildPrompt(){
     'jiandu': '真诚坦率，监督有力度协商有温度，指出问题也提出方案。先肯定成绩再指出问题（先扬后抑），每个问题配一条改进建议',
     'zhengqiu': '专业谦和，先扬后抑，意见有分量：先具体肯定再提意见，眼光准、意见实、有高度，姿态谦和观点鲜明，让人信服',
     'qingdian': '喜庆热烈，温暖真挚，有仪式感和感染力，如祝酒词般自然。用“一核四维”法：核词定调（温情选“答案、缘分”，大气选“风骨、格局”），四维锚定（夸长辈、送主角、祝生活，或讲禀赋、积淀、作为、方向），开篇点季节扣身份，结尾画面式收束',
+    'shenghuo': '温暖真挚、自然亲切，像拉家常一样说话，不端不装。根据补充说明中的具体场合自动判断（婚礼、生日、家庭聚会、获奖感言、读书分享等），选准称呼、讲清场合、融入真情，用身边小事讲大道理，结尾有温度有余味',
     'yanjiang': '激情澎湃又收放自如，以故事开场抓人，以金句收束燃人，有起承转合的节奏感，让人听完想鼓掌、想行动'
   };
 
