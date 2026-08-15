@@ -530,15 +530,8 @@ body{
     <div class="type-grid" id="lifeGrid"></div>
     <div class="section-title" style="margin-top:10px;">内容结构 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（不选则自动判断）</span></div>
     <div class="type-grid" id="logicGrid"></div>
-    <div class="section-title" style="margin-top:10px;">高级</div>
-    <div id="kernelBox">
-      <div style="font-size:0.8rem;color:var(--text);margin-top:2px;line-height:1.6;">写作高级感已默认拉满：历史纵深 · 理论依据 · 实践落地 · 辩证视角 · 价值温度</div>
-      <div class="type-grid" id="advGrid" style="margin-top:8px;"></div>
-      <label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
-        <input type="checkbox" id="wenhuaToggle" onchange="toggleWenhua()" style="width:16px;height:16px;accent-color:var(--primary);"> 加强文史素材
-      </label>
-      <input type="hidden" id="webSearchToggle" checked>
-    </div>
+    <input type="hidden" id="kernelBox"><input type="hidden" id="advGrid">
+    <input type="hidden" id="wenhuaToggle" onchange="toggleWenhua()"><input type="hidden" id="webSearchToggle" checked>
   </div>
 
   <!-- Step 2: Topic -->
@@ -551,15 +544,6 @@ body{
     <div class="input-group">
       <label class="input-label">补充说明 <span class="input-hint">（可选，如身份、特殊要求等）</span></label>
       <input type="text" class="text-input" id="noteInput" placeholder="例如：作为政协委员代表发言...">
-      <div class="quick-tags"><span>发言人身份：</span>
-        <button class="quick-tag" onclick="quickFill('note','市领导')">市领导</button>
-        <button class="quick-tag" onclick="quickFill('note','部门负责人')">部门负责人</button>
-        <button class="quick-tag" onclick="quickFill('note','政协委员')">政协委员</button>
-        <button class="quick-tag" onclick="quickFill('note','基层干部')">基层干部</button>
-        <button class="quick-tag" onclick="quickFill('note','专家')">专家</button>
-        <button class="quick-tag" onclick="quickFill('note','主持人')">主持人</button>
-        <button class="quick-tag" onclick="quickFill('note','普通人')">普通人</button>
-      </div>
     </div>
     <div class="input-group">
       <label class="input-label">与会听众 <span class="input-hint">（如：市领导、部门负责人、企业代表等，便于开头问好）</span></label>
@@ -570,6 +554,8 @@ body{
         <button class="quick-tag" onclick="quickFill('aud','企业代表')">企业代表</button>
         <button class="quick-tag" onclick="quickFill('aud','基层群众')">基层群众</button>
         <button class="quick-tag" onclick="quickFill('aud','政协委员')">政协委员</button>
+        <button class="quick-tag" onclick="quickFill('aud','家人')">家人</button>
+        <button class="quick-tag" onclick="quickFill('aud','亲朋好友')">亲朋好友</button>
         <button class="quick-tag" onclick="quickFill('aud','全体人员')">全体人员</button>
       </div>
     </div>
@@ -719,7 +705,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v38.6 高级感默认版
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v38.7 六式六景版
 </div>
 
 </div>
@@ -750,8 +736,8 @@ var MEETING_TYPES = [
   {id:'hunli',name:'婚礼致辞',icon:'囍',cat:'life'},
   {id:'shengri',name:'生日祝福',icon:'岁',cat:'life'},
   {id:'shenghuo',name:'生活致辞',icon:'家',cat:'life'},
-  // 高级选项
-  {id:'tigang',name:'思路提纲',icon:'纲',cat:'adv'}
+  {id:'jiating',name:'家庭聚会',icon:'聚',cat:'life'},
+  {id:'rensheng',name:'人生感悟',icon:'悟',cat:'life'}
 ];
 
 // ===== 内容结构（四大逻辑） =====
@@ -759,7 +745,9 @@ var LOGICS = [
   {id:'zongfen',name:'总分式',icon:'总'},
   {id:'shishen',name:'认知式',icon:'知'},
   {id:'wenti',name:'问题式',icon:'问'},
-  {id:'shijiao',name:'角度式',icon:'看'}
+  {id:'shijiao',name:'角度式',icon:'看'},
+  {id:'time',name:'时间式',icon:'时'},
+  {id:'bianzheng',name:'辩证式',icon:'辨'}
 ];
 
 // ===== 内容内核（五大内核，多选） =====
@@ -1852,7 +1840,9 @@ function buildPrompt(){
     'yanjiang': '激情澎湃又收放自如，以故事开场抓人，以金句收束燃人，有起承转合的节奏感，让人听完想鼓掌、想行动',
     'hunli': '喜庆温馨、真诚不套话。选准对新人的称呼，夸新人之美、谢父母之恩、祝未来之好，用一件小事讲出一份真情，结尾画面式祝福',
     'shengri': '温情真诚、忆往昔赞今朝。按寿星身份选称呼（长辈则敬重感恩、同辈则亲切温暖），讲一两个难忘往事，送健康平安祝愿',
-    'shenghuo': '温暖真挚、自然亲切，像拉家常一样说话，不端不装。根据补充说明中的具体场合自动判断（家庭聚会、读书分享、获奖感言、宴会致词等），选准称呼、讲清场合、融入真情，用身边小事讲大道理，结尾有温度有余味'
+    'shenghuo': '温暖真挚、自然亲切，像拉家常一样说话，不端不装。根据补充说明中的具体场合自动判断（读书分享、获奖感言、宴会致词等），选准称呼、讲清场合、融入真情，用身边小事讲大道理，结尾有温度有余味',
+    'jiating': '家常亲切、亲情温暖。像拉家常一样说话，讲家人之间的故事和感动，感恩包容理解，祝家庭和美，用细节打动人心',
+    'rensheng': '通透深刻、温润有力。结合经历谈人生感悟，提炼有共鸣的道理，不空谈不煽情，让听者有所思、有所得、有所暖'
   };
 
   var tone = typeTones[state.meetingType] || typeTones['diaoyan'];
@@ -2015,10 +2005,12 @@ function callAI(apiKey){
   // V38：内容结构（四大逻辑）
   if(state.logic){
     var logicGuide = {
-      'zongfen': '\n\n【内容结构——总-分-总】开头总起亮明核心观点，正文分三层展开（每层一个观点，有事例有数据，观点标题对仗工整），结尾总结升华、呼应开头。',
-      'shishen': '\n\n【内容结构——是什么-做什么-怎么做】先讲清是什么（形势判断、本质认识），再讲清做什么（重点任务、目标要求），最后讲怎么做（路径方法、保障措施）。',
-      'wenti': '\n\n【内容结构——问题-分析-解决】先提出真问题（具体可感，有冲击力），再深入分析原因（摆表现、析成因、看危害），最后给出对策（可操作、能落地、有责任）。',
-      'shijiao': '\n\n【内容结构——从某某看】从两到三个不同视角观察同一事物，每个视角有具体内容和独立判断（如从数据看、从服务看、从基层看），最后汇拢成整体认识。'
+      'zongfen': '\n\n【内容结构——总分式（强制）】本结构为强制要求，全文严格按此组织，场景默认写法服从本结构，只保留场景的语气和姿态。结构为：第一，总起亮明核心观点；第二，分三个层次展开（每层一个观点，有事例有数据，观点标题对仗工整）；第三，总结升华、呼应开头。必须明确呈现三个层次。',
+      'shishen': '\n\n【内容结构——认知式（强制）】本结构为强制要求，全文严格按此组织，场景默认写法服从本结构。结构为：第一，是什么（形势判断、本质认识）；第二，做什么（重点任务、目标要求）；第三，怎么做（路径方法、保障措施）。必须明确呈现三个部分。',
+      'wenti': '\n\n【内容结构——问题式（强制）】本结构为强制要求，全文严格按此组织，场景默认写法服从本结构。结构为：第一，提出真问题（具体可感，有冲击力）；第二，分析原因（摆表现、析成因、看危害）；第三，给出对策（可操作、能落地、有责任）。必须明确呈现三个部分。',
+      'shijiao': '\n\n【内容结构——角度式（强制）】本结构为强制要求，全文严格按此组织，场景默认写法服从本结构。结构为：从三个不同视角观察同一事物（如从数据看、从服务看、从基层看），每个视角有具体内容和独立判断，最后汇拢成整体认识。必须明确呈现三个角度。',
+      'time': '\n\n【内容结构——时间式（强制）】本结构为强制要求，全文严格按此组织，场景默认写法服从本结构。结构为：第一，回望过去（来路、积累、启示）；第二，立足现在（当下、进展、判断）；第三，展望未来（方向、目标、行动）。必须明确呈现过去、现在、未来三个层次。',
+      'bianzheng': '\n\n【内容结构——辩证式（强制）】本结构为强制要求，全文严格按此组织，场景默认写法服从本结构。结构为：从对立统一的三对关系中展开（如无与有、危与机、破与立），每对关系讲清矛盾双方、转化逻辑和现实启示。必须明确呈现三对辩证关系。'
     };
     if(logicGuide[state.logic]){ prompt += logicGuide[state.logic]; }
   }
