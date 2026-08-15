@@ -566,6 +566,9 @@ body{
     <input type="hidden" id="modeGrid"><input type="hidden" id="subJixiBox"><input type="hidden" id="subJixiGrid">
     <input type="hidden" id="feedbackInput"><input type="hidden" id="feedbackHistory"><input type="hidden" id="feedbackList">
     <input type="hidden" id="modeArrow">
+    <label style="display:flex;align-items:center;gap:6px;margin:10px 0 6px;font-size:0.8rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
+      <input type="checkbox" id="skipSearchToggle" style="width:15px;height:15px;accent-color:var(--primary);"> 本次不联网搜索（更快）
+    </label>
     <button class="btn btn-primary" id="generateBtn" onclick="handleGenerate()">
       开始生成发言稿
     </button>
@@ -697,7 +700,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v40.0 提速稳定版
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v40.1 再提速版
 </div>
 
 </div>
@@ -2071,8 +2074,8 @@ function searchMaterials(apiKey, topic, typeName, callback){
   // - 用 max_output_tokens 而非 max_tokens
   var searchData = JSON.stringify({
     model: 'deepseek-v4-flash',
-    instructions: '你是一个素材搜索助手。请联网搜索官方网站、官方新闻媒体和政府网站的信息，优先搜索政府工作报告、官方媒体、权威数据。搜索注意：本地会议优先本地官方素材（如涟源市政府网站、娄底市政府网站）；外出考察或异地交流优先对方所在地官方素材。提取结果请结构化整理为四类：【核心数据】（具体数字并注明来源）、【政策表述】（政策文件中的关键提法）、【典型案例】（具体单位、做法、成效）、【领导金句】（可引用的权威表述），总字数不超过800字。检索不到的内容明确标注“未检索到”，绝不编造。',
-    input: '请联网搜索以下主题的官方报道、最新政策文件、权威数据和领导讲话全文，优先政府网站和官方媒体。请将搜索结果结构化整理为【核心数据】【政策表述】【典型案例】【领导金句】四类素材摘要（不超过800字），数据注明来源，未检索到的内容明确标注。\n\n主题：' + searchQuery,
+    instructions: '联网搜索官方报道、政策文件、权威数据，本地话题优先本地官方素材。提取【核心数据】【政策表述】【典型案例】三类素材，每条一句话，总字数不超过400字。检索不到标注“未检索到”，绝不编造。',
+    input: '搜索以下主题的官方报道和权威数据，整理为【核心数据】【政策表述】【典型案例】三类，每条一句话，共不超过400字。主题：' + searchQuery,
     tools: [{type: 'web_search'}],
     tool_choice: {type: 'web_search'},
     max_output_tokens: 2048,
@@ -2193,8 +2196,11 @@ function callAI(apiKey){
   document.getElementById('card-result').style.display = 'none';
   document.getElementById('generateBtn').disabled = true;
 
-  // 联网搜索：先搜素材，再生成发言稿
-  if(state.webSearch){
+  // 联网搜索：先搜素材，再生成发言稿（勾选"本次不搜索"则跳过，速度更快）
+  var skipSearch = false;
+  var skipEl = document.getElementById('skipSearchToggle');
+  if(skipEl){ skipSearch = skipEl.checked; }
+  if(state.webSearch && !skipSearch){
     var topic = state.topic;
     var typeName = state.meetingType;
     for(var ti = 0; ti < MEETING_TYPES.length; ti++){
