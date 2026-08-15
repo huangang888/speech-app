@@ -705,7 +705,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v38.7 六式六景版
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v38.8 多选强执版
 </div>
 
 </div>
@@ -785,7 +785,7 @@ var SUB_JIXI_MODES = [
 var state = {
   meetingType:'',
   speechMode:'',
-  logic:'',
+  logics:[],
   kernels:[],
   subMode:'',
   topic:'',
@@ -1189,7 +1189,7 @@ function renderLogicGrid(){
   var html = '';
   for(var i = 0; i < LOGICS.length; i++){
     var t = LOGICS[i];
-    var sel = state.logic === t.id ? ' selected' : '';
+    var sel = state.logics.indexOf(t.id) > -1 ? ' selected' : '';
     html += '<button class="type-btn' + sel + '" onclick="selectLogic(\'' + t.id + '\')" data-logic="' + t.id + '">' + t.name + '</button>';
   }
   grid.innerHTML = html;
@@ -1210,11 +1210,10 @@ function renderKernelGrid(){
 }
 
 function selectLogic(key){
-  state.logic = (key === 'auto') ? '' : key;
-  var btns = document.querySelectorAll('[data-logic]');
-  for(var i = 0; i < btns.length; i++){
-    btns[i].classList.toggle('selected', btns[i].getAttribute('data-logic') === key);
-  }
+  state.logics = state.logics || [];
+  var idx = state.logics.indexOf(key);
+  if(idx > -1){ state.logics.splice(idx, 1); } else { state.logics.push(key); }
+  renderLogicGrid();
 }
 function selectKernel(key){
   if(key === 'auto'){
@@ -2002,17 +2001,26 @@ function searchMaterials(apiKey, topic, typeName, callback){
 
 function callAI(apiKey){
   var prompt = buildPrompt();
-  // V38：内容结构（四大逻辑）
-  if(state.logic){
+  // V38.8：内容结构（可多选，最高指令前置强制执行）
+  var larr = state.logics || [];
+  if(larr.length > 0){
     var logicGuide = {
-      'zongfen': '\n\n【内容结构——总分式（强制）】本结构为强制要求，全文严格按此组织，场景默认写法服从本结构，只保留场景的语气和姿态。结构为：第一，总起亮明核心观点；第二，分三个层次展开（每层一个观点，有事例有数据，观点标题对仗工整）；第三，总结升华、呼应开头。必须明确呈现三个层次。',
-      'shishen': '\n\n【内容结构——认知式（强制）】本结构为强制要求，全文严格按此组织，场景默认写法服从本结构。结构为：第一，是什么（形势判断、本质认识）；第二，做什么（重点任务、目标要求）；第三，怎么做（路径方法、保障措施）。必须明确呈现三个部分。',
-      'wenti': '\n\n【内容结构——问题式（强制）】本结构为强制要求，全文严格按此组织，场景默认写法服从本结构。结构为：第一，提出真问题（具体可感，有冲击力）；第二，分析原因（摆表现、析成因、看危害）；第三，给出对策（可操作、能落地、有责任）。必须明确呈现三个部分。',
-      'shijiao': '\n\n【内容结构——角度式（强制）】本结构为强制要求，全文严格按此组织，场景默认写法服从本结构。结构为：从三个不同视角观察同一事物（如从数据看、从服务看、从基层看），每个视角有具体内容和独立判断，最后汇拢成整体认识。必须明确呈现三个角度。',
-      'time': '\n\n【内容结构——时间式（强制）】本结构为强制要求，全文严格按此组织，场景默认写法服从本结构。结构为：第一，回望过去（来路、积累、启示）；第二，立足现在（当下、进展、判断）；第三，展望未来（方向、目标、行动）。必须明确呈现过去、现在、未来三个层次。',
-      'bianzheng': '\n\n【内容结构——辩证式（强制）】本结构为强制要求，全文严格按此组织，场景默认写法服从本结构。结构为：从三对对立统一的辩证关系中展开。这三对关系不限定，必须根据会议主题和发言内容自然提炼最贴切的正反组合（如守正与创新、当前与长远、显绩与潜绩、数量与质量、速度与温度、保护与开发、继承与突破、投入与产出等），正反词必须贴合主题、不牵强。每对关系讲清：矛盾双方各自的内涵、二者的对立统一关系、转化的条件与路径、对实际工作的启示。必须明确呈现三对辩证关系。'
+      'zongfen': '结构一·总分式：第一，总起亮明核心观点；第二，分三个层次展开（每层一个观点，标题对仗工整）；第三，总结升华、呼应开头。必须明确呈现三个层次。',
+      'shishen': '结构二·认知式：第一，是什么（形势判断、本质认识）；第二，做什么（重点任务、目标要求）；第三，怎么做（路径方法、保障措施）。必须明确呈现三个部分。',
+      'wenti': '结构三·问题式：第一，提出真问题（具体可感、有冲击力）；第二，分析原因（摆表现、析成因、看危害）；第三，给出对策（可操作、能落地）。必须明确呈现三个部分。',
+      'shijiao': '结构四·角度式：从三个不同视角观察同一事物（如从文化看、从产业看、从人看），每个视角有具体内容和独立判断，最后汇拢成整体认识。必须明确呈现三个角度。',
+      'time': '结构五·时间式：第一，回望过去（来路、积累、启示）；第二，立足现在（当下、进展、判断）；第三，展望未来（方向、目标、行动）。必须明确呈现过去、现在、未来三个层次。',
+      'bianzheng': '结构六·辩证式：从三对对立统一的辩证关系中展开。这三对关系不限定，必须根据发言主题自然提炼最贴切的正反组合（如守正与创新、当前与长远、显绩与潜绩、保护与开发、继承与突破等），正反词必须贴合主题、不牵强。每个观点的标题必须直接呈现正反成对的辩证关系（格式如：守正与创新——让老树发新芽；当前与长远——既看一域更看全局），并讲清矛盾双方的内涵、统一关系、转化路径、现实启示。必须明确呈现三对辩证观点。'
     };
-    if(logicGuide[state.logic]){ prompt += logicGuide[state.logic]; }
+    var structDesc = '';
+    for(var li = 0; li < larr.length; li++){
+      if(logicGuide[larr[li]]){ structDesc += logicGuide[larr[li]] + '\n'; }
+    }
+    if(larr.length > 1){
+      structDesc += '\n【多结构要求】本稿同时采用多个结构，请分别按每个所选结构各生成三个具体观点，观点要有鲜明标题和充实阐述；不同结构的观点之间用清晰的章节标题分隔（如“结构一·总分式”“结构二·辩证式”），各自独立成组，不得混同。\n';
+    }
+    structDesc += '\n【字数要求】本稿字数不限，每个观点写充实、写透彻，宁长勿短，确保内容有分量。\n';
+    prompt = '【最高写作指令】以下内容结构为强制要求，必须严格执行，全文严格按所选结构生成观点，场景默认写法服从本结构，只保留场景的语气姿态。\n' + structDesc + '\n' + prompt;
   }
   // V38：内容内核（五大内核，多选）
   var karr = state.kernels || [];
