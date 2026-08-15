@@ -697,7 +697,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v39.9 保鲜版
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v40.0 提速稳定版
 </div>
 
 </div>
@@ -746,6 +746,26 @@ var MEETING_TYPES = [
   {id:'weiwen',name:'慰问探望',icon:'暖',cat:'life'},
   {id:'daoci',name:'悼词',icon:'念',cat:'life'}
 ];
+
+// ===== 场景专属提示词库（身份适配+听众意识+核心打法+情商要求） =====
+var SCENE_PROMPTS = {
+  'dangke': '【党课要领】身份：党组织负责人、理论宣讲人，既是授课人也是同行者。听众意识：面对身边党员同事，要让他们听得进、坐得住、记得牢，切忌照本宣科。打法：用理论照亮现实（讲理论必联系单位实际和身边事例）、用经历连接同事（讲亲身经历拉近距离）、用提问引发思考（关键处设问）、用讲真话凝聚共识（不回避问题）。情商：姿态平等不居高临下，是交流不是训话，多谈体会少下命令。语言：朴实生动、有故事有细节，大道理讲成家常话。',
+  'zhishu': '【述职要领】身份：部门负责人，向组织和同事如实交账。听众意识：面对领导和同事，既报成绩也报不足，让听者信服实绩、认可担当。打法：述政治→亮实绩（数据说话、实事证明）→剖不足（具体真实、不避重就轻）→讲打算（方向明措施实）。情商：态度诚恳不邀功，成绩归功集体同事，不足勇于担责。语言：朴实有据，数字硬、事例实。',
+  'zuzhi': '【组织生活会要领】身份：党员、班子成员，作对照检查。听众意识：面对支委和党员，批评与自我批评要有辣味，让人感受真诚决心。打法：亮态度→查摆问题（见人见事见思想、不空泛）→剖析根源（触及灵魂、找准病根）→整改措施（可操作有时限）。情商：自我批评要真、对同志批评要诚（先肯定再指出、对事不对人）、整改表态要实。语言：诚恳深刻、不绕弯子。',
+  'huanying': '【欢迎会要领】身份：东道主代表，热情迎接来宾。听众意识：面对远道客人，要让他们感到被尊重、被重视、宾至如归。打法：开篇热烈欢迎→介绍情况（本地亮点）→表达合作期待→热情收尾。情商：不卑不亢、真诚大方，称呼准确得体，赞地方不贬他人，留余地不夸海口。语言：热情有分寸、有仪式感。',
+  'zhaoshang': '【招商推介要领】身份：招商推介人，代表本地区诚意邀商。听众意识：面对企业家客商，要激发投资兴趣和信心。打法：讲优势（区位产业资源政策、条条有据）→亮项目（有亮点有前景）→表诚意（营商环境、服务承诺）→发邀请（实地考察、投资兴业）。情商：热情有分寸、不夸大不忽悠，站在投资者角度讲回报。语言：数据说话、亮点突出、激情而有信服力。',
+  'xieshang': '【协商议政要领】身份：政协委员、协商议政者，围绕议题坦诚建言。听众意识：面对党委政府和部门负责人，意见要有用、能采纳、可落实。打法：紧扣议题→先肯定现状（真诚具体）→指出问题（见人见事、有理有据）→提对策（可操作能落地）。情商：先扬后抑、对事不对人，措辞有分寸（建议而不指责）。语言：观点鲜明、有理有据、协商有温度。',
+  'kaimu': '【开幕词要领】身份：主办方代表，为活动开场定调。听众意识：面对全体来宾，要简洁有力、提振氛围。打法：宣布开幕→欢迎来宾→点明意义→表达期望→预祝成功。情商：热情大气、简洁得体，不拖沓。语言：庄重凝练、有仪式感。',
+  'bimu': '【闭幕词要领】身份：主办方代表，为活动收束总结。听众意识：面对参会者，要让大家感到收获满满。打法：回顾成果→提炼意义→感谢参与→宣布圆满落幕。情商：肯定每个人的付出，感谢到具体人和事，收束温暖有力量。语言：总结到位、鼓舞人心。',
+  'peixun': '【培训讲座要领】身份：授课专家、业务骨干。听众意识：面对学员，要让他们学有所获、学有所用。打法：讲清知识要点（条理清晰）→结合实际案例→互动启发→提炼方法。情商：尊重学员、平等交流，不卖弄不居高临下，多鼓励，用学员听得懂的话讲专业的事。语言：专业务实、通俗接地气。',
+  'jingyan': '【经验交流要领】身份：经验介绍人，分享做法供人借鉴。听众意识：面对同行兄弟单位，要让他们听得进、学得走、用得上。打法：讲背景→讲做法（分条有抓手）→亮成效（数据说话）→谈启示（可学可用）。情商：谦逊不居功，肯定兄弟单位，突出可复制性。语言：朴实有说服力，讲干货不注水。',
+  'qiaoqian': '【乔迁要领】身份：亲友、主人，贺新居之喜。听众意识：面对主人和宾客，要喜庆吉祥、情真意切。打法：贺乔迁之喜→赞新家之美（细节）→祝新生活。情商：夸得真诚具体（提到新家细节），不说教不炫富。语言：吉庆祥和。',
+  'shengxue': '【升学宴要领】身份：亲友、家长，庆贺学子升学。听众意识：面对老师亲友学子，要欣慰自豪、感恩得体。打法：忆成长→谢师恩（具体到人和事）→寄期望。情商：自豪不炫耀，感恩真诚，对学子期望亲切不施压。语言：温暖真诚、有画面感。',
+  'weiwen': '【慰问要领】身份：亲友、组织代表，探视慰问。听众意识：面对病人受慰问者，要让他感到温暖被关心。打法：表关切→宽慰鼓励→祝健康平安。情商：体贴入微、轻声细语，不追问病情细节，少说多听。语言：温暖真诚、不添负担。',
+  'daoci': '【悼词要领】身份：亲友、组织代表，致悼念之词。听众意识：面对逝者亲友各界人士，要庄重肃穆、情真意切。打法：忆生平→颂品格（真实不过誉）→寄哀思（化悲痛为力量）。情商：庄重克制、真情流露不失体统，对家属表达深切慰问。语言：庄重肃穆、有力量。',
+  'dushu': '【读书分享要领】身份：分享者，荐书讲书。听众意识：面对书友听众，要让人想读这本书、有所启发。打法：讲书核心（一两句说透）→书里书外（联系现实）→我的启发。情商：真诚分享阅读感受，不卖弄不掉书袋，用故事细节打动人。语言：生动有感染力。',
+  'huojiang': '【获奖感言要领】身份：获奖者，发表感言。听众意识：面对颁奖者领导和同事，要谦逊真诚、归功于众。打法：感谢（具体到人和事）→归功（成绩属于集体）→前行（继续努力共勉）。情商：谦逊不居功、真诚不客套，突出团队他人。语言：朴实有力、有温度。'
+};
 
 // ===== 内容结构（四大逻辑） =====
 var LOGICS = [
@@ -2045,19 +2065,24 @@ function searchMaterials(apiKey, topic, typeName, callback){
     stream: false
   });
 
+  var controller = new AbortController();
+  var timer = setTimeout(function(){ controller.abort(); safeCallback(''); }, 15000);
   fetch(RESPONSES_URL, {
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer ' + apiKey},
-    body: searchData
+    body: searchData,
+    signal: controller.signal
   }).then(function(resp){
     if(!resp.ok){
       console.log('Search failed: ' + resp.status);
       return resp.text().then(function(txt){
         console.log('Search error body: ' + txt.substring(0, 300));
+        clearTimeout(timer);
         safeCallback('');
         return null;
       });
     }
+    clearTimeout(timer);
     return resp.json();
   }).then(function(data){
     if(!data){
@@ -2089,6 +2114,10 @@ function searchMaterials(apiKey, topic, typeName, callback){
 
 function callAI(apiKey){
   var prompt = buildPrompt();
+  // V40.0b：场景专属要领注入（身份适配+听众意识+打法+情商，前置提升执行力）
+  if(SCENE_PROMPTS && SCENE_PROMPTS[state.meetingType]){
+    prompt = '【本场景讲话要领——必须遵循】' + SCENE_PROMPTS[state.meetingType] + '\n\n' + prompt;
+  }
   // V38.8：内容结构（可多选，最高指令前置强制执行）
   var larr = state.logics || [];
   if(larr.length > 0){
@@ -2130,11 +2159,11 @@ function callAI(apiKey){
 
   // V39.9：历史去重，避免与近期生成雷同
   var histD = loadData();
-  var histList = (histD.history || []).slice(-3);
+  var histList = (histD.history || []).slice(-2);
   if(histList.length > 0){
-    var recent = '\n\n【近期已生成参考——务必避免雷同】近期已生成过以下主题的发言，本次必须变换切入角度、使用不同案例、更新语言表达，与之前明显不同：\n';
+    var recent = '\n【避免雷同】近期已生成过类似主题，请变换角度、案例和表达：';
     for(var hi = 0; hi < histList.length; hi++){
-      if(histList[hi].topic){ recent += '· ' + histList[hi].topic + '\n'; }
+      if(histList[hi].topic){ recent += (histList[hi].topic.substring(0, 20)) + '；'; }
     }
     prompt += recent;
   }
@@ -2160,8 +2189,8 @@ function callAI(apiKey){
     document.getElementById('loadingText').textContent = '正在联网搜索相关素材...';
     searchMaterials(apiKey, topic, typeName, function(searchResult){
       if(searchResult){
-        prompt += '\n\n【联网搜索素材——请结合以下素材撰写，数据和事例优先采用】\n' + searchResult.substring(0, 2000);
-        state.searchContext = searchResult.substring(0, 500);
+        prompt += '\n【联网素材——优先采用】' + searchResult.substring(0, 1200);
+        state.searchContext = searchResult.substring(0, 400);
       }
       document.getElementById('loadingText').textContent = '正在为您精心撰写发言稿...';
       doGenerate(apiKey, prompt, model, temp);
@@ -2171,7 +2200,9 @@ function callAI(apiKey){
   }
 }
 
-function doGenerate(apiKey, prompt, model, temp){
+function doGenerate(apiKey, prompt, model, temp, isRetry){
+  var genController = new AbortController();
+  var genTimer = setTimeout(function(){ genController.abort(); }, 90000);
   fetch(API_URL, {
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer ' + apiKey},
@@ -2181,9 +2212,11 @@ function doGenerate(apiKey, prompt, model, temp){
       temperature:temp,
       max_tokens:8192,
       stream:true
-    })
+    }),
+    signal: genController.signal
   }).then(function(resp){
     if(!resp.ok){
+      clearTimeout(genTimer);
       document.getElementById('loading').classList.remove('active');
       document.getElementById('generateBtn').disabled = false;
       if(resp.status===401){showToast('API Key 无效，请检查设置');switchTab('settings');}
@@ -2201,6 +2234,7 @@ function doGenerate(apiKey, prompt, model, temp){
     function pump(){
       reader.read().then(function(result){
         if(result.done){
+          clearTimeout(genTimer);
           finishStream(full);
           return;
         }
@@ -2226,16 +2260,23 @@ function doGenerate(apiKey, prompt, model, temp){
         }
         pump();
       }).catch(function(){
+        clearTimeout(genTimer);
         document.getElementById('loading').classList.remove('active');
         document.getElementById('generateBtn').disabled = false;
         showToast('已接收部分内容');
       });
     }
     pump();
-  }).catch(function(){
+  }).catch(function(err){
+    clearTimeout(genTimer);
+    if(!isRetry){
+      console.log('Retry generate: ' + err);
+      doGenerate(apiKey, prompt, model, temp, true);
+      return;
+    }
     document.getElementById('loading').classList.remove('active');
     document.getElementById('generateBtn').disabled = false;
-    showToast('网络错误，请检查网络连接');
+    showToast('生成超时或网络中断，请重试');
   });
 }
 
