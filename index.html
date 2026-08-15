@@ -521,9 +521,10 @@ body{
     <div id="kernelBox" style="display:none;">
       <div class="type-grid" id="kernelGrid"></div>
     </div>
-    <div class="section-title" style="margin-top:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;" onclick="toggleAdv()">高级选项 <span id="advArrow" style="font-size:0.8rem;color:var(--text-light);">▸</span></div>
-    <div id="advBox" style="display:none;">
-      <label style="display:flex;align-items:center;gap:6px;margin-top:4px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
+    <div class="section-title" style="margin-top:8px;">高级选项</div>
+    <div id="advBox">
+      <div class="type-grid" id="advGrid"></div>
+      <label style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:0.82rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
         <input type="checkbox" id="wenhuaToggle" onchange="toggleWenhua()" style="width:16px;height:16px;accent-color:var(--primary);"> 加强文史素材
       </label>
       <input type="hidden" id="webSearchToggle" checked>
@@ -691,7 +692,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v38.2 场景精简版
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v38.3 分类优化版
 </div>
 
 </div>
@@ -715,14 +716,15 @@ var MEETING_TYPES = [
   {id:'dongyuan',name:'动员部署会',icon:'动',cat:'work'},
   {id:'jiandu',name:'监督协商会',icon:'协',cat:'work'},
   {id:'zhengqiu',name:'征求意见会',icon:'征',cat:'work'},
-  {id:'huibao',name:'工作汇报',icon:'报',cat:'work'},
-  {id:'huiyi',name:'会议发言',icon:'言',cat:'work'},
-  {id:'yanjiang',name:'演讲发言',icon:'讲',cat:'work'},
-  {id:'tigang',name:'拟草思路提纲',icon:'纲',cat:'work'},
+  {id:'huibao',name:'工作汇报会',icon:'报',cat:'work'},
+  {id:'huiyi',name:'其他发言',icon:'言',cat:'work'},
   // 生活类
+  {id:'yanjiang',name:'演讲发言',icon:'讲',cat:'life'},
   {id:'hunli',name:'婚礼致辞',icon:'囍',cat:'life'},
   {id:'shengri',name:'生日祝福',icon:'岁',cat:'life'},
-  {id:'shenghuo',name:'生活致辞',icon:'家',cat:'life'}
+  {id:'shenghuo',name:'生活致辞',icon:'家',cat:'life'},
+  // 高级选项
+  {id:'tigang',name:'思路提纲',icon:'纲',cat:'adv'}
 ];
 
 // ===== 内容结构（四大逻辑） =====
@@ -1139,15 +1141,19 @@ function saveHistory(speech){
 function renderTypeGrid(){
   var wg = document.getElementById('workGrid');
   var lg = document.getElementById('lifeGrid');
-  var wh = '', lh = '';
+  var ag = document.getElementById('advGrid');
+  var wh = '', lh = '', ah = '';
   for(var i = 0; i < MEETING_TYPES.length; i++){
     var t = MEETING_TYPES[i];
     var sel = state.meetingType === t.id ? ' selected' : '';
     var btn = '<button class="type-btn' + sel + '" onclick="selectType(\'' + t.id + '\')" data-type="' + t.id + '">' + t.name + '</button>';
-    if(t.cat === 'life'){ lh += btn; } else { wh += btn; }
+    if(t.cat === 'life'){ lh += btn; }
+    else if(t.cat === 'adv'){ ah += btn; }
+    else { wh += btn; }
   }
   if(wg) wg.innerHTML = wh;
   if(lg) lg.innerHTML = lh;
+  if(ag) ag.innerHTML = ah;
 }
 
 function renderLogicGrid(){
@@ -1281,10 +1287,14 @@ function selectType(typeId){
   var noteInput = document.getElementById('noteInput');
   var topicInput = document.getElementById('topicInput');
   var genBtn = document.getElementById('generateBtn');
-  if(typeId === 'hunli' || typeId === 'shengri' || typeId === 'jiating' || typeId === 'dushu' || typeId === 'huojiang' || typeId === 'yanyan'){
+  if(typeId === 'hunli' || typeId === 'shengri' || typeId === 'shenghuo'){
     noteInput.placeholder = '请写明具体场合，如：侄女婚礼、父亲六十大寿、家庭团圆饭...';
     topicInput.placeholder = '请输入致辞主题或想表达的心意...';
     genBtn.textContent = '开始生成致辞';
+  }else if(typeId === 'yanjiang'){
+    noteInput.placeholder = '请写明演讲场合、身份，如：行业大会、创业者、学校礼堂...';
+    topicInput.placeholder = '请输入演讲主题...';
+    genBtn.textContent = '开始生成演讲稿';
   }else if(typeId === 'tigang'){
     noteInput.placeholder = '可选，补充讲话身份、重点方向等';
     topicInput.placeholder = '请输入需要提炼观点的会议主题...';
