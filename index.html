@@ -676,7 +676,8 @@ body{
       <div class="stat-card"><div class="stat-num" id="statFav">-</div><div class="stat-label">常用会议</div></div>
     </div>
     <div class="stats-row" style="margin-top:0;">
-      <div class="stat-card"><div class="stat-num" id="statBalance">请设置</div><div class="stat-label">剩余余额</div></div>
+      <div class="stat-card"><div class="stat-num" id="statBalance">请设置</div><div class="stat-label">DeepSeek余额</div></div>
+      <div class="stat-card"><div class="stat-num" id="statKimiBalance">请设置</div><div class="stat-label">Kimi余额</div></div>
     </div>
     <div class="input-group" style="margin-top:12px;">
       <label class="input-label">DeepSeek 账户余额 <span class="input-hint">（在 <a href="https://platform.deepseek.com/top_up" target="_blank" style="color:var(--primary);">platform.deepseek.com</a> 查看余额后填入，每次生成后自动扣减）</span></label>
@@ -684,6 +685,14 @@ body{
         <input type="number" class="text-input" id="balanceInput" placeholder="输入当前账户余额（元）" style="flex:1;" step="0.01" min="0">
         <button class="btn btn-primary btn-sm" onclick="setBalance()" style="width:auto;flex-shrink:0;">保存</button>
         <a href="https://platform.deepseek.com/top_up" target="_blank" class="btn btn-outline btn-sm" style="text-decoration:none;flex-shrink:0;">查余额</a>
+      </div>
+    </div>
+    <div class="input-group" style="margin-top:12px;">
+      <label class="input-label">Kimi 账户余额 <span class="input-hint">（在 <a href="https://platform.kimi.com/console/pay" target="_blank" style="color:var(--primary);">platform.kimi.com</a> 查看余额后填入，每次生成后自动扣减）</span></label>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="number" class="text-input" id="kimiBalanceInput" placeholder="输入当前Kimi余额（元）" style="flex:1;" step="0.01" min="0">
+        <button class="btn btn-primary btn-sm" onclick="setKimiBalance()" style="width:auto;flex-shrink:0;">保存</button>
+        <a href="https://platform.kimi.com/console/pay" target="_blank" class="btn btn-outline btn-sm" style="text-decoration:none;flex-shrink:0;">查余额</a>
       </div>
     </div>
   </div>
@@ -987,9 +996,9 @@ function estimateTokens(text){ return Math.round(text.length / 1.5) + 200; }
 function loadData(){
   try{
     var d = localStorage.getItem(STORAGE_KEY);
-    return d ? JSON.parse(d) : {history:[],apiKey:'',kimiApiKey:'',memory:{count:0,typeCounts:{},topics:[],level:1}}
+    return d ? JSON.parse(d) : {history:[],apiKey:'',kimiApiKey:'',kimiBalanceInput:0,memory:{count:0,typeCounts:{},topics:[],level:1}}
   }catch(e){
-    return {history:[],apiKey:'',kimiApiKey:'',memory:{count:0,typeCounts:{},topics:[],level:1}}
+    return {history:[],apiKey:'',kimiApiKey:'',kimiBalanceInput:0,memory:{count:0,typeCounts:{},topics:[],level:1}}
   }
 }
 
@@ -1607,6 +1616,22 @@ function renderStats(){
   }
   // 恢复余额输入
   document.getElementById('balanceInput').value = savedBalance || '';
+  // Kimi 余额
+  var kimiBal = data.kimiBalanceInput || 0;
+  var kimiCost = data.kimiCumCost || 0;
+  var kimiEl = document.getElementById('statKimiBalance');
+  var kimiInputEl = document.getElementById('kimiBalanceInput');
+  if(kimiEl){
+    if(kimiBal > 0){
+      var kimiRemain = kimiBal - kimiCost;
+      kimiEl.textContent = kimiRemain > 0 ? '¥' + kimiRemain.toFixed(2) : '已超支';
+      kimiEl.style.color = kimiRemain > 0 ? (kimiRemain < 2 ? '#e80' : '') : '#c00';
+    }else{
+      kimiEl.textContent = '请设置';
+      kimiEl.style.color = 'var(--text-light)';
+    }
+  }
+  if(kimiInputEl) kimiInputEl.value = kimiBal || '';
 }
 
 function setBalance(){
@@ -1621,6 +1646,21 @@ function setBalance(){
   saveData(data);
   var remaining = val - cum.totalCost;
   showToast('余额已保存：¥' + val.toFixed(2) + '，可用约' + Math.floor(remaining / 0.03) + '次发言');
+  renderStats();
+}
+
+function setKimiBalance(){
+  var val = parseFloat(document.getElementById('kimiBalanceInput').value);
+  if(isNaN(val) || val < 0){
+    showToast('请输入有效金额');
+    return;
+  }
+  var data = loadData();
+  data.kimiBalanceInput = val;
+  saveData(data);
+  var kimiCost = data.kimiCumCost || 0;
+  var remaining = val - kimiCost;
+  showToast('Kimi余额已保存：¥' + val.toFixed(2) + '，可用约' + Math.floor(remaining / 0.05) + '次发言');
   renderStats();
 }
 
@@ -2197,7 +2237,7 @@ function doGenerate(apiKey, prompt, model, temp, isRetry){
       document.getElementById('loading').classList.remove('active');
       document.getElementById('generateBtn').disabled = false;
       if(resp.status===401){showToast('API Key 无效，请检查设置');switchTab('settings');}
-      else if(resp.status===429){showToast('请求过于频繁，请稍后再试');}
+      else if(resp.status===429){showToast(state.model==='kimi-k2-6'?'Kimi余额不足或限速，请充值或稍后再试':'请求过于频繁，请稍后再试');}
       else{showToast('生成失败: '+resp.status);}
       return null;
     }
@@ -2281,6 +2321,19 @@ function finishStream(full){
   cumData.cumUsage.totalCost += parseFloat(cost);
   cumData.cumUsage.history.push({time:new Date().toISOString(),tokens:total,cost:parseFloat(cost),type:state.meetingType,topic:state.topic});
   if(cumData.cumUsage.history.length > 100) cumData.cumUsage.history.shift();
+  // Kimi 余额扣减
+  if(state.model === 'kimi-k2-6'){
+    cumData.kimiCumCost = (cumData.kimiCumCost || 0) + parseFloat(cost);
+    var kimiBal = cumData.kimiBalanceInput || 0;
+    if(kimiBal > 0){
+      var kimiRemain = kimiBal - cumData.kimiCumCost;
+      if(kimiRemain < 2 && kimiRemain > 0){
+        showToast('Kimi余额仅剩¥' + kimiRemain.toFixed(2) + '，请及时充值');
+      }else if(kimiRemain <= 0){
+        showToast('Kimi余额已不足，请充值后继续使用');
+      }
+    }
+  }
   saveData(cumData);
   updateMemory(state.meetingType, state.topic);
   saveHistory(full);
