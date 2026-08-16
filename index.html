@@ -2223,10 +2223,17 @@ function doGenerate(apiKey, prompt, model, temp, isRetry){
   fetch(genUrl, {
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer ' + apiKey},
-    body: JSON.stringify({
+    body: JSON.stringify(model === 'kimi-k2.6' ? {
       model:model,
       messages:[{role:'system',content:SYSTEM_PROMPT},{role:'user',content:prompt}],
-      temperature:(model === 'kimi-k2.6' ? 1 : temp),
+      temperature:0.6,
+      max_tokens:4096,
+      stream:true,
+      thinking:{type:'disabled'}
+    } : {
+      model:model,
+      messages:[{role:'system',content:SYSTEM_PROMPT},{role:'user',content:prompt}],
+      temperature:temp,
       max_tokens:4096,
       stream:true
     }),
