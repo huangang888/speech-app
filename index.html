@@ -486,7 +486,7 @@ body{
   .header-title{font-size:1.8rem;}
 }
 #logicGrid{grid-template-columns:1fr 1fr;}
-#kernelGrid{grid-template-columns:1fr 1fr 1fr;}
+
 .quick-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center;}
 .quick-tags span{font-size:0.8rem;color:var(--text-light);}
 .quick-tag{
@@ -521,7 +521,7 @@ body{
 <!-- Generate Page -->
 <div class="page active" id="page-generate">
 
-  <!-- Step 1: 场景 + 结构 + 内核 -->
+  <!-- Step 1: 场景 + 结构 -->
   <div class="card" id="card-type">
     <div class="section-title">场景</div>
     <div class="cat-title">工作类</div>
@@ -531,7 +531,7 @@ body{
     <div class="section-title" style="margin-top:10px;">内容结构 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（可多选，每个结构各出三点）</span></div>
     <div class="type-grid" id="logicGrid"></div>
     <div style="font-size:0.75rem;color:var(--text-light);margin-top:8px;line-height:1.8;border:1px dashed var(--border);border-radius:8px;padding:8px 10px;">结构逻辑：<br>总分式＝总起→分三点→总收<br>认知式＝是什么→做什么→怎么做<br>问题式＝提出问题→分析问题→解决问题<br>角度式＝三个角度各看（从××看）<br>时间式＝过去→现在→将来<br>辩证式＝三对正反词（守正与创新等）</div>
-    <input type="hidden" id="kernelBox"><input type="hidden" id="advGrid">
+    <input type="hidden" id="advGrid">
     <input type="hidden" id="wenhuaToggle" onchange="toggleWenhua()"><input type="hidden" id="webSearchToggle" checked>
   </div>
 
@@ -794,14 +794,7 @@ var LOGICS = [
   {id:'bianzheng',name:'辩证式',icon:'辨'}
 ];
 
-// ===== 内容内核（五大内核，多选） =====
-var KERNELS = [
-  {id:'lishi',name:'历史',icon:'史',desc:'讲清来龙去脉、发展脉络，让内容有纵深感'},
-  {id:'lilun',name:'理论',icon:'论',desc:'讲清理论依据、内在道理，让内容有学理性'},
-  {id:'shijian',name:'实践',icon:'践',desc:'讲清具体路径、操作办法，让内容能落地'},
-  {id:'bianzheng',name:'辩证',icon:'辨',desc:'用对立统一看问题，无与有、危与机，让内容有深度'},
-  {id:'jiazhi',name:'价值',icon:'心',desc:'落点为了谁、以人民为中心，让内容有温度有魂'}
-];
+
 
 // ===== 发言目的（结构模式，源自《提高会议发言水平的9个公式》） =====
 var SPEECH_MODES = [
@@ -830,7 +823,6 @@ var state = {
   meetingType:'',
   speechMode:'',
   logics:[],
-  kernels:[],
   subMode:'',
   topic:'',
   historyManage:false,
@@ -851,11 +843,7 @@ var state = {
 var SYSTEM_PROMPT = '你是一位顶级党政文稿撰稿人，深谙机关公文写作规范和领导讲话艺术。你的核心理念：大秘的逻辑、诗人的情怀、专家的严谨、学者的钻研。\n' +
   '发言的核心在于：逻辑清晰、重点突出、表达高效，体现政治高度、思想深度、实践温度。\n' +
   '你写的是党政会议上的发言，必须使用规范的政治语言和机关表述。\n' +
-  '常用规范表述：倍感振奋、高屋建瓴、催人奋进、完全拥护、坚决支持、深感认同、深受启发。\n' +
-  '禁止使用不规范口语：热乎劲儿、心里涌上来、暖人心窝、像回家一样等乡俗表达。\n' +
   '短句、排比、金句要用，但必须在党政语言框架内使用，不能为了修辞牺牲严肃性。\n' +
-  '结构上用总（亮明观点）-分（第一、第二、第三分点阐述）-总（总结收尾，呼应开头）。\n' +
-  '所有数据和事例必须源自参考资料或联网搜索，绝不胡编捏造。尤其历史人物、家书、名言、事件细节，资料中没有的一律用“×××”占位或留白，宁可空着也不虚构。\n' +
   '═══════ 灵魂要求：让发言“走心接地气” ═══════\n' +
   '一、脚下有泥土：内容贴近实际、有生活气息，讲具体的人和事，不悬在半空。\n' +
   '二、眼里要有人：心里装着听众，体现对人的关怀和理解。\n' +
@@ -1244,35 +1232,12 @@ function renderLogicGrid(){
   grid.innerHTML = html;
 }
 
-function renderKernelGrid(){
-  var grid = document.getElementById('kernelGrid');
-  if(!grid) return;
-  var html = '';
-  var karr = state.kernels || [];
-  for(var i = 0; i < KERNELS.length; i++){
-    var t = KERNELS[i];
-    var sel = karr.indexOf(t.id) > -1 ? ' selected' : '';
-    var tip = t.desc ? ' title="' + t.desc + '"' : '';
-    html += '<button class="type-btn' + sel + '"' + tip + ' onclick="selectKernel(\'' + t.id + '\')" data-kernel="' + t.id + '">' + t.name + '</button>';
-  }
-  grid.innerHTML = html;
-}
 
 function selectLogic(key){
   state.logics = state.logics || [];
   var idx = state.logics.indexOf(key);
   if(idx > -1){ state.logics.splice(idx, 1); } else { state.logics.push(key); }
   renderLogicGrid();
-}
-function selectKernel(key){
-  if(key === 'auto'){
-    state.kernels = [];
-  }else{
-    state.kernels = state.kernels || [];
-    var idx = state.kernels.indexOf(key);
-    if(idx > -1){ state.kernels.splice(idx, 1); } else { state.kernels.push(key); }
-  }
-  renderKernelGrid();
 }
 // ===== 听众点选自动生成（按场景+主题） =====
 var AUD_MAP = {
@@ -1340,13 +1305,6 @@ function quickFill(target, val){
   var cur = input.value.trim();
   input.value = cur ? cur + '；' + val : val;
   input.focus();
-}
-function toggleKernel(){
-  var b = document.getElementById('kernelBox');
-  var a = document.getElementById('kernelArrow');
-  if(!b || !a) return;
-  if(b.style.display === 'none'){ b.style.display = 'block'; a.textContent = '▾'; }
-  else { b.style.display = 'none'; a.textContent = '▸'; }
 }
 
 function renderModeGrid(){
@@ -2083,7 +2041,7 @@ function searchMaterials(apiKey, topic, typeName, callback){
   });
 
   var controller = new AbortController();
-  var timer = setTimeout(function(){ controller.abort(); safeCallback(''); }, 15000);
+  var timer = setTimeout(function(){ controller.abort(); safeCallback(''); }, 10000);
   fetch(RESPONSES_URL, {
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer ' + apiKey},
@@ -2155,20 +2113,6 @@ function callAI(apiKey){
     }
     structDesc += '\n【字数要求】每个观点写200-300字，观点精炼有料、论述紧凑有力，全文篇幅适中、节奏明快，不做无谓铺陈。\n';
     prompt = '【最高写作指令】以下内容结构为强制要求，必须严格执行，全文严格按所选结构生成观点，场景默认写法服从本结构，只保留场景的语气姿态。\n' + structDesc + '\n' + prompt;
-  }
-  // V38：内容内核（五大内核，多选）
-  var karr = state.kernels || [];
-  if(karr.length > 0){
-    var kernelGuide = {
-      'lishi': '\n\n【内容内核——历史】讲清来龙去脉、发展脉络，让内容有历史纵深。',
-      'lilun': '\n\n【内容内核——理论】讲清理论依据、内在道理，让内容有学理支撑。',
-      'shijian': '\n\n【内容内核——实践】讲清具体路径、操作办法，让内容务实可落地。',
-      'bianzheng': '\n\n【内容内核——辩证】用对立统一看问题（无与有、危与机、虚与实、短与长），增强思想深度。',
-      'jiazhi': '\n\n【内容内核——价值】落点“为了谁”，体现以人民为中心，让内容有温度、有情怀。'
-    };
-    for(var ki = 0; ki < karr.length; ki++){
-      if(kernelGuide[karr[ki]]){ prompt += kernelGuide[karr[ki]]; }
-    }
   }
   // V39.9：今日变量注入，增强时效感
   var nowD = new Date();
