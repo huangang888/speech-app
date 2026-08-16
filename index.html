@@ -2226,7 +2226,7 @@ function doGenerate(apiKey, prompt, model, temp, isRetry){
     body: JSON.stringify({
       model:model,
       messages:[{role:'system',content:SYSTEM_PROMPT},{role:'user',content:prompt}],
-      temperature:temp,
+      temperature:(model === 'kimi-k2.6' ? 1 : temp),
       max_tokens:4096,
       stream:true
     }),
