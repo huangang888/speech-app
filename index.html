@@ -653,7 +653,7 @@ body{
     <div class="input-group" style="margin-top:12px;">
       <label class="input-label">AI 模型 <span class="input-hint">（推荐 deepseek-reasoner，质量更高）</span></label>
       <select class="text-input" id="modelSelect" style="appearance:auto;-webkit-appearance:auto;">
-        <option value="kimi-k2-6">kimi-k2-6（Kimi，最接近人类写作）</option>
+        <option value="kimi-k2.6">kimi-k2.6（Kimi，最接近人类写作）</option>
         <option value="deepseek-v4-pro">deepseek-v4-pro（DeepSeek，逻辑强）</option>
         <option value="deepseek-v4-flash">deepseek-v4-flash（快速响应）</option>
       </select>
@@ -847,7 +847,7 @@ var state = {
   note:'',
   result:null,
   currentPage:'generate',
-  model:'kimi-k2-6',
+  model:'kimi-k2.6',
   kimiApiKey:'',
   refine:'',
   streamUsage:null,
@@ -985,7 +985,7 @@ var WRITING_STANDARDS = '\n\n【写作标准——八条硬指标，逐条对照
   '  · 破：长句拆短句，长短交错，让文字有呼吸感，每句不超过20字\n' +
   '  · 留：结尾有余味，不强行升华、不喊口号，用场景或画面收束，让人回味\n';
 
-var COST_PER_MIL = { 'kimi-k2-6': 27, 'deepseek-v4-pro': 6, 'deepseek-v4-flash': 1.2 };
+var COST_PER_MIL = { 'kimi-k2.6': 27, 'deepseek-v4-pro': 6, 'deepseek-v4-flash': 1.2 };
 var typeTemps = { 'wenhua':0.8, 'qingdian':0.85, 'shenghuo':0.85, 'kaocha':0.5, 'xuexi':0.4, 'dongyuan':0.6, 'diaoyan':0.5, 'jiandu':0.4, 'zhengqiu':0.4, 'yanjiang':0.7, 'qita':0.5, 'tigang':0.5 };
 function getScenarioTemp(){
   return typeTemps[state.meetingType] || 0.5;
@@ -1703,7 +1703,7 @@ function handleGenerate(){
   document.getElementById('generateBtn').disabled = true;
 
   var writeApiKey = data.apiKey;
-  if(state.model === 'kimi-k2-6' && data.kimiApiKey){
+  if(state.model === 'kimi-k2.6' && data.kimiApiKey){
     writeApiKey = data.kimiApiKey;
   }
   callAI(writeApiKey);
@@ -2219,7 +2219,7 @@ function callAI(apiKey){
 function doGenerate(apiKey, prompt, model, temp, isRetry){
   var genController = new AbortController();
   var genTimer = setTimeout(function(){ genController.abort(); }, 90000);
-  var genUrl = (model === 'kimi-k2-6') ? MOONSHOT_URL : API_URL;
+  var genUrl = (model === 'kimi-k2.6') ? MOONSHOT_URL : API_URL;
   fetch(genUrl, {
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer ' + apiKey},
@@ -2237,7 +2237,7 @@ function doGenerate(apiKey, prompt, model, temp, isRetry){
       document.getElementById('loading').classList.remove('active');
       document.getElementById('generateBtn').disabled = false;
       if(resp.status===401){showToast('API Key 无效，请检查设置');switchTab('settings');}
-      else if(resp.status===429){showToast(state.model==='kimi-k2-6'?'Kimi余额不足或限速，请充值或稍后再试':'请求过于频繁，请稍后再试');}
+      else if(resp.status===429){showToast(state.model==='kimi-k2.6'?'Kimi余额不足或限速，请充值或稍后再试':'请求过于频繁，请稍后再试');}
       else{showToast('生成失败: '+resp.status);}
       return null;
     }
@@ -2322,7 +2322,7 @@ function finishStream(full){
   cumData.cumUsage.history.push({time:new Date().toISOString(),tokens:total,cost:parseFloat(cost),type:state.meetingType,topic:state.topic});
   if(cumData.cumUsage.history.length > 100) cumData.cumUsage.history.shift();
   // Kimi 余额扣减
-  if(state.model === 'kimi-k2-6'){
+  if(state.model === 'kimi-k2.6'){
     cumData.kimiCumCost = (cumData.kimiCumCost || 0) + parseFloat(cost);
     var kimiBal = cumData.kimiBalanceInput || 0;
     if(kimiBal > 0){
