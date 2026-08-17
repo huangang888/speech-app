@@ -532,6 +532,9 @@ body{
     <div class="type-grid" id="logicGrid"></div>
     <div style="font-size:0.75rem;color:var(--text-light);margin-top:8px;line-height:1.8;border:1px dashed var(--border);border-radius:8px;padding:8px 10px;">结构逻辑：<br>总分式＝总起→分三点→总收<br>认知式＝是什么→做什么→怎么做<br>问题式＝提出问题→分析问题→解决问题<br>角度式＝三个角度各看（从××看）<br>时间式＝过去→现在→将来<br>辩证式＝三对正反词（守正与创新等）</div>
     <input type="hidden" id="advGrid">
+    <div class="section-title" style="margin-top:10px;">价值 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（选场景后自动标注，可点选调整）</span></div>
+    <div class="type-grid" id="valueGrid"></div>
+    <div style="font-size:0.75rem;color:var(--text-light);margin-top:6px;line-height:1.6;">价值话术：情绪＝被看见被点燃｜实用＝拿得走用得上｜成长＝开眼界长本事｜社交＝建连接聚共识｜稀缺＝别处听不到｜陪伴＝不孤单有人懂｜审美＝语言美值得品</div>
     <input type="hidden" id="wenhuaToggle" onchange="toggleWenhua()"><input type="hidden" id="webSearchToggle" checked>
   </div>
 
@@ -715,7 +718,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v40.5 监督评议+Kimi K2.6双引擎
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v40.6 七价值话术+Kimi K2.6双引擎
 </div>
 
 </div>
@@ -809,6 +812,53 @@ var LOGICS = [
   {id:'time',name:'时间式',icon:'时'},
   {id:'bianzheng',name:'辩证式',icon:'辨'}
 ];
+
+// ===== 人际价值类型（只管话术，不碰结构和身份） =====
+var VALUE_TYPES = [
+  {id:'qingxu',name:'情绪',icon:'情',prompt:'话术要求：共情开场，用"我和大家一样"拉近距离；肯定在前，批评在后；温度收尾，不喊口号。选材偏重能引发共鸣的人和事。'},
+  {id:'shiyong',name:'实用',icon:'用',prompt:'话术要求：每个观点必须落到"谁来做、怎么做、何时见效"，用数据说话，不说"要重视"而说"每周晨会盯进度"。选材偏重可操作的具体做法。'},
+  {id:'chengzhang',name:'成长',icon:'长',prompt:'话术要求：提供新视角，用"换一个角度看"引入，制造认知反转，引而不发。选材偏重有启发性的案例和规律。'},
+  {id:'shejiao',name:'社交',icon:'交',prompt:'话术要求：多用"我们"建共同体，提到具体的人和事让每个人都有参与感。选材偏重能拉近距离的共同经历。'},
+  {id:'xique',name:'稀缺',icon:'稀',prompt:'话术要求：给独家判断，"这个情况在全省少见"，提供别人看不到的角度。选材偏重独有资源和独特经验。'},
+  {id:'peiban',name:'陪伴',icon:'伴',prompt:'话术要求：不居高临下，"我也曾走过这段路"，承认困难，并肩姿态。选材偏重真实经历和共同困境。'},
+  {id:'shenmei',name:'审美',icon:'美',prompt:'话术要求：长短句交替造节奏，具体意象代抽象，金句收尾留余味。选材偏重有画面感的细节。'}
+];
+
+// ===== 各会议类型默认价值标签 =====
+var VALUE_MAP = {
+  'wenhua':['shenmei','chengzhang','shejiao'],
+  'diaoyan':['shiyong','chengzhang'],
+  'kaocha':['chengzhang','shejiao'],
+  'xuexi':['chengzhang','peiban'],
+  'dongyuan':['qingxu','chengzhang'],
+  'jiandu':['shiyong','xique'],
+  'zhengqiu':['xique','shiyong'],
+  'huibao':['shiyong','xique'],
+  'jingyan':['shiyong','chengzhang'],
+  'dangke':['qingxu','chengzhang','peiban'],
+  'zhishu':['shiyong','xique'],
+  'zuzhi':['peiban','shiyong'],
+  'huanying':['shejiao','qingxu'],
+  'zhaoshang':['shiyong','xique'],
+  'xieshang':['shiyong','shejiao'],
+  'kaimu':['qingxu','shenmei'],
+  'bimu':['qingxu','chengzhang'],
+  'peixun':['chengzhang','shiyong'],
+  'yanjiang':['qingxu','shenmei'],
+  'hunli':['qingxu','shenmei','shejiao'],
+  'shengri':['qingxu','peiban','shenmei'],
+  'jiating':['qingxu','peiban','shejiao'],
+  'rensheng':['chengzhang','peiban','shenmei'],
+  'dushu':['chengzhang','shenmei'],
+  'huojiang':['qingxu','shejiao','peiban'],
+  'yanyan':['qingxu','shenmei','shejiao'],
+  'qiaoqian':['qingxu','shenmei'],
+  'shengxue':['qingxu','chengzhang','peiban'],
+  'weiwen':['qingxu','peiban'],
+  'daoci':['qingxu','peiban','shenmei'],
+  'tigang':['chengzhang','xique'],
+  'qita':['shiyong','chengzhang']
+};
 
 
 
@@ -1256,6 +1306,29 @@ function selectLogic(key){
   if(idx > -1){ state.logics.splice(idx, 1); } else { state.logics.push(key); }
   renderLogicGrid();
 }
+
+function renderValueGrid(){
+  var grid = document.getElementById('valueGrid');
+  if(!grid) return;
+  // 选场景时自动设置默认价值标签
+  if(!state.values || state.values.length === 0){
+    state.values = (VALUE_MAP[state.meetingType] || []).slice();
+  }
+  var html = '';
+  for(var i = 0; i < VALUE_TYPES.length; i++){
+    var v = VALUE_TYPES[i];
+    var sel = state.values.indexOf(v.id) > -1 ? ' selected' : '';
+    html += '<button class="type-btn' + sel + '" onclick="selectValue(\'' + v.id + '\')" data-value="' + v.id + '">' + v.name + '</button>';
+  }
+  grid.innerHTML = html;
+}
+
+function selectValue(key){
+  state.values = state.values || [];
+  var idx = state.values.indexOf(key);
+  if(idx > -1){ state.values.splice(idx, 1); } else { state.values.push(key); }
+  renderValueGrid();
+}
 // ===== 听众点选自动生成（按场景+主题） =====
 var AUD_MAP = {
   wenhua:['文化学者','文史爱好者','群众代表','相关部门'],
@@ -1389,6 +1462,8 @@ function selectType(typeId){
     clearRefFile();
   }
   state.meetingType = typeId;
+  state.values = (VALUE_MAP[typeId] || []).slice();
+  renderValueGrid();
   updateAudTags();
   var btns = document.querySelectorAll('.type-btn');
   for(var i = 0; i < btns.length; i++){
@@ -2144,6 +2219,24 @@ function callAI(apiKey){
   // V40.0b：场景专属要领注入（身份适配+听众意识+打法+情商，前置提升执行力）
   if(SCENE_PROMPTS && SCENE_PROMPTS[state.meetingType]){
     prompt = '【本场景讲话要领——必须遵循】' + SCENE_PROMPTS[state.meetingType] + '\n\n' + prompt;
+  }
+  // V40.6：人际价值话术注入（只管话术，不碰结构和身份）
+  var varr = state.values || VALUE_MAP[state.meetingType] || [];
+  if(varr.length > 0){
+    var valueText = '';
+    var valueNames = [];
+    for(var vi = 0; vi < varr.length; vi++){
+      for(var vti = 0; vti < VALUE_TYPES.length; vti++){
+        if(VALUE_TYPES[vti].id === varr[vi]){
+          valueText += VALUE_TYPES[vti].prompt + '\n';
+          valueNames.push(VALUE_TYPES[vti].name);
+          break;
+        }
+      }
+    }
+    if(valueText){
+      prompt = '【价值话术指引——只管话术，不改变结构和身份】本篇讲话核心价值：' + valueNames.join('、') + '。\n' + valueText + '\n' + prompt;
+    }
   }
   // V38.8：内容结构（可多选，最高指令前置强制执行）
   var larr = state.logics || [];
