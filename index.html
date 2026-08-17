@@ -486,7 +486,7 @@ body{
   .header-title{font-size:1.8rem;}
 }
 #logicGrid{grid-template-columns:1fr 1fr;}
-
+#kernelGrid{grid-template-columns:1fr 1fr 1fr;}
 .quick-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center;}
 .quick-tags span{font-size:0.8rem;color:var(--text-light);}
 .quick-tag{
@@ -521,26 +521,26 @@ body{
 <!-- Generate Page -->
 <div class="page active" id="page-generate">
 
-  <!-- Step 1: 场景 + 结构 -->
+  <!-- Step 1: 场景 + 结构 + 内核 -->
   <div class="card" id="card-type">
     <div class="section-title">场景</div>
     <div class="cat-title">工作类</div>
     <div class="type-grid" id="workGrid"></div>
     <div class="cat-title" style="margin-top:8px;">生活类</div>
     <div class="type-grid" id="lifeGrid"></div>
-    <div class="section-title" style="margin-top:10px;">结构 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（可多选，每个结构各出三点）</span></div>
+    <div class="section-title" style="margin-top:10px;">内容结构 <span style="font-size:0.75rem;color:var(--text-light);font-weight:400;">（可多选，每个结构各出三点）</span></div>
     <div class="type-grid" id="logicGrid"></div>
     <div style="font-size:0.75rem;color:var(--text-light);margin-top:8px;line-height:1.8;border:1px dashed var(--border);border-radius:8px;padding:8px 10px;">结构逻辑：<br>总分式＝总起→分三点→总收<br>认知式＝是什么→做什么→怎么做<br>问题式＝提出问题→分析问题→解决问题<br>角度式＝三个角度各看（从××看）<br>时间式＝过去→现在→将来<br>辩证式＝三对正反词（守正与创新等）</div>
-    <input type="hidden" id="advGrid">
+    <input type="hidden" id="kernelBox"><input type="hidden" id="advGrid">
     <input type="hidden" id="wenhuaToggle" onchange="toggleWenhua()"><input type="hidden" id="webSearchToggle" checked>
   </div>
 
   <!-- Step 2: Topic -->
   <div class="card" id="card-topic">
-    <div class="section-title">要素</div>
+    <div class="section-title">发言主题</div>
     <div class="input-group">
       <label class="input-label">会议主题或关键词 <span class="input-hint">（如"文化传承与创新"）</span></label>
-      <input type="text" class="text-input" id="topicInput" placeholder="请输入要素..." oninput="updateAudTags()">
+      <input type="text" class="text-input" id="topicInput" placeholder="请输入发言主题..." oninput="updateAudTags()">
     </div>
     <div class="input-group">
       <label class="input-label">补充说明 <span class="input-hint">（可选，如身份、特殊要求等）</span></label>
@@ -625,7 +625,7 @@ body{
       <button id="batchDelBtn" class="btn btn-outline btn-sm" onclick="batchDeleteHistory()" style="color:#c00;border-color:#c00;flex:1;">删除选中(0)</button>
     </div>
     <div style="display:flex;gap:6px;margin-bottom:10px;">
-      <input type="text" class="text-input" id="historySearch" placeholder="搜索要素..." style="flex:1;" oninput="renderHistory()">
+      <input type="text" class="text-input" id="historySearch" placeholder="搜索发言主题..." style="flex:1;" oninput="renderHistory()">
       <select class="text-input" id="historyTypeFilter" onchange="renderHistory()" style="width:auto;flex-shrink:0;max-width:110px;"><option value="">全部类型</option></select>
     </div>
     <div id="historyList">
@@ -641,20 +641,14 @@ body{
   <div class="card">
     <div class="section-title">API 设置</div>
     <div class="input-group">
-      <label class="input-label">DeepSeek API Key <span class="input-hint">（联网搜索必填）</span></label>
+      <label class="input-label">DeepSeek API Key</label>
       <input type="password" class="text-input" id="apiKeyInput" placeholder="sk-...">
       <span class="input-hint" style="margin-top:4px;display:block;">获取地址：platform.deepseek.com</span>
     </div>
     <div class="input-group" style="margin-top:12px;">
-      <label class="input-label">Kimi API Key <span class="input-hint">（选 Kimi 模型时必填）</span></label>
-      <input type="password" class="text-input" id="kimiApiKeyInput" placeholder="sk-...">
-      <span class="input-hint" style="margin-top:4px;display:block;">获取地址：platform.moonshot.cn <a href="https://platform.kimi.com/console/pay" target="_blank" style="color:var(--primary);">去充值</a></span>
-    </div>
-    <div class="input-group" style="margin-top:12px;">
       <label class="input-label">AI 模型 <span class="input-hint">（推荐 deepseek-reasoner，质量更高）</span></label>
       <select class="text-input" id="modelSelect" style="appearance:auto;-webkit-appearance:auto;">
-        <option value="kimi-k2.6">kimi-k2.6（Kimi，最接近人类写作）</option>
-        <option value="deepseek-v4-pro">deepseek-v4-pro（DeepSeek，逻辑强）</option>
+        <option value="deepseek-v4-pro">deepseek-v4-pro（推荐，最高质量）</option>
         <option value="deepseek-v4-flash">deepseek-v4-flash（快速响应）</option>
       </select>
     </div>
@@ -664,7 +658,7 @@ body{
         <span style="font-size:0.85rem;">账户余额 & 充值</span>
         <a href="https://platform.deepseek.com/top_up" target="_blank" class="btn btn-outline btn-sm" style="text-decoration:none;">去充值</a>
       </div>
-      <span class="input-hint" style="margin-top:2px;display:block;">K2.6：输出 ¥27/百万token | V4 Pro：输出 ¥6/百万token | V4 Flash：输出 ¥1.2/百万token</span>
+      <span class="input-hint" style="margin-top:2px;display:block;">V4 Pro：输入 ¥2/百万token，输出 ¥6/百万token</span>
     </div>
   </div>
 
@@ -676,8 +670,7 @@ body{
       <div class="stat-card"><div class="stat-num" id="statFav">-</div><div class="stat-label">常用会议</div></div>
     </div>
     <div class="stats-row" style="margin-top:0;">
-      <div class="stat-card"><div class="stat-num" id="statBalance">请设置</div><div class="stat-label">DeepSeek余额</div></div>
-      <div class="stat-card"><div class="stat-num" id="statKimiBalance">请设置</div><div class="stat-label">Kimi余额</div></div>
+      <div class="stat-card"><div class="stat-num" id="statBalance">请设置</div><div class="stat-label">剩余余额</div></div>
     </div>
     <div class="input-group" style="margin-top:12px;">
       <label class="input-label">DeepSeek 账户余额 <span class="input-hint">（在 <a href="https://platform.deepseek.com/top_up" target="_blank" style="color:var(--primary);">platform.deepseek.com</a> 查看余额后填入，每次生成后自动扣减）</span></label>
@@ -685,14 +678,6 @@ body{
         <input type="number" class="text-input" id="balanceInput" placeholder="输入当前账户余额（元）" style="flex:1;" step="0.01" min="0">
         <button class="btn btn-primary btn-sm" onclick="setBalance()" style="width:auto;flex-shrink:0;">保存</button>
         <a href="https://platform.deepseek.com/top_up" target="_blank" class="btn btn-outline btn-sm" style="text-decoration:none;flex-shrink:0;">查余额</a>
-      </div>
-    </div>
-    <div class="input-group" style="margin-top:12px;">
-      <label class="input-label">Kimi 账户余额 <span class="input-hint">（在 <a href="https://platform.kimi.com/console/pay" target="_blank" style="color:var(--primary);">platform.kimi.com</a> 查看余额后填入，每次生成后自动扣减）</span></label>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <input type="number" class="text-input" id="kimiBalanceInput" placeholder="输入当前Kimi余额（元）" style="flex:1;" step="0.01" min="0">
-        <button class="btn btn-primary btn-sm" onclick="setKimiBalance()" style="width:auto;flex-shrink:0;">保存</button>
-        <a href="https://platform.kimi.com/console/pay" target="_blank" class="btn btn-outline btn-sm" style="text-decoration:none;flex-shrink:0;">查余额</a>
       </div>
     </div>
   </div>
@@ -715,7 +700,7 @@ body{
 
 <!-- Footer -->
 <div class="footer">
-  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v40.2 优化提速版
+  <span class="brand">讲话助手</span> · 黄主任专属 · 用心写好每一次发言 · v40.3 即兴公式版
 </div>
 
 </div>
@@ -727,7 +712,6 @@ body{
 // ===== 常量 =====
 var STORAGE_KEY = 'speech_app_data';
 var API_URL = 'https://api.deepseek.com/chat/completions';
-var MOONSHOT_URL = 'https://api.moonshot.cn/v1/chat/completions';
 var RESPONSES_URL = 'https://api.deepseek.com/responses';
 
 // ===== 会议类型 =====
@@ -738,7 +722,7 @@ var MEETING_TYPES = [
   {id:'kaocha',name:'考察座谈会',icon:'考',cat:'work'},
   {id:'xuexi',name:'学习研讨会',icon:'学',cat:'work'},
   {id:'dongyuan',name:'动员部署会',icon:'动',cat:'work'},
-  {id:'jiandu',name:'监督评议会',icon:'评',cat:'work'},
+  {id:'jiandu',name:'监督协商会',icon:'协',cat:'work'},
   {id:'zhengqiu',name:'征求意见会',icon:'征',cat:'work'},
   {id:'huibao',name:'工作汇报会',icon:'报',cat:'work'},
   {id:'jingyan',name:'经验交流会',icon:'经',cat:'work'},
@@ -788,11 +772,11 @@ var SCENE_PROMPTS = {
   'diaoyan': '【调研座谈要领】身份：调研组成员、受邀撰稿人。听众意识：面对被调研单位和调研组成员，本地调研要问题真实、建议有用；受邀写报告要表达启发收获、体现专业。打法：本地调研：问题部分用巡察式（先共性问题、再个性问题、再具体举例，见人见事见数据）；受邀写报告：听看感受→讲启发收获思考→点评典型发言→表明写入报告的内容。情商：肯定在前、问题在后，不越位不居高临下。语言：朴实有力、讲真话。',
   'kaocha': '【考察座谈要领】身份：考察学习成员。听众意识：面对被考察单位，要让他们感到被尊重、被认可。打法：三学（学到什么、好在哪里、回去怎么用），每点有细节有感悟。情商：眼光高（精准概括对方经验）、概括强（提炼规律）、让人舒服（真诚肯定到细节），不谈自身优劣、不贬低对方。语言：开放包容、有比较有鉴别。',
   'xuexi': '【学习研讨要领】身份：参学人员、研讨者。听众意识：面对学习组成员和同仁，要体现真学真思、学有所悟。打法：学思践悟（学了什么→悟到什么→差距在哪→怎么干），先学原文原句再结合实际展开，不引完就完。情商：谦逊求教、不卖弄，结合本单位实际谈，让听者有共鸣。语言：严谨深刻、理论联系实际。',
-  'dongyuan': '【动员部署要领】身份：动员者、部署者。听众意识：面对执行任务的干部职工，要让他们明白为什么干、怎么干、干到什么程度。打法：四段式（破题锚定坐标→扫描现实用三个看到→破局指明路径用三个换→升华凝聚共识），部署任务必须落到谁来做、怎么做、何时完成。情商：用理论照亮现实、用经历连接同事、用提问引发思考、用讲真话凝聚共识，不喊口号。语言：气势磅礴又接地气。',
-  'jiandu': '【监督评议要领】身份：评议者、监督评议参与者。听众意识：面对监督对象和评议组成员，要客观公正、让人信服。打法：亮评议标准→评工作成效（数据和事例说话）→指存在不足（具体真实不回避）→提改进建议（可操作能落地）。情商：客观公正不偏激，肯定成绩也指出问题，评议有尺度有分寸，对事不对人。语言：严谨有力、有据有理。',
-  'zhengqiu': '【征求意见要领】身份：受邀专家、资深人士，发表专业意见。听众意识：面对征求意见单位，要让他们觉得意见中肯、值得采纳。打法：总体评价（先真诚肯定到细节）→分层意见（眼光准、意见实、有高度）→风险三查（政策、财力、人民利益，有风险必提）。情商：姿态谦和（谈几点不成熟的看法供参考）但观点鲜明不骑墙，对事不对人。语言：专业谦和、有分量。',
-  'huibao': '【工作汇报要领】身份：汇报人，向上级如实报告工作。听众意识：面对领导和上级部门，要让他们快速掌握情况、看到实绩、了解问题。打法：背景情况→所做工作→取得成效（数据说话）→不足打算（坦诚不回避）。情商：条理清晰、重点突出，报喜也报忧，成绩不夸大、问题不遮掩。语言：朴实有据、数字硬事例实。',
-  'yanjiang': '【演讲要领】身份：演讲者，用语言打动人。听众意识：面对现场观众，3秒抓住注意力，让人听得进、记得住、受感染。打法：故事开场（一个画面、一句反常识）→起承转合推进（层层深入、情绪递进）→金句收束（一句能记住的话）。情商：与听众共鸣，讲他们的心声，不居高临下不喊口号。语言：长短句交替、排比推高潮，有节奏有画面。',
+  'dongyuan': '【动员部署要领】身份：动员者、部署者。听众意识：面对执行任务的干部职工，要让他们明白为什么干、怎么干、干到什么程度。打法：四段式（破题锚定坐标→扫描现实用三个看到→破局指明路径用三个换→升华凝聚共识），可套用“黄金圈：为什么-怎么做-做什么”公式，部署任务必须落到谁来做、怎么做、何时完成。情商：用理论照亮现实、用经历连接同事、用提问引发思考、用讲真话凝聚共识，不喊口号。语言：气势磅礴又接地气。',
+  'jiandu': '【监督协商要领】身份：监督者、协商者。听众意识：面对被监督单位，要让他们服气、愿意改进。打法：先肯定成绩再指出问题（先扬后抑），每个问题配一条改进建议，监督有力度、协商有温度。情商：对事不对人，问题用事实说话，建议给台阶给办法。语言：真诚坦率、有理有据。',
+  'zhengqiu': '【征求意见要领】身份：受邀专家、资深人士，发表专业意见。听众意识：面对征求意见单位，要让他们觉得意见中肯、值得采纳。打法：总体评价（先真诚肯定到细节）→分层意见（眼光准、意见实、有高度）→风险三查，可套用“赞美-建议-鼓励”公式。情商：姿态谦和（谈几点不成熟的看法供参考）但观点鲜明不骑墙，对事不对人。语言：专业谦和、有分量。',
+  'huibao': '【工作汇报要领】身份：汇报人，向上级如实报告工作。听众意识：面对领导和上级部门，要让他们快速掌握情况、看到实绩、了解问题。打法：背景情况→所做工作→取得成效（数据说话）→不足打算（坦诚不回避），可套用“问题-原因-方案”或“过去-现在-未来”公式。情商：条理清晰、重点突出，报喜也报忧，成绩不夸大、问题不遮掩。语言：朴实有据、数字硬事例实。',
+  'yanjiang': '【演讲要领】身份：演讲者，用语言打动人。听众意识：面对现场观众，3秒抓住注意力，让人听得进、记得住、受感染。打法：故事开场（一个画面、一句反常识）→起承转合推进→金句收束，可套用“故事-感悟-行动”公式。情商：与听众共鸣，讲他们的心声，不居高临下不喊口号。语言：长短句交替、排比推高潮，有节奏有画面。',
   'hunli': '【婚礼致辞要领】身份：证婚人、亲友、长辈。听众意识：面对新人、双方父母和宾客，要喜庆、真诚、有祝福感。打法：夸新人之美（具体到人和事）→谢父母之恩（养育不易）→祝未来之好（婚姻美满、百年好合）→画面式祝福收尾。情商：用一件小事或细节打动人心，不套话不煽情过度，让全场感受到真情。语言：喜庆温馨、朗朗上口。',
   'shengri': '【生日祝福要领】身份：亲友、家人。听众意识：面对寿星和在场亲友，要让寿星感到被珍视。打法：忆往昔（讲一两个难忘往事）→赞今朝（精神面貌、为人处世）→送祝愿（健康平安、幸福长久）。情商：按寿星身份定语气（长辈则敬重感恩、同辈则亲切温暖），往事要真实有细节。语言：温情真诚、不空洞。',
   'jiating': '【家庭聚会要领】身份：家庭成员，团圆的见证者。听众意识：面对家人，要让大家感到亲情的温暖。打法：家常开场→讲家人故事（真实的细节和感动）→感恩包容理解→祝家庭和美。情商：像拉家常一样说话，不端不装，多讲具体的人和事，让每个人都有被提起的温暖。语言：家常亲切、细节动人。',
@@ -810,7 +794,14 @@ var LOGICS = [
   {id:'bianzheng',name:'辩证式',icon:'辨'}
 ];
 
-
+// ===== 内容内核（五大内核，多选） =====
+var KERNELS = [
+  {id:'lishi',name:'历史',icon:'史',desc:'讲清来龙去脉、发展脉络，让内容有纵深感'},
+  {id:'lilun',name:'理论',icon:'论',desc:'讲清理论依据、内在道理，让内容有学理性'},
+  {id:'shijian',name:'实践',icon:'践',desc:'讲清具体路径、操作办法，让内容能落地'},
+  {id:'bianzheng',name:'辩证',icon:'辨',desc:'用对立统一看问题，无与有、危与机，让内容有深度'},
+  {id:'jiazhi',name:'价值',icon:'心',desc:'落点为了谁、以人民为中心，让内容有温度有魂'}
+];
 
 // ===== 发言目的（结构模式，源自《提高会议发言水平的9个公式》） =====
 var SPEECH_MODES = [
@@ -839,6 +830,7 @@ var state = {
   meetingType:'',
   speechMode:'',
   logics:[],
+  kernels:[],
   subMode:'',
   topic:'',
   historyManage:false,
@@ -847,8 +839,7 @@ var state = {
   note:'',
   result:null,
   currentPage:'generate',
-  model:'kimi-k2.6',
-  kimiApiKey:'',
+  model:'deepseek-v4-pro',
   refine:'',
   streamUsage:null,
   keyData:'',
@@ -860,7 +851,11 @@ var state = {
 var SYSTEM_PROMPT = '你是一位顶级党政文稿撰稿人，深谙机关公文写作规范和领导讲话艺术。你的核心理念：大秘的逻辑、诗人的情怀、专家的严谨、学者的钻研。\n' +
   '发言的核心在于：逻辑清晰、重点突出、表达高效，体现政治高度、思想深度、实践温度。\n' +
   '你写的是党政会议上的发言，必须使用规范的政治语言和机关表述。\n' +
+  '常用规范表述：倍感振奋、高屋建瓴、催人奋进、完全拥护、坚决支持、深感认同、深受启发。\n' +
+  '禁止使用不规范口语：热乎劲儿、心里涌上来、暖人心窝、像回家一样等乡俗表达。\n' +
   '短句、排比、金句要用，但必须在党政语言框架内使用，不能为了修辞牺牲严肃性。\n' +
+  '结构上用总（亮明观点）-分（第一、第二、第三分点阐述）-总（总结收尾，呼应开头）。\n' +
+  '所有数据和事例必须源自参考资料或联网搜索，绝不胡编捏造。尤其历史人物、家书、名言、事件细节，资料中没有的一律用“×××”占位或留白，宁可空着也不虚构。\n' +
   '═══════ 灵魂要求：让发言“走心接地气” ═══════\n' +
   '一、脚下有泥土：内容贴近实际、有生活气息，讲具体的人和事，不悬在半空。\n' +
   '二、眼里要有人：心里装着听众，体现对人的关怀和理解。\n' +
@@ -892,6 +887,17 @@ var SYSTEM_PROMPT = '你是一位顶级党政文稿撰稿人，深谙机关公�
   '二、观点角度要求新：换一个切入角度、换一种论证方式，避免老生常谈\n' +
   '三、用例要求活：优先采用近期事件、身边事例、最新数据，不用陈年旧例\n' +
   '四、表述要求新巧：避免重复套话，让每次的稿子都有新意、不雷同\n\n' +
+  '═══════ 即兴发言万能公式（被点名、临时发言时自动套用，先定框架再填内容，每点1-2句话控制时长） ═══════\n' +
+  '一、赶过猪：感谢+回顾+祝愿（聚会应酬）\n' +
+  '二、PREP：观点-理由-举例-重申（表达观点）\n' +
+  '三、问题-原因-方案（职场汇报）\n' +
+  '四、黄金圈：为什么-怎么做-做什么（激励动员）\n' +
+  '五、时间轴：过去-现在-未来（述职总结）\n' +
+  '六、三点式：第一-第二-第三（突然点名）\n' +
+  '七、赞美-建议-鼓励（反馈点评）\n' +
+  '八、故事-感悟-行动（演讲分享）\n' +
+  '九、对比法：现状-对比-结论（说服辩论）\n' +
+  '十、感谢-收获-承诺（履新/调岗/活动总结）\n\n' +
   '═══════ 高情商表达 ═══════\n' +
   '一、先扬后抑：提建议前先真诚肯定，对事不对人，维护氛围。\n' +
   '二、只提方案不抛难题：摆出卡点同时给出对策，把选择题交给领导，不当“问题传递者”。\n' +
@@ -952,7 +958,7 @@ var WRITING_STANDARDS = '\n\n【写作标准——八条硬指标，逐条对照
   '  · 参考资料和搜索结果中没有的数据，不写具体数字，可用“×××”占位或笼统表述\n' +
   '  · 绝不编造人物、家书、名言、历史事件、具体案例；历史人物、文史典故尤其严格，宁缺毋滥，宁可留白不可虚构\n' +
   '  · 联网搜索不到的素材，明确注明“需补充核实”，不得自行想象填充\n' +
-  '  · 联网搜索的素材必须紧扣要素，不能脱离实际\n' +
+  '  · 联网搜索的素材必须紧扣发言主题，不能脱离实际\n' +
   '七、身份意识：认清发言场合\n' +
   '  · 党政会议上发言人是机关干部，不是文史研究者\n' +
   '  · 不要主动提及文史编书、文史研究等身份信息\n' +
@@ -985,7 +991,7 @@ var WRITING_STANDARDS = '\n\n【写作标准——八条硬指标，逐条对照
   '  · 破：长句拆短句，长短交错，让文字有呼吸感，每句不超过20字\n' +
   '  · 留：结尾有余味，不强行升华、不喊口号，用场景或画面收束，让人回味\n';
 
-var COST_PER_MIL = { 'kimi-k2.6': 27, 'deepseek-v4-pro': 6, 'deepseek-v4-flash': 1.2 };
+var COST_PER_MIL = { 'deepseek-v4-pro': 6, 'deepseek-v4-flash': 1.2 };
 var typeTemps = { 'wenhua':0.8, 'qingdian':0.85, 'shenghuo':0.85, 'kaocha':0.5, 'xuexi':0.4, 'dongyuan':0.6, 'diaoyan':0.5, 'jiandu':0.4, 'zhengqiu':0.4, 'yanjiang':0.7, 'qita':0.5, 'tigang':0.5 };
 function getScenarioTemp(){
   return typeTemps[state.meetingType] || 0.5;
@@ -996,9 +1002,9 @@ function estimateTokens(text){ return Math.round(text.length / 1.5) + 200; }
 function loadData(){
   try{
     var d = localStorage.getItem(STORAGE_KEY);
-    return d ? JSON.parse(d) : {history:[],apiKey:'',kimiApiKey:'',kimiBalanceInput:0,memory:{count:0,typeCounts:{},topics:[],level:1}}
+    return d ? JSON.parse(d) : {history:[],apiKey:'',memory:{count:0,typeCounts:{},topics:[],level:1}}
   }catch(e){
-    return {history:[],apiKey:'',kimiApiKey:'',kimiBalanceInput:0,memory:{count:0,typeCounts:{},topics:[],level:1}}
+    return {history:[],apiKey:'',memory:{count:0,typeCounts:{},topics:[],level:1}}
   }
 }
 
@@ -1249,12 +1255,35 @@ function renderLogicGrid(){
   grid.innerHTML = html;
 }
 
+function renderKernelGrid(){
+  var grid = document.getElementById('kernelGrid');
+  if(!grid) return;
+  var html = '';
+  var karr = state.kernels || [];
+  for(var i = 0; i < KERNELS.length; i++){
+    var t = KERNELS[i];
+    var sel = karr.indexOf(t.id) > -1 ? ' selected' : '';
+    var tip = t.desc ? ' title="' + t.desc + '"' : '';
+    html += '<button class="type-btn' + sel + '"' + tip + ' onclick="selectKernel(\'' + t.id + '\')" data-kernel="' + t.id + '">' + t.name + '</button>';
+  }
+  grid.innerHTML = html;
+}
 
 function selectLogic(key){
   state.logics = state.logics || [];
   var idx = state.logics.indexOf(key);
   if(idx > -1){ state.logics.splice(idx, 1); } else { state.logics.push(key); }
   renderLogicGrid();
+}
+function selectKernel(key){
+  if(key === 'auto'){
+    state.kernels = [];
+  }else{
+    state.kernels = state.kernels || [];
+    var idx = state.kernels.indexOf(key);
+    if(idx > -1){ state.kernels.splice(idx, 1); } else { state.kernels.push(key); }
+  }
+  renderKernelGrid();
 }
 // ===== 听众点选自动生成（按场景+主题） =====
 var AUD_MAP = {
@@ -1263,7 +1292,7 @@ var AUD_MAP = {
   kaocha:['考察组成员','被考察单位','负责人','一线人员'],
   xuexi:['学习组成员','党员干部','理论骨干'],
   dongyuan:['全体干部职工','部门负责人','基层单位'],
-  jiandu:['评议组成员','监督对象','部门负责人','群众代表'],
+  jiandu:['政协委员','部门负责人','特邀监督员'],
   zhengqiu:['专家','部门负责人','基层代表'],
   huibao:['领导','班子成员','上级部门'],
   jingyan:['同行单位','与会代表','参会人员'],
@@ -1322,6 +1351,13 @@ function quickFill(target, val){
   var cur = input.value.trim();
   input.value = cur ? cur + '；' + val : val;
   input.focus();
+}
+function toggleKernel(){
+  var b = document.getElementById('kernelBox');
+  var a = document.getElementById('kernelArrow');
+  if(!b || !a) return;
+  if(b.style.display === 'none'){ b.style.display = 'block'; a.textContent = '▾'; }
+  else { b.style.display = 'none'; a.textContent = '▸'; }
 }
 
 function renderModeGrid(){
@@ -1425,7 +1461,7 @@ function selectType(typeId){
     genBtn.textContent = '开始生成动员讲话稿';
   }else{
     noteInput.placeholder = '例如：作为政协委员代表发言...';
-    topicInput.placeholder = '请输入要素...';
+    topicInput.placeholder = '请输入发言主题...';
     genBtn.textContent = '开始生成发言稿';
   }
 }
@@ -1616,22 +1652,6 @@ function renderStats(){
   }
   // 恢复余额输入
   document.getElementById('balanceInput').value = savedBalance || '';
-  // Kimi 余额
-  var kimiBal = data.kimiBalanceInput || 0;
-  var kimiCost = data.kimiCumCost || 0;
-  var kimiEl = document.getElementById('statKimiBalance');
-  var kimiInputEl = document.getElementById('kimiBalanceInput');
-  if(kimiEl){
-    if(kimiBal > 0){
-      var kimiRemain = kimiBal - kimiCost;
-      kimiEl.textContent = kimiRemain > 0 ? '¥' + kimiRemain.toFixed(2) : '已超支';
-      kimiEl.style.color = kimiRemain > 0 ? (kimiRemain < 2 ? '#e80' : '') : '#c00';
-    }else{
-      kimiEl.textContent = '请设置';
-      kimiEl.style.color = 'var(--text-light)';
-    }
-  }
-  if(kimiInputEl) kimiInputEl.value = kimiBal || '';
 }
 
 function setBalance(){
@@ -1646,21 +1666,6 @@ function setBalance(){
   saveData(data);
   var remaining = val - cum.totalCost;
   showToast('余额已保存：¥' + val.toFixed(2) + '，可用约' + Math.floor(remaining / 0.03) + '次发言');
-  renderStats();
-}
-
-function setKimiBalance(){
-  var val = parseFloat(document.getElementById('kimiBalanceInput').value);
-  if(isNaN(val) || val < 0){
-    showToast('请输入有效金额');
-    return;
-  }
-  var data = loadData();
-  data.kimiBalanceInput = val;
-  saveData(data);
-  var kimiCost = data.kimiCumCost || 0;
-  var remaining = val - kimiCost;
-  showToast('Kimi余额已保存：¥' + val.toFixed(2) + '，可用约' + Math.floor(remaining / 0.05) + '次发言');
   renderStats();
 }
 
@@ -1684,7 +1689,7 @@ function handleGenerate(){
   }
   var topic = document.getElementById('topicInput').value.trim();
   if(!topic){
-    showToast('请输入要素');
+    showToast('请输入发言主题');
     return;
   }
   state.topic = topic;
@@ -1702,11 +1707,7 @@ function handleGenerate(){
   document.getElementById('card-result').style.display = 'none';
   document.getElementById('generateBtn').disabled = true;
 
-  var writeApiKey = data.apiKey;
-  if(state.model === 'kimi-k2.6' && data.kimiApiKey){
-    writeApiKey = data.kimiApiKey;
-  }
-  callAI(writeApiKey);
+  callAI(data.apiKey);
 }
 
 function buildPrompt(){
@@ -1950,7 +1951,7 @@ function buildPrompt(){
     'dongyuan': '气势磅礴又接地气，用理论照亮现实，用经历连接同事，用提问引发思考，用讲真话凝聚共识。采用"四段式融合讲话框架"：第一段破题锚定坐标，把上级要求转化为"为什么我们今天坐在这里"；第二段扫描共认现实，用"三个看到"讲成绩、差距、根源，穿插提问和亲身经历；第三段破局指明路径，用"三个换"给出具体可操作的动作，明确谁做什么；第四段升华凝聚共识，用情感共鸣收尾，回到"人"的层面。部署任务必须落到“谁来做、怎么做、何时完成”，不喊口号',
     'kaocha': '开放包容，有比较有鉴别，突出“学到了什么、怎么用”。以客人、学习者身份发言：精准概括对方经验（眼光高）、提炼规律（概括强）、真诚肯定到细节（让人舒服），不谈自身优劣',
     'xuexi': '严谨深刻，理论联系实际，学思践悟有理论高度。先学原文原句，再结合本单位实际展开，不“引完就完”',
-    'jiandu': '客观公正，评议有尺度有分寸，肯定成绩也指出问题。亮标准评成效指不足提建议，每条评议有理有据',
+    'jiandu': '真诚坦率，监督有力度协商有温度，指出问题也提出方案。先肯定成绩再指出问题（先扬后抑），每个问题配一条改进建议',
     'zhengqiu': '专业谦和，先扬后抑，意见有分量：先具体肯定再提意见，眼光准、意见实、有高度，姿态谦和观点鲜明，让人信服',
     'qingdian': '喜庆热烈，温暖真挚，有仪式感和感染力，如祝酒词般自然。用“一核四维”法：核词定调（温情选“答案、缘分”，大气选“风骨、格局”），四维锚定（夸长辈、送主角、祝生活，或讲禀赋、积淀、作为、方向），开篇点季节扣身份，结尾画面式收束',
     'huibao': '条理清晰、数据说话，实事求是讲成绩、不回避讲不足。按“背景情况—所做工作—取得成效—不足打算”组织，语言朴实有据',
@@ -2093,7 +2094,7 @@ function searchMaterials(apiKey, topic, typeName, callback){
   });
 
   var controller = new AbortController();
-  var timer = setTimeout(function(){ controller.abort(); safeCallback(''); }, 10000);
+  var timer = setTimeout(function(){ controller.abort(); safeCallback(''); }, 15000);
   fetch(RESPONSES_URL, {
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer ' + apiKey},
@@ -2166,6 +2167,20 @@ function callAI(apiKey){
     structDesc += '\n【字数要求】每个观点写200-300字，观点精炼有料、论述紧凑有力，全文篇幅适中、节奏明快，不做无谓铺陈。\n';
     prompt = '【最高写作指令】以下内容结构为强制要求，必须严格执行，全文严格按所选结构生成观点，场景默认写法服从本结构，只保留场景的语气姿态。\n' + structDesc + '\n' + prompt;
   }
+  // V38：内容内核（五大内核，多选）
+  var karr = state.kernels || [];
+  if(karr.length > 0){
+    var kernelGuide = {
+      'lishi': '\n\n【内容内核——历史】讲清来龙去脉、发展脉络，让内容有历史纵深。',
+      'lilun': '\n\n【内容内核——理论】讲清理论依据、内在道理，让内容有学理支撑。',
+      'shijian': '\n\n【内容内核——实践】讲清具体路径、操作办法，让内容务实可落地。',
+      'bianzheng': '\n\n【内容内核——辩证】用对立统一看问题（无与有、危与机、虚与实、短与长），增强思想深度。',
+      'jiazhi': '\n\n【内容内核——价值】落点“为了谁”，体现以人民为中心，让内容有温度、有情怀。'
+    };
+    for(var ki = 0; ki < karr.length; ki++){
+      if(kernelGuide[karr[ki]]){ prompt += kernelGuide[karr[ki]]; }
+    }
+  }
   // V39.9：今日变量注入，增强时效感
   var nowD = new Date();
   prompt += '\n\n【今日时间】今天日期：' + nowD.getFullYear() + '年' + (nowD.getMonth() + 1) + '月' + nowD.getDate() + '日。发言中如需时间表述请使用今天及近期时间；如需结合时事，请优先采用当前最新情况，不使用过时信息。';
@@ -2219,18 +2234,10 @@ function callAI(apiKey){
 function doGenerate(apiKey, prompt, model, temp, isRetry){
   var genController = new AbortController();
   var genTimer = setTimeout(function(){ genController.abort(); }, 90000);
-  var genUrl = (model === 'kimi-k2.6') ? MOONSHOT_URL : API_URL;
-  fetch(genUrl, {
+  fetch(API_URL, {
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer ' + apiKey},
-    body: JSON.stringify(model === 'kimi-k2.6' ? {
-      model:model,
-      messages:[{role:'system',content:SYSTEM_PROMPT},{role:'user',content:prompt}],
-      temperature:0.6,
-      max_tokens:4096,
-      stream:true,
-      thinking:{type:'disabled'}
-    } : {
+    body: JSON.stringify({
       model:model,
       messages:[{role:'system',content:SYSTEM_PROMPT},{role:'user',content:prompt}],
       temperature:temp,
@@ -2244,7 +2251,7 @@ function doGenerate(apiKey, prompt, model, temp, isRetry){
       document.getElementById('loading').classList.remove('active');
       document.getElementById('generateBtn').disabled = false;
       if(resp.status===401){showToast('API Key 无效，请检查设置');switchTab('settings');}
-      else if(resp.status===429){showToast(state.model==='kimi-k2.6'?'Kimi余额不足或限速，请充值或稍后再试':'请求过于频繁，请稍后再试');}
+      else if(resp.status===429){showToast('请求过于频繁，请稍后再试');}
       else{showToast('生成失败: '+resp.status);}
       return null;
     }
@@ -2328,19 +2335,6 @@ function finishStream(full){
   cumData.cumUsage.totalCost += parseFloat(cost);
   cumData.cumUsage.history.push({time:new Date().toISOString(),tokens:total,cost:parseFloat(cost),type:state.meetingType,topic:state.topic});
   if(cumData.cumUsage.history.length > 100) cumData.cumUsage.history.shift();
-  // Kimi 余额扣减
-  if(state.model === 'kimi-k2.6'){
-    cumData.kimiCumCost = (cumData.kimiCumCost || 0) + parseFloat(cost);
-    var kimiBal = cumData.kimiBalanceInput || 0;
-    if(kimiBal > 0){
-      var kimiRemain = kimiBal - cumData.kimiCumCost;
-      if(kimiRemain < 2 && kimiRemain > 0){
-        showToast('Kimi余额仅剩¥' + kimiRemain.toFixed(2) + '，请及时充值');
-      }else if(kimiRemain <= 0){
-        showToast('Kimi余额已不足，请充值后继续使用');
-      }
-    }
-  }
   saveData(cumData);
   updateMemory(state.meetingType, state.topic);
   saveHistory(full);
@@ -2631,16 +2625,12 @@ function copySpeech(){
 // ===== 设置 =====
 function saveSettings(){
   var apiKey = document.getElementById('apiKeyInput').value.trim();
-  var kimiApiKey = '';
-  var kimiEl = document.getElementById('kimiApiKeyInput');
-  if(kimiEl) kimiApiKey = kimiEl.value.trim();
-  if(!apiKey && !kimiApiKey){
-    showToast('请至少输入一个 API Key');
+  if(!apiKey){
+    showToast('请输入 API Key');
     return;
   }
   var data = loadData();
   data.apiKey = apiKey;
-  data.kimiApiKey = kimiApiKey;
   var modelEl = document.getElementById('modelSelect');
   if(modelEl){
     state.model = modelEl.value;
@@ -2654,10 +2644,6 @@ function loadSettings(){
   var data = loadData();
   if(data.apiKey){
     document.getElementById('apiKeyInput').value = data.apiKey;
-  }
-  if(data.kimiApiKey){
-    var kimiEl = document.getElementById('kimiApiKeyInput');
-    if(kimiEl) kimiEl.value = data.kimiApiKey;
   }
   if(data.model){
     state.model = data.model;
