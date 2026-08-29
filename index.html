@@ -1808,9 +1808,11 @@ function handleConsult(){
   if(ref) prompt += '\n【参考资料要点】' + ref.substring(0, 1500);
   prompt += '\n\n请按系统要求输出一页纸写作思路，总字数控制在600字以内，不代写全文。';
   window.__speechTitle = '写作思路参谋';
+  window.__consultRender = true;
   doGenerate(writeApiKey, prompt, model, 0.6, false, CONSULT_SYSTEM);
 }
 function handleGenerate(){
+  window.__consultRender = false;
   if(state.mode==='consult'){ handleConsult(); return; }
   if(!state.meetingType){
     showToast('请先选择会议类型');
@@ -2457,11 +2459,47 @@ function doGenerate(apiKey, prompt, model, temp, isRetry, sysOverride){
   });
 }
 
+// 参谋模式的清晰分层渲染：五大板块 + 编号要点 + 列表项，层次分明
+function renderConsult(text){
+  var lines = text.trim().split('\n');
+  var html = '';
+  var blockPattern = /^【(方向研判|三个可选角度|展开支撑|框架铺排|提法与金句|思路总览)】/;
+  var esc = function(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+  var bold = function(s){ return s.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>'); };
+  for(var i=0;i<lines.length;i++){
+    var line = lines[i].trim();
+    if(!line){ continue; }
+    var bm = line.match(blockPattern);
+    if(bm){
+      html += '<div style="font-family:var(--font-heading);font-weight:700;font-size:1.08em;color:var(--primary);border-left:4px solid var(--primary);padding-left:10px;margin:18px 0 8px;letter-spacing:1px;">' + esc(line) + '</div>';
+      continue;
+    }
+    // 编号要点：1. 2. 3. / （一）（二） / 角度一 / 第N
+    if(/^(\d+[.、]|[（(][一二三四五六七八九十0-9]+[)）]|角度[一二三1-3]|方向[一二三1-3]|第[一二三1-3][：:])/.test(line)){
+      html += '<div style="margin:7px 0 7px 14px;line-height:1.9;">' + bold(esc(line)) + '</div>';
+      continue;
+    }
+    // 列表项：- · *
+    if(/^[-•*·]\s+/.test(line)){
+      var liText = line.replace(/^[-•*·]\s+/, '');
+      html += '<div style="margin:4px 0 4px 30px;position:relative;line-height:1.85;"><span style="position:absolute;left:-16px;color:var(--primary);">•</span>' + bold(esc(liText)) + '</div>';
+      continue;
+    }
+    // 行内小块标签：【xxx】
+    if(/^【[^】]+】/.test(line)){
+      html += '<div style="margin:8px 0 4px;font-weight:600;color:var(--text);line-height:1.8;">' + bold(esc(line)) + '</div>';
+      continue;
+    }
+    // 普通段落
+    html += '<p style="margin:5px 0;text-indent:2em;line-height:1.85;">' + bold(esc(line)) + '</p>';
+  }
+  return html;
+}
 function updateStreamResult(text){
   // 流式输出期间只更新内容，不改变card-result的display
   // card-result保持display:none，由finishStream中的showResult统一显示
   // 这样loading转圈全程可见，不抖动
-  document.getElementById('resultContent').innerHTML = parseSpeech(text);
+  document.getElementById('resultContent').innerHTML = (window.__consultRender ? renderConsult(text) : parseSpeech(text));
   document.getElementById('wordCount').textContent = '共 ' + text.replace(/\s/g,'').length + ' 字';
 }
 
@@ -2504,7 +2542,7 @@ function finishStream(full){
 
 function showResult(content){
   document.getElementById('card-result').style.display = 'block';
-  var html = parseSpeech(content);
+  var html = (window.__consultRender ? renderConsult(content) : parseSpeech(content));
   document.getElementById('resultContent').innerHTML = html;
   // 提取标题：优先取摘要区“标题：”字段
   var title = window.__speechTitle || '';
