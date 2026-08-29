@@ -572,6 +572,11 @@ body{
     <label style="display:flex;align-items:center;gap:6px;margin:10px 0 6px;font-size:0.8rem;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent;">
       <input type="checkbox" id="skipSearchToggle" style="width:15px;height:15px;accent-color:var(--primary);"> 本次不联网搜索（更快）
     </label>
+    <div style="display:flex;gap:6px;margin:10px 0 6px;">
+      <button class="btn btn-outline btn-sm" id="modeConsultBtn" onclick="setMode('consult')" style="flex:1;">参谋 · 出方向观点</button>
+      <button class="btn btn-outline btn-sm" id="modeWriteBtn" onclick="setMode('write')" style="flex:1;">成稿 · 写全文</button>
+    </div>
+    <div style="font-size:0.75rem;color:var(--text-light);margin-bottom:6px;line-height:1.6;" id="modeHint">参谋模式：不写全文，只给方向、角度、观点、框架和金句，供您挑用</div>
     <button class="btn btn-primary" id="generateBtn" onclick="handleGenerate()">
       开始生成发言稿
     </button>
@@ -904,8 +909,19 @@ var state = {
   keyData:'',
   wenhuaStrengthen:false,
   webSearch:true,
-  searchContext:''
+  searchContext:'',
+  mode:'consult'
 };
+
+// ===== 参谋模式（出方向、出观点，不代写全文） =====
+var CONSULT_SYSTEM = '你是一位深谙党政机关与政协文史工作的写作参谋，不代笔写稿，只出方向和观点，供撰稿人挑选使用。\n' +
+  '你的任务：针对用户给出的讲话或文章主题，输出一页纸的写作思路。严格按以下五块组织：\n' +
+  '【方向研判】一句话点明这个场合讲话要解决什么问题、达到什么目的，立住纲。\n' +
+  '【三个可选角度】给出3个不同切面的角度（如差距谈、机遇谈、方法论谈等），每个角度一句话讲清核心观点，注明适合什么场合。\n' +
+  '【展开支撑】为最有价值的两个角度各列2-3个展开层次，提示可引的素材或数据方向。\n' +
+  '【框架铺排】给出一套可直接用的骨架：先立什么、再铺什么、最后落到哪，分块列出。\n' +
+  '【提法与金句】给出2-3个有辨识度的小标题提法，1-2句收尾金句。\n' +
+  '写作要求：观点要新、有辨识度、能立住，宁缺毋滥；每条观点一句话讲清，供人挑选；不写空话套话，不代写正文。';
 
 var SYSTEM_PROMPT = '你是一位顶级党政文稿撰稿人，深谙机关公文写作规范和领导讲话艺术。你的核心理念：大秘的逻辑、诗人的情怀、专家的严谨、学者的钻研。\n' +
   '发言的核心在于：逻辑清晰、重点突出、表达高效，体现政治高度、思想深度、实践温度。\n' +
@@ -1752,7 +1768,50 @@ function switchTab(page){
 }
 
 // ===== 生成 =====
+function setMode(m){
+  state.mode = m;
+  var cb = document.getElementById('modeConsultBtn');
+  var wb = document.getElementById('modeWriteBtn');
+  if(cb){ cb.style.background = (m==='consult') ? 'var(--primary)' : ''; cb.style.color = (m==='consult') ? '#fff' : ''; }
+  if(wb){ wb.style.background = (m==='write') ? 'var(--primary)' : ''; wb.style.color = (m==='write') ? '#fff' : ''; }
+  var hint = document.getElementById('modeHint');
+  if(hint){ hint.innerHTML = (m==='consult') ? '参谋模式：不写全文，只给方向、角度、观点、框架和金句，供您挑用' : '成稿模式：按场景与结构生成完整发言稿'; }
+  var btn = document.getElementById('generateBtn');
+  if(btn){ btn.innerHTML = (m==='consult') ? '生成写作思路' : '开始生成发言稿'; }
+}
+function handleConsult(){
+  var topic = document.getElementById('topicInput').value.trim();
+  if(!topic){ showToast('请输入要素'); return; }
+  state.topic = topic;
+  state.note = document.getElementById('noteInput').value.trim();
+  var data = loadData();
+  if(!data.apiKey){
+    showToast('请先在设置中填写 DeepSeek API Key');
+    switchTab('settings');
+    return;
+  }
+  var writeApiKey = data.apiKey;
+  if(state.model === 'kimi-k2.6' && data.kimiApiKey){ writeApiKey = data.kimiApiKey; }
+  var typeName = '';
+  if(state.meetingType){
+    for(var i=0;i<MEETING_TYPES.length;i++){ if(MEETING_TYPES[i].id===state.meetingType){ typeName=MEETING_TYPES[i].name; break; } }
+  }
+  var model = state.model || 'deepseek-v4-pro';
+  document.getElementById('loading').classList.add('active');
+  document.getElementById('card-result').style.display = 'none';
+  document.getElementById('generateBtn').disabled = true;
+  document.getElementById('loadingText').textContent = '参谋正在研判方向与观点...';
+  var prompt = '【讲话或文章主题】' + topic;
+  if(typeName) prompt += '\n【适用场景】' + typeName;
+  if(state.note) prompt += '\n【补充说明】' + state.note;
+  var ref = document.getElementById('refText').value.trim();
+  if(ref) prompt += '\n【参考资料要点】' + ref.substring(0, 1500);
+  prompt += '\n\n请按系统要求输出一页纸写作思路，总字数控制在600字以内，不代写全文。';
+  window.__speechTitle = '写作思路参谋';
+  doGenerate(writeApiKey, prompt, model, 0.6, false, CONSULT_SYSTEM);
+}
 function handleGenerate(){
+  if(state.mode==='consult'){ handleConsult(); return; }
   if(!state.meetingType){
     showToast('请先选择会议类型');
     return;
@@ -2309,7 +2368,8 @@ function callAI(apiKey){
   }
 }
 
-function doGenerate(apiKey, prompt, model, temp, isRetry){
+function doGenerate(apiKey, prompt, model, temp, isRetry, sysOverride){
+  var sysC = sysOverride || SYSTEM_PROMPT;
   var genController = new AbortController();
   var genTimer = setTimeout(function(){ genController.abort(); }, 90000);
   var genUrl = (model === 'kimi-k2.6') ? MOONSHOT_URL : API_URL;
@@ -2318,14 +2378,14 @@ function doGenerate(apiKey, prompt, model, temp, isRetry){
     headers:{'Content-Type':'application/json','Authorization':'Bearer ' + apiKey},
     body: JSON.stringify(model === 'kimi-k2.6' ? {
       model:model,
-      messages:[{role:'system',content:SYSTEM_PROMPT},{role:'user',content:prompt}],
+      messages:[{role:'system',content:sysC},{role:'user',content:prompt}],
       temperature:0.6,
       max_tokens:4096,
       stream:true,
       thinking:{type:'disabled'}
     } : {
       model:model,
-      messages:[{role:'system',content:SYSTEM_PROMPT},{role:'user',content:prompt}],
+      messages:[{role:'system',content:sysC},{role:'user',content:prompt}],
       temperature:temp,
       max_tokens:4096,
       stream:true
@@ -2925,6 +2985,7 @@ function init(){
   loadSettings();
   initHistoryFilter();
   state.webSearch = true;
+  setMode('consult');
 
   // Tab 切换
   var tabs = document.querySelectorAll('.tab');
