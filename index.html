@@ -5,31 +5,31 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>讲话助手·知衡版</title>
 <style>
-:root{--bg:#f5f6f8;--card:#fff;--text:#20242b;--muted:#7b8491;--line:#e8ebef;--accent:#1f5eff;--accent2:#edf3ff;--danger:#c93636;--shadow:0 10px 35px rgba(27,38,61,.06)}
+:root{--bg:#FAF7F2;--card:#fff;--text:#2C2C2C;--muted:#666;--line:#D5C5A8;--accent:#8B1A1A;--accent2:#F7EDE3;--gold:#C9A96E;--danger:#c93636;--shadow:0 2px 16px rgba(0,0,0,.08)}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
 button,input,textarea,select{font:inherit}button{cursor:pointer}
 .app{max-width:1120px;margin:auto;padding:28px 24px 60px}
 header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
-.brand{display:flex;align-items:center;gap:13px}.logo{width:42px;height:42px;border-radius:12px;background:#1f5eff;color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px}
+.brand{display:flex;align-items:center;gap:13px}.logo{width:42px;height:42px;border-radius:12px;background:#8B1A1A;color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px}
 h1{font-size:22px;margin:0 0 3px;letter-spacing:.5px}.tagline{font-size:13px;color:var(--muted)}
-.top-actions{display:flex;gap:8px}.ghost{border:1px solid var(--line);background:#fff;color:#68717e;padding:9px 13px;border-radius:9px}
-.hero{background:linear-gradient(135deg,#fff 0%,#f9fbff 100%);border:1px solid var(--line);border-radius:18px;padding:30px;box-shadow:var(--shadow)}
+.top-actions{display:flex;gap:8px}.ghost{border:1.5px solid var(--line);background:#fff;color:#8B1A1A;padding:9px 13px;border-radius:9px}
+.hero{background:linear-gradient(135deg,#fff 0%,#FAF7F2 100%);border:1px solid var(--line);border-radius:18px;padding:30px;box-shadow:var(--shadow)}
 .hero h2{font-size:25px;margin:0 0 7px}.hero p{margin:0 0 25px;color:var(--muted);font-size:14px}
 .row{display:grid;grid-template-columns:190px 1fr;gap:16px;margin-bottom:18px;align-items:start}
 label{font-weight:700;font-size:14px;padding-top:12px}.hint{display:block;font-size:12px;font-weight:400;color:#9aa2ad;margin-top:5px;line-height:1.5}
-input,textarea,select{width:100%;border:1px solid #dfe4ea;background:#fff;border-radius:10px;padding:12px 13px;outline:none;transition:.15s}
-input:focus,textarea:focus,select:focus{border-color:#9db7ff;box-shadow:0 0 0 3px #edf3ff}
+input,textarea,select{width:100%;border:1.5px solid #D5C5A8;background:#fff;border-radius:10px;padding:12px 13px;outline:none;transition:.15s}
+input:focus,textarea:focus,select:focus{border-color:#8B1A1A;box-shadow:0 0 0 3px rgba(139,26,26,.12)}
 textarea{resize:vertical;min-height:170px;line-height:1.7}
-.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{border:1px solid var(--line);background:#fff;border-radius:20px;padding:7px 13px;color:#69727e;font-size:13px}.chip.active{border-color:#9db7ff;background:var(--accent2);color:var(--accent);font-weight:600}
-.drop{border:1px dashed #cbd2db;border-radius:10px;padding:15px;color:#8a939e;font-size:13px;background:#fbfcfd}
+.chips{display:flex;flex-wrap:wrap;gap:8px}.chip{border:1.5px solid var(--line);background:#fff;border-radius:20px;padding:7px 13px;color:#69727e;font-size:13px}.chip.active{border-color:#8B1A1A;background:var(--accent2);color:var(--accent);font-weight:600}
+.drop{border:1.5px dashed #C9A96E;border-radius:10px;padding:15px;color:#8a939e;font-size:13px;background:#fffdf8}
 .drop input{display:none}.drop b{color:#3e4752}.file-name{margin-top:7px;color:var(--accent)}
 .primary{width:100%;border:0;border-radius:11px;padding:14px;background:var(--accent);color:#fff;font-size:16px;font-weight:700;margin-top:5px}
 .primary:hover{filter:brightness(.96)}
 .advanced{margin-top:17px;border-top:1px solid var(--line);padding-top:15px}.adv-title{display:flex;justify-content:space-between;align-items:center;color:#68717e;font-size:13px;cursor:pointer}.adv-body{display:none;margin-top:15px}.advanced.open .adv-body{display:block}.adv-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.field-title{font-size:12px;color:#737d89;margin-bottom:7px}
 #work{display:none;margin-top:22px}
-.learnbox{margin-top:18px;border:1px solid var(--line);border-radius:12px;background:#fbfcfe;padding:16px}
-.learnbox h4{margin:0 0 6px;font-size:14px}.learnbox p{margin:0 0 10px;color:#8a939e;font-size:12px}.learnbox textarea{min-height:110px}.learn-actions{display:flex;gap:8px;margin-top:9px}.learn-tag{display:inline-block;background:#eef3ff;color:#4167b5;border-radius:12px;padding:3px 8px;font-size:11px;margin:3px}.stagebar{display:flex;gap:5px;margin-bottom:14px}.stage{flex:1;text-align:center;padding:8px 4px;border-radius:7px;background:#e9edf2;color:#87909c;font-size:11px}.stage.on{background:#e6eeff;color:#1f5eff}.stage.done{background:#e9f5ed;color:#338452}
-.result{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}.result-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.result-head b{font-size:16px}.badge{font-size:12px;padding:5px 9px;border-radius:20px;background:#edf8f1;color:#34865a}.result-body{padding:24px}.adviser{display:grid;grid-template-columns:1.25fr 1fr;gap:20px}.panel{border:1px solid var(--line);border-radius:12px;padding:18px}.panel h3{font-size:14px;margin:0 0 11px}.bigjudgment{font-size:21px;line-height:1.55;font-weight:750}.list{margin:0;padding-left:20px;line-height:1.9}.cta-row{display:flex;gap:10px;margin-top:18px}.secondary{border:1px solid #dce2e9;background:#fff;border-radius:9px;padding:10px 15px;color:#596370}.speech{font-size:16px;line-height:2.05;white-space:pre-wrap}.review{margin-top:18px;background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:16px}.review summary{cursor:pointer;font-weight:650}.scores{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:13px}.score{background:#fff;border:1px solid var(--line);padding:10px;border-radius:8px;font-size:12px}.score strong{display:block;font-size:18px;margin-top:4px}.error{color:var(--danger);background:#fff2f2;border:1px solid #ffd6d6;border-radius:10px;padding:12px;margin-top:12px;font-size:13px}
+.learnbox{margin-top:18px;border:1.5px solid var(--line);border-radius:12px;background:#fffdf8;padding:16px}
+.learnbox h4{margin:0 0 6px;font-size:14px}.learnbox p{margin:0 0 10px;color:#8a939e;font-size:12px}.learnbox textarea{min-height:110px}.learn-actions{display:flex;gap:8px;margin-top:9px}.learn-tag{display:inline-block;background:#F7EDE3;color:#8B1A1A;border-radius:12px;padding:3px 8px;font-size:11px;margin:3px}.stagebar{display:flex;gap:5px;margin-bottom:14px}.stage{flex:1;text-align:center;padding:8px 4px;border-radius:7px;background:#EDE4D4;color:#87909c;font-size:11px}.stage.on{background:#F7EDE3;color:#8B1A1A}.stage.done{background:#E9F0E8;color:#338452}
+.result{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}.result-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.result-head b{font-size:16px}.badge{font-size:12px;padding:5px 9px;border-radius:20px;background:#F7EDE3;color:#8B1A1A}.result-body{padding:24px}.adviser{display:grid;grid-template-columns:1.25fr 1fr;gap:20px}.panel{border:1px solid var(--line);border-radius:12px;padding:18px}.panel h3{font-size:14px;margin:0 0 11px}.bigjudgment{font-size:21px;line-height:1.55;font-weight:750}.list{margin:0;padding-left:20px;line-height:1.9}.cta-row{display:flex;gap:10px;margin-top:18px}.secondary{border:1.5px solid #D5C5A8;background:#fff;border-radius:9px;padding:10px 15px;color:#596370}.speech{font-size:16px;line-height:2.05;white-space:pre-wrap}.review{margin-top:18px;background:#fffdf8;border:1.5px solid var(--line);border-radius:12px;padding:16px}.review summary{cursor:pointer;font-weight:650}.scores{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:13px}.score{background:#fff;border:1px solid var(--line);padding:10px;border-radius:8px;font-size:12px}.score strong{display:block;font-size:18px;margin-top:4px}.error{color:var(--danger);background:#fff2f2;border:1px solid #ffd6d6;border-radius:10px;padding:12px;margin-top:12px;font-size:13px}
 footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 @media(max-width:720px){.app{padding:18px 13px}.hero{padding:20px}.row{grid-template-columns:1fr;gap:7px}.adv-grid,.adviser{grid-template-columns:1fr}.scores{grid-template-columns:repeat(2,1fr)}header{align-items:flex-start}.top-actions{display:flex;gap:6px}.top-actions .ghost{padding:7px 10px;font-size:13px}}
 </style>
@@ -107,8 +107,8 @@ document.getElementById("file").onchange=e=>{const f=e.target.files[0];if(f){doc
 function toggleAdvanced(){const a=document.getElementById("advanced");a.classList.toggle("open");document.getElementById("advArrow").textContent=a.classList.contains("open")?"－":"＋"}
 function setStage(n){document.querySelectorAll(".stage").forEach((x,i)=>x.className="stage "+(i<n?"done":i===n?"on":""))}
 function getKey(){return localStorage.getItem("zhiheng_api_key")||""}
-function getProvider(){return localStorage.getItem("zhiheng_provider")||"deepseek"}
-function getModel(){return localStorage.getItem("zhiheng_model")||"deepseek-chat"}
+function getProvider(){const p=localStorage.getItem("zhiheng_provider");return p==="kimi"?"kimi":"deepseek"}
+function getModel(){const m=localStorage.getItem("zhiheng_model");return (m==="deepseek-v4-pro"||m==="kimi-k2-6")?m:"deepseek-v4-pro"}
 
 const ZHENGHENG_MEMORY = `
 【知衡长期写作记忆】
@@ -156,7 +156,7 @@ async function callAI(system,user){
    try{const e=await r.json();msg=(e?.error?.message||e?.message||"").slice(0,200)}catch(_){}
    let hint="";
    if(/context|token|length|maximum/i.test(msg)) hint="。疑似输入内容过长，请精简参考材料或去掉上传文件后再试";
-   else if(/model/i.test(msg)) hint="。疑似模型名称不正确，deepseek 请用 deepseek-chat，kimi 请填官方模型名，到“设置”核对";
+   else if(/model/i.test(msg)) hint="。疑似模型名称不正确，请到“设置”重新选择模型（1. deepseek-v4-pro / 2. kimi-k2-6）";
    else if(/key|auth|invalid/i.test(msg)) hint="。疑似 API Key 无效或已过期，请到“设置”重新填写";
    throw new Error("接口调用失败("+r.status+")"+(msg?"："+msg:"")+hint);
  }
@@ -345,8 +345,10 @@ function saveHistory(type,payload,data){state.history.unshift({time:new Date().t
 function showHistory(){alert("历史记录已保存在本机。当前版本提供本地记录能力，后续可继续扩展为卡片式历史库。")}
 function showSettings(){
  const p=prompt("输入 API Key（仅保存在本机浏览器）：",getKey()); if(p!==null)localStorage.setItem("zhiheng_api_key",p);
- const provider=prompt("服务商：deepseek / kimi",getProvider());if(provider)localStorage.setItem("zhiheng_provider",provider);
- const model=prompt("模型名称",getModel());if(model)localStorage.setItem("zhiheng_model",model);
+ const cur=getModel();
+ const sel=prompt("选择写稿模型（当前："+cur+"）：\n1. deepseek-v4-pro（默认，逻辑强）\n2. kimi-k2-6（写作更像人）", cur==="kimi-k2-6"?"2":"1");
+ if(sel==="2"){localStorage.setItem("zhiheng_provider","kimi");localStorage.setItem("zhiheng_model","kimi-k2-6");}
+ else if(sel==="1"){localStorage.setItem("zhiheng_provider","deepseek");localStorage.setItem("zhiheng_model","deepseek-v4-pro");}
 }
 </script>
 </body>
