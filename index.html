@@ -41,6 +41,18 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 .bar i{display:block;height:100%;background:linear-gradient(90deg,#C9A96E,#8B1A1A);border-radius:3px;transition:width .4s}
 .result{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}.result-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.result-head b{font-size:16px}.badge{font-size:12px;padding:5px 9px;border-radius:20px;background:#F7EDE3;color:#8B1A1A}.result-body{padding:24px}.adviser{display:grid;grid-template-columns:1.25fr 1fr;gap:20px}.panel{border:1px solid var(--line);border-radius:12px;padding:18px}.panel h3{font-size:14px;margin:0 0 11px}.bigjudgment{font-size:21px;line-height:1.55;font-weight:750}.list{margin:0;padding-left:20px;line-height:1.9}.cta-row{display:flex;gap:10px;margin-top:18px}.secondary{border:1.5px solid #D5C5A8;background:#fff;border-radius:9px;padding:10px 15px;color:#596370}.speech{font-size:16px;line-height:2.05;white-space:pre-wrap}.review{margin-top:18px;background:#fffdf8;border:1.5px solid var(--line);border-radius:12px;padding:16px}.review summary{cursor:pointer;font-weight:650}.scores{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:13px}.score{background:#fff;border:1px solid var(--line);padding:10px;border-radius:8px;font-size:12px}.score strong{display:block;font-size:18px;margin-top:4px}.error{color:var(--danger);background:#fff2f2;border:1px solid #ffd6d6;border-radius:10px;padding:12px;margin-top:12px;font-size:13px}
 footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
+.modal-mask{display:none;position:fixed;inset:0;background:rgba(44,32,16,.5);z-index:99;align-items:center;justify-content:center;padding:20px}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden;border:1px solid var(--line)}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:#F7EDE3;color:#8B1A1A;font-weight:700;font-size:16px}
+.modal-head .x{cursor:pointer;font-size:22px;line-height:1;color:#8B1A1A;padding:0 4px}
+.modal-body{padding:20px}
+.model-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.model-card{border:1.5px solid var(--line);border-radius:10px;padding:12px;cursor:pointer;text-align:center;transition:.15s;background:#fff}
+.model-card.active{border-color:#8B1A1A;background:#F7EDE3;box-shadow:0 2px 8px rgba(139,26,26,.12)}
+.model-card b{display:block;font-size:14px;color:var(--text);margin-bottom:3px}
+.model-card span{font-size:11px;color:var(--muted)}
+.model-tip{font-size:11px;color:#9aa2ad;margin:4px 0 12px;line-height:1.5}
+.set-field{margin-bottom:14px}
 @media(max-width:720px){.app{padding:18px 13px}.hero{padding:20px}.row{grid-template-columns:1fr;gap:7px}.adv-grid,.adviser{grid-template-columns:1fr}.scores{grid-template-columns:repeat(2,1fr)}header{align-items:flex-start}.top-actions{display:flex;gap:6px}.top-actions .ghost{padding:7px 10px;font-size:13px}}
 </style>
 </head>
@@ -110,6 +122,24 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 <footer>讲话助手　不只替您写，更替您想</footer>
 </div>
 
+<div class="modal-mask" id="setMask" onclick="if(event.target===this)closeSettings()">
+  <div class="modal">
+    <div class="modal-head">设置<span class="x" onclick="closeSettings()">×</span></div>
+    <div class="modal-body">
+      <div class="set-field"><div class="field-title">API Key（仅保存在本机浏览器）</div><input id="setKey" type="password" placeholder="粘贴您的 API Key" autocomplete="off"></div>
+      <div class="set-field"><div class="field-title">写稿模型</div>
+        <div class="model-cards" id="modelCards">
+          <div class="model-card" data-provider="deepseek" onclick="pickModel(this)"><b>deepseek-v4-pro</b><span>逻辑强 · 默认</span></div>
+          <div class="model-card" data-provider="kimi" onclick="pickModel(this)"><b>kimi-k2-6</b><span>写作更像人</span></div>
+        </div>
+        <div class="model-tip">点选服务商后自动填入对应模型名，也可手动修改下方模型名。</div>
+      </div>
+      <div class="set-field"><div class="field-title">模型名（可微调）</div><input id="setModel" placeholder="deepseek-v4-pro" autocomplete="off"></div>
+      <button class="primary" onclick="saveSettings()">保存设置</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const state={scene:"工作会议",fileText:"",context:null,history:JSON.parse(localStorage.getItem("zhiheng_history")||"[]")};
 document.querySelectorAll(".chip").forEach(x=>x.onclick=()=>{document.querySelectorAll(".chip").forEach(y=>y.classList.remove("active"));x.classList.add("active");state.scene=x.dataset.v});
@@ -138,7 +168,7 @@ function refreshTimer(){
 function stopTimer(){if(_ti){clearInterval(_ti);_ti=null}}
 function getKey(){return localStorage.getItem("zhiheng_api_key")||""}
 function getProvider(){const p=localStorage.getItem("zhiheng_provider");return p==="kimi"?"kimi":"deepseek"}
-function getModel(){const m=localStorage.getItem("zhiheng_model");return (m==="deepseek-v4-pro"||m==="kimi-k2-6")?m:"deepseek-v4-pro"}
+function getModel(){return localStorage.getItem("zhiheng_model")||"deepseek-v4-pro"}
 
 const ZHENGHENG_MEMORY = `
 【知衡长期写作记忆】
@@ -398,12 +428,29 @@ function downloadTxt(){const t=window.last?.draft||"";const a=document.createEle
 function saveHistory(type,payload,data){state.history.unshift({time:new Date().toLocaleString(),type,payload,data});state.history=state.history.slice(0,30);localStorage.setItem("zhiheng_history",JSON.stringify(state.history))}
 function showHistory(){alert("历史记录已保存在本机。当前版本提供本地记录能力，后续可继续扩展为卡片式历史库。")}
 function showSettings(){
- const p=prompt("输入 API Key（仅保存在本机浏览器）：",getKey()); if(p!==null)localStorage.setItem("zhiheng_api_key",p);
- const cur=getModel();
- const sel=prompt("选择写稿模型（当前："+cur+"）：\n1. deepseek-v4-pro（默认，逻辑强）\n2. kimi-k2-6（写作更像人）", cur==="kimi-k2-6"?"2":"1");
- if(sel==="2"){localStorage.setItem("zhiheng_provider","kimi");localStorage.setItem("zhiheng_model","kimi-k2-6");}
- else if(sel==="1"){localStorage.setItem("zhiheng_provider","deepseek");localStorage.setItem("zhiheng_model","deepseek-v4-pro");}
+  document.getElementById("setKey").value=getKey();
+  const p=getProvider(),m=getModel();
+  document.querySelectorAll(".model-card").forEach(c=>c.classList.toggle("active",c.dataset.provider===p));
+  document.getElementById("setModel").value=m;
+  document.getElementById("setMask").style.display="flex";
 }
+function pickModel(el){
+  document.querySelectorAll(".model-card").forEach(c=>c.classList.remove("active"));
+  el.classList.add("active");
+  document.getElementById("setModel").value=el.dataset.provider==="kimi"?"kimi-k2-6":"deepseek-v4-pro";
+}
+function saveSettings(){
+  const k=document.getElementById("setKey").value.trim();
+  if(k)localStorage.setItem("zhiheng_api_key",k);
+  const card=document.querySelector(".model-card.active");
+  const provider=card?card.dataset.provider:"deepseek";
+  localStorage.setItem("zhiheng_provider",provider);
+  const m=document.getElementById("setModel").value.trim()||(provider==="kimi"?"kimi-k2-6":"deepseek-v4-pro");
+  localStorage.setItem("zhiheng_model",m);
+  closeSettings();
+  alert("设置已保存："+m);
+}
+function closeSettings(){document.getElementById("setMask").style.display="none"}
 </script>
 </body>
 </html>
