@@ -143,7 +143,8 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
   <div class="modal">
     <div class="modal-head">设置<span class="x" onclick="closeSettings()">×</span></div>
     <div class="modal-body">
-      <div class="set-field"><div class="field-title">API Key（仅保存在本机浏览器）</div><input id="setKey" type="password" placeholder="粘贴您的 API Key" autocomplete="off"></div>
+      <div class="set-field"><div class="field-title">DeepSeek API Key（写 deepseek 模型用）</div><input id="setKey" type="password" placeholder="粘贴 DeepSeek API Key" autocomplete="off"></div>
+      <div class="set-field"><div class="field-title">Kimi API Key（写 kimi 模型用）</div><input id="setKimiKey" type="password" placeholder="粘贴 Kimi API Key" autocomplete="off"></div>
       <div class="set-field"><div class="field-title">写稿模型</div>
         <div class="model-cards" id="modelCards">
           <div class="model-card" data-provider="deepseek" data-model="deepseek-v4-pro" onclick="pickModel(this)"><b>deepseek-v4-pro</b><span>DeepSeek · 逻辑强 · 默认</span></div>
@@ -198,7 +199,7 @@ function refreshTimer(){
   if(bar)bar.style.width=Math.min(100,Math.round(dw/(dw+rw)*100))+"%";
 }
 function stopTimer(){if(_ti){clearInterval(_ti);_ti=null}}
-function getKey(){return localStorage.getItem("zhiheng_api_key")||""}
+function getKey(){const p=getProvider();return p==="kimi"?(localStorage.getItem("zhiheng_kimi_key")||""):(localStorage.getItem("zhiheng_api_key")||"")}
 function getProvider(){const p=localStorage.getItem("zhiheng_provider");return p==="kimi"?"kimi":"deepseek"}
 function getModel(){return localStorage.getItem("zhiheng_model")||"deepseek-v4-pro"}
 
@@ -239,10 +240,11 @@ return ZHENGHENG_MEMORY + `
 }
 
 async function callAI(system,user){
- const key=getKey(); if(!key) throw new Error("请先在“设置”中填写 API Key。");
+ const key=getKey(); if(!key) throw new Error("请先在“设置”中填写当前模型的 API Key。");
  const provider=getProvider(), model=getModel();
  const url=provider==="kimi"?"https://api.moonshot.cn/v1/chat/completions":"https://api.deepseek.com/chat/completions";
- const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify({model,messages:[{role:"system",content:system},{role:"user",content:user}],temperature:.65,max_tokens:8192})});
+ const body=provider==="kimi"?{model,messages:[{role:"system",content:system},{role:"user",content:user}],temperature:0.6,max_tokens:4096,thinking:{type:"disabled"}}:{model,messages:[{role:"system",content:system},{role:"user",content:user}],temperature:0.6,max_tokens:4096};
+ const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify(body)});
  if(!r.ok){
    let msg="";
    try{const e=await r.json();msg=(e?.error?.message||e?.message||"").slice(0,200)}catch(_){}
@@ -520,7 +522,8 @@ function exportHistoryJson(){
   a.download="讲话助手历史备份.json";a.click();
 }
 function showSettings(){
-  document.getElementById("setKey").value=getKey();
+  document.getElementById("setKey").value=localStorage.getItem("zhiheng_api_key")||"";
+  document.getElementById("setKimiKey").value=localStorage.getItem("zhiheng_kimi_key")||"";
   const p=getProvider(),m=getModel();
   document.querySelectorAll(".model-card").forEach(c=>c.classList.toggle("active",c.dataset.provider===p));
   document.getElementById("setModel").value=m;
@@ -534,13 +537,15 @@ function pickModel(el){
 function saveSettings(){
   const k=document.getElementById("setKey").value.trim();
   if(k)localStorage.setItem("zhiheng_api_key",k);
+  const kk=document.getElementById("setKimiKey").value.trim();
+  if(kk)localStorage.setItem("zhiheng_kimi_key",kk);
   const card=document.querySelector(".model-card.active");
   const provider=card?card.dataset.provider:"deepseek";
   localStorage.setItem("zhiheng_provider",provider);
   const m=document.getElementById("setModel").value.trim()||(provider==="kimi"?"kimi-k2.6":"deepseek-v4-pro");
   localStorage.setItem("zhiheng_model",m);
   closeSettings();
-  alert("设置已保存："+m);
+  alert("设置已保存："+m+"（当前选择："+(provider==="kimi"?"Kimi":"DeepSeek")+"）");
 }
 function closeSettings(){document.getElementById("setMask").style.display="none"}
 </script>
