@@ -40,7 +40,13 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 .bar{height:5px;background:#EDE4D4;border-radius:3px;overflow:hidden;margin-top:6px}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,#C9A96E,#8B1A1A);border-radius:3px;transition:width .4s}
-.result{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}.result-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.result-head b{font-size:16px}.badge{font-size:12px;padding:5px 9px;border-radius:20px;background:#F7EDE3;color:#8B1A1A}.result-body{padding:24px}.adviser{display:grid;grid-template-columns:1.25fr 1fr;gap:20px}.panel{border:1px solid var(--line);border-radius:12px;padding:18px}.panel h3{font-size:14px;margin:0 0 11px}.bigjudgment{font-size:21px;line-height:1.55;font-weight:750}.list{margin:0;padding-left:20px;line-height:1.9}.cta-row{display:flex;gap:10px;margin-top:18px}.secondary{border:1.5px solid #D5C5A8;background:#fff;border-radius:9px;padding:10px 15px;color:#596370}.speech{font-size:16px;line-height:2.05;white-space:pre-wrap}.review{margin-top:18px;background:#fffdf8;border:1.5px solid var(--line);border-radius:12px;padding:16px}.review summary{cursor:pointer;font-weight:650}.scores{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:13px}.score{background:#fff;border:1px solid var(--line);padding:10px;border-radius:8px;font-size:12px}.score strong{display:block;font-size:18px;margin-top:4px}.error{color:var(--danger);background:#fff2f2;border:1px solid #ffd6d6;border-radius:10px;padding:12px;margin-top:12px;font-size:13px}
+.result{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}.result-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.result-head b{font-size:16px}.badge{font-size:12px;padding:5px 9px;border-radius:20px;background:#F7EDE3;color:#8B1A1A}.result-body{padding:24px}.adviser{display:grid;grid-template-columns:1.25fr 1fr;gap:20px}.panel{border:1px solid var(--line);border-radius:12px;padding:18px}.panel h3{font-size:14px;margin:0 0 11px}.bigjudgment{font-size:21px;line-height:1.55;font-weight:750}.list{margin:0;padding-left:20px;line-height:1.9}.cta-row{display:flex;gap:10px;margin-top:18px}.secondary{border:1.5px solid #D5C5A8;background:#fff;border-radius:9px;padding:10px 15px;color:#596370}.speech{font-size:16px;line-height:2.05;white-space:pre-wrap}
+.sp-title{color:#8B1A1A;font-weight:700;font-size:17px;margin:16px 0 4px;line-height:1.6}
+.feedback{margin-top:18px;border:1.5px solid var(--line);border-radius:12px;background:#fffdf8;padding:16px}
+.fb-row{display:flex;gap:10px;flex-wrap:wrap}
+.fb-input{margin-top:12px}
+.fb-input textarea{min-height:90px}
+.fb-msg{margin-top:10px;font-size:13px;line-height:1.7}.review{margin-top:18px;background:#fffdf8;border:1.5px solid var(--line);border-radius:12px;padding:16px}.review summary{cursor:pointer;font-weight:650}.scores{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:13px}.score{background:#fff;border:1px solid var(--line);padding:10px;border-radius:8px;font-size:12px}.score strong{display:block;font-size:18px;margin-top:4px}.error{color:var(--danger);background:#fff2f2;border:1px solid #ffd6d6;border-radius:10px;padding:12px;margin-top:12px;font-size:13px}
 footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 .modal-mask{display:none;position:fixed;inset:0;background:rgba(44,32,16,.5);z-index:99;align-items:center;justify-content:center;padding:20px}
 .modal{background:#fff;border-radius:16px;width:100%;max-width:440px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 20px 60px rgba(0,0,0,.25);border:1px solid var(--line)}
@@ -71,7 +77,7 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 .hi-detail .hi-draft{font-size:13px;line-height:1.8;white-space:pre-wrap;max-height:30vh;overflow-y:auto;background:#fbf7f0;border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px}
 .hist-foot{display:flex;gap:8px}
 .hist-foot button{flex:1}
-@media(max-width:720px){.app{padding:18px 13px}.hero{padding:20px}.row{grid-template-columns:1fr;gap:7px}.adv-grid,.adviser{grid-template-columns:1fr}.scores{grid-template-columns:repeat(2,1fr)}header{align-items:flex-start}.top-actions{display:flex;gap:6px}.top-actions .ghost{padding:7px 10px;font-size:13px}.drop{width:100%}#reference{width:100%;margin-left:0}}
+@media(max-width:720px){.app{padding:18px 13px}.hero{padding:20px}.row{grid-template-columns:1fr;gap:7px}.adv-grid,.adviser{grid-template-columns:1fr}.scores{grid-template-columns:repeat(2,1fr)}header{align-items:flex-start}.top-actions{display:flex;gap:6px}.top-actions .ghost{padding:7px 10px;font-size:13px}.drop{width:100%}#reference{width:100%;margin-left:0}.fb-row{flex-direction:column}.fb-row button{width:100%}}
 </style>
 </head>
 <body>
@@ -420,23 +426,47 @@ function renderBrainDesk(c){
  window.last=c;
 }
 function continueWrite(){document.getElementById("mode").value="writer";start()}
+function renderSpeech(t){
+  const lines=String(t||"").split("\n");
+  return lines.map(line=>{
+    const s=line.trim();
+    if(!s)return "";
+    if(/^#{1,4}\s/.test(s))return '<div class="sp-title">'+esc(s.replace(/^#{1,4}\s*/,""))+'</div>';
+    if(/^\*\*.+\*\*$/.test(s))return '<div class="sp-title">'+esc(s.replace(/^\*\*|\*\*$/g,""))+'</div>';
+    if(/^[一二三四五六七八九十]+、/.test(s)&&s.length<40)return '<div class="sp-title">'+esc(s)+'</div>';
+    if(/^（?[一二三四五六七八九十]+）/.test(s)&&s.length<40)return '<div class="sp-title">'+esc(s)+'</div>';
+    return esc(s);
+  }).join("\n");
+}
 function renderDraft(c){
  const r=c.review||{};
  const sc=r.scores||{};
+ const scList=[
+   ["思想深度",sc.thought],["逻辑结构",sc.logic],["针对性",sc.targeting],["事实准确",sc.fact],
+   ["政策边界",sc.policy],["口语现场",sc.oral],["辨识度",sc.distinctiveness],["AI味控制",sc.aiTaste]
+ ];
  document.getElementById("result").innerHTML=`
  <div class="result-head"><b>讲话稿</b><span class="badge">${r.route==="PASS"?"审稿通过":"已完成定向校正"}</span></div>
  <div class="result-body">
-   <div class="speech" id="speech">${esc(c.draft)}</div>
+   <div class="speech" id="speech">${renderSpeech(c.draft)}</div>
    <div class="review"><details><summary>展开“审稿意见”</summary>
     <div class="scores">
-      <div class="score">思想深度<strong>${esc(sc.thought??"—")}</strong></div>
-      <div class="score">逻辑结构<strong>${esc(sc.logic??"—")}</strong></div>
-      <div class="score">针对性<strong>${esc(sc.targeting??"—")}</strong></div>
-      <div class="score">AI味控制<strong>${esc(sc.aiTaste??"—")}</strong></div>
+      ${scList.map(x=>'<div class="score">'+x[0]+'<strong>'+(x[1]!=null?x[1]:"—")+'</strong></div>').join("")}
     </div>
-    <p class="speech" style="font-size:13px;line-height:1.7"><b>关键问题：</b>${esc((r.criticalProblems||[]).join("；"))}<br><b>建议：</b>${esc((r.suggestions||[]).join("；"))}</p>
+    <p class="speech" style="font-size:13px;line-height:1.7"><b>关键问题：</b>${esc((r.criticalProblems||[]).join("；"))||"—"}<br><b>必改项：</b>${esc((r.mustFix||[]).join("；"))||"—"}<br><b>建议：</b>${esc((r.suggestions||[]).join("；"))||"—"}<br><b>保留：</b>${esc((r.retain||[]).join("；"))||"—"}</p>
    </details></div>
    <div class="cta-row"><button class="secondary" onclick="copyText()">复制全文</button><button class="secondary" onclick="downloadTxt()">导出TXT</button></div>
+   <div class="feedback">
+     <div class="fb-row">
+       <button class="primary" onclick="markSatisfied()">满意，就用这篇</button>
+       <button class="secondary" onclick="askRevision()">还需要修改</button>
+     </div>
+     <div class="fb-input" id="fbInput" style="display:none">
+       <textarea id="fbText" placeholder="告诉助手哪里不满意，比如：开头不够有力、第二部分判断太空、结尾要有气势、某个例子不对……"></textarea>
+       <div class="learn-actions"><button class="primary" onclick="rewriteWithFeedback()">按我的意见重写</button></div>
+     </div>
+     <div class="fb-msg" id="fbMsg"></div>
+   </div>
    <div class="learnbox">
      <h4>让助手越来越懂您 <span class="learn-tag">长期学习</span></h4>
      <p>您如果亲自改过这篇，把最终版本粘贴进来。助手会比较前后差异，只学习“为什么这样写”，不会机械记住一次性的姓名、数字和项目。</p>
@@ -446,13 +476,39 @@ function renderDraft(c){
  </div>`;
  window.last=c;
 }
+function markSatisfied(){
+  const m=document.getElementById("fbMsg");
+  if(m)m.innerHTML='<span style="color:#5d8a6c">感谢认可！这篇讲话已存入历史记录，随时可在“历史”中查看、导出。</span>';
+}
+function askRevision(){
+  const el=document.getElementById("fbInput");
+  if(el)el.style.display="block";
+  const m=document.getElementById("fbMsg");
+  if(m)m.innerHTML="";
+}
+async function rewriteWithFeedback(){
+  const fb=document.getElementById("fbText").value.trim();
+  if(!fb){alert("请先填写修改意见");return}
+  const c=window.last;if(!c)return;
+  const btn=event.target;btn.disabled=true;btn.textContent="重写中…";
+  try{
+    c.draft=await callAI(`你是“改稿官”。按用户的具体修改意见，在保留原文真正好的判断和表达的基础上定向修改。修改后仍是领导讲话，不是论文或调研报告。`,"【用户修改意见】\n"+fb+"\n【原稿】\n"+trim(c.draft,6000));
+    c.review=cleanJSON(await callAI(BRAIN.review,compactForWrite(c)+"\n【待审成稿】\n"+trim(c.draft,6000)));
+    renderDraft(c);
+    const m=document.getElementById("fbMsg");
+    if(m)m.innerHTML="<span style=\"color:#5d8a6c\">已按您的意见重写并重新审稿，请查看。</span>";
+  }catch(e){
+    alert("重写失败："+e.message);
+  }finally{
+    btn.disabled=false;btn.textContent="按我的意见重写";
+  }
+}
 function copyBrain(){const c=window.last||{};navigator.clipboard?.writeText(JSON.stringify({strategy:c.strategy,thesis:c.thesis},null,2)).then(()=>alert("已复制"))}
 
 function renderAdviser(x){
 document.getElementById("result").innerHTML=`<div class="result-head"><b>参谋意见</b><span class="badge">先谋后写</span></div><div class="result-body"><div class="adviser"><div class="panel"><h3>一句话总判断</h3><div class="bigjudgment">${esc(x.adviser)}</div></div><div class="panel"><h3>核心立意</h3><div class="speech">${esc(x.thesis)}</div></div></div><div class="panel" style="margin-top:20px"><h3>知局分析</h3><div class="speech">${esc(x.know)}</div></div><div class="cta-row"><button class="primary" style="width:auto" onclick="continueWrite()">按这个思路写成讲话</button><button class="secondary" onclick="copyText()">复制参谋意见</button></div></div>`;window.last=x}
 function continueWrite(){document.getElementById("mode").value="writer";start()}
-function renderDraft(x){
-document.getElementById("result").innerHTML=`<div class="result-head"><b>讲话稿</b><span class="badge">已审</span></div><div class="result-body"><div class="speech" id="speech">${esc(x.draft)}</div><div class="review"><details><summary>查看“审稿”意见</summary><div class="scores"><div class="score">思想深度<strong>—</strong></div><div class="score">逻辑结构<strong>—</strong></div><div class="score">针对性<strong>—</strong></div><div class="score">AI味控制<strong>—</strong></div></div><p class="speech" style="font-size:13px;line-height:1.7">${esc(x.review)}</p></details></div><div class="cta-row"><button class="secondary" onclick="copyText()">复制全文</button><button class="secondary" onclick="downloadTxt()">导出TXT</button></div></div>`;window.last=x}
+
 function esc(s){return String(s||"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]))}
 function copyText(){const t=window.last?.draft||window.last?.thesis||"";navigator.clipboard?.writeText(t).then(()=>alert("已复制"))}
 function downloadTxt(){const t=window.last?.draft||"";const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/plain;charset=utf-8"}));a.download="讲话稿.txt";a.click()}
