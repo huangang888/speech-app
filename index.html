@@ -17,18 +17,28 @@ h1{font-size:22px;margin:0 0 3px;letter-spacing:.5px}.tagline{font-size:13px;col
 .hero h2{font-size:25px;margin:0 0 7px}.hero p{margin:0 0 25px;color:var(--muted);font-size:14px}
 .row{display:grid;grid-template-columns:190px 1fr;gap:16px;margin-bottom:18px;align-items:start}
 label{font-weight:700;font-size:14px;padding-top:12px}.hint{display:block;font-size:12px;font-weight:400;color:#9aa2ad;margin-top:5px;line-height:1.5}
-input,textarea,select{width:100%;border:1.5px solid #D5C5A8;background:#fff;border-radius:10px;padding:12px 13px;outline:none;transition:.15s}
+input,textarea,select{width:100%;border:1.5px solid #D5C5A8;background:#fff;border-radius:10px;padding:12px 13px;outline:none;transition:.15s;color:var(--text)}
 input:focus,textarea:focus,select:focus{border-color:#8B1A1A;box-shadow:0 0 0 3px rgba(139,26,26,.12)}
-textarea{resize:vertical;min-height:170px;line-height:1.7}
+textarea{resize:none;min-height:170px;line-height:1.7}
+textarea::-webkit-resizer{display:none}
+select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B1A1A' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;cursor:pointer}
+::placeholder{color:#b0a898;opacity:1}
 .chips{display:flex;flex-wrap:wrap;gap:8px}.chip{border:1.5px solid var(--line);background:#fff;border-radius:20px;padding:7px 13px;color:#69727e;font-size:13px}.chip.active{border-color:#8B1A1A;background:var(--accent2);color:var(--accent);font-weight:600}
-.drop{border:1.5px solid #D5C5A8;border-radius:10px;padding:15px;color:#8a939e;font-size:13px;background:#fffdf8}
+.drop{border:1.5px solid #D5C5A8;border-radius:10px;padding:15px;color:#8a939e;font-size:13px;background:#fffdf8;cursor:pointer;transition:.2s}
+.drop:hover{border-color:#8B1A1A;background:#FFF8F0}
 .drop input{display:none}.drop b{color:#3e4752}.file-name{margin-top:7px;color:var(--accent)}
 .primary{width:100%;border:0;border-radius:11px;padding:14px;background:var(--accent);color:#fff;font-size:16px;font-weight:700;margin-top:5px}
 .primary:hover{filter:brightness(.96)}
 .advanced{margin-top:17px;border-top:1px solid var(--line);padding-top:15px}.adv-title{display:flex;justify-content:space-between;align-items:center;color:#68717e;font-size:13px;cursor:pointer}.adv-body{display:none;margin-top:15px}.advanced.open .adv-body{display:block}.adv-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.field-title{font-size:12px;color:#737d89;margin-bottom:7px}
 #work{display:none;margin-top:22px}
 .learnbox{margin-top:18px;border:1.5px solid var(--line);border-radius:12px;background:#fffdf8;padding:16px}
-.learnbox h4{margin:0 0 6px;font-size:14px}.learnbox p{margin:0 0 10px;color:#8a939e;font-size:12px}.learnbox textarea{min-height:110px}.learn-actions{display:flex;gap:8px;margin-top:9px}.learn-tag{display:inline-block;background:#F7EDE3;color:#8B1A1A;border-radius:12px;padding:3px 8px;font-size:11px;margin:3px}.stagebar{display:flex;gap:5px;margin-bottom:14px}.stage{flex:1;text-align:center;padding:8px 4px;border-radius:7px;background:#EDE4D4;color:#87909c;font-size:11px}.stage.on{background:#F7EDE3;color:#8B1A1A}.stage.done{background:#E9F0E8;color:#338452}
+.learnbox h4{margin:0 0 6px;font-size:14px}.learnbox p{margin:0 0 10px;color:#8a939e;font-size:12px}.learnbox textarea{min-height:110px;resize:none}.learn-actions{display:flex;gap:8px;margin-top:9px}.learn-tag{display:inline-block;background:#F7EDE3;color:#8B1A1A;border-radius:12px;padding:3px 8px;font-size:11px;margin:3px}.stagebar{display:flex;gap:6px;margin-bottom:12px}.stage{flex:1;text-align:center;padding:9px 4px;border-radius:8px;background:#EDE4D4;color:#87909c;font-size:11px;font-weight:500;transition:.25s}.stage.on{background:#8B1A1A;color:#fff;box-shadow:0 2px 8px rgba(139,26,26,.22)}.stage.done{background:#E9F0E8;color:#338452}
+.timer{display:flex;align-items:center;gap:8px;font-size:13px;color:#8a939e;background:#fffdf8;border:1.5px solid var(--line);border-radius:10px;padding:9px 13px;margin-bottom:12px}
+.timer b{color:#8B1A1A;font-weight:700}
+.timer .dot{width:8px;height:8px;border-radius:50%;background:#8B1A1A;display:inline-block;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.bar{height:5px;background:#EDE4D4;border-radius:3px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,#C9A96E,#8B1A1A);border-radius:3px;transition:width .4s}
 .result{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}.result-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.result-head b{font-size:16px}.badge{font-size:12px;padding:5px 9px;border-radius:20px;background:#F7EDE3;color:#8B1A1A}.result-body{padding:24px}.adviser{display:grid;grid-template-columns:1.25fr 1fr;gap:20px}.panel{border:1px solid var(--line);border-radius:12px;padding:18px}.panel h3{font-size:14px;margin:0 0 11px}.bigjudgment{font-size:21px;line-height:1.55;font-weight:750}.list{margin:0;padding-left:20px;line-height:1.9}.cta-row{display:flex;gap:10px;margin-top:18px}.secondary{border:1.5px solid #D5C5A8;background:#fff;border-radius:9px;padding:10px 15px;color:#596370}.speech{font-size:16px;line-height:2.05;white-space:pre-wrap}.review{margin-top:18px;background:#fffdf8;border:1.5px solid var(--line);border-radius:12px;padding:16px}.review summary{cursor:pointer;font-weight:650}.scores{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:13px}.score{background:#fff;border:1px solid var(--line);padding:10px;border-radius:8px;font-size:12px}.score strong{display:block;font-size:18px;margin-top:4px}.error{color:var(--danger);background:#fff2f2;border:1px solid #ffd6d6;border-radius:10px;padding:12px;margin-top:12px;font-size:13px}
 footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 @media(max-width:720px){.app{padding:18px 13px}.hero{padding:20px}.row{grid-template-columns:1fr;gap:7px}.adv-grid,.adviser{grid-template-columns:1fr}.scores{grid-template-columns:repeat(2,1fr)}header{align-items:flex-start}.top-actions{display:flex;gap:6px}.top-actions .ghost{padding:7px 10px;font-size:13px}}
@@ -91,6 +101,7 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 
 <section id="work">
   <div style="font-size:12px;color:#8a939e;margin:0 0 8px 2px">正在替您完成：看局面 → 找矛盾 → 定主旨 → 谋结构 → 写讲话 → 挑问题</div>
+  <div class="timer" id="timer" style="display:none"><span class="dot"></span><span id="timerText">正在准备…</span><span class="bar" style="flex:1"><i id="timerBar" style="width:0%"></i></span></div>
   <div class="stagebar" id="stagebar">
     <div class="stage">看清局面</div><div class="stage">找准矛盾</div><div class="stage">形成判断</div><div class="stage">设计逻辑</div><div class="stage">写成讲话</div><div class="stage">反向审稿</div>
   </div>
@@ -105,7 +116,26 @@ document.querySelectorAll(".chip").forEach(x=>x.onclick=()=>{document.querySelec
 document.getElementById("file").onchange=e=>{const f=e.target.files[0];if(f){document.getElementById("fileName").textContent="已选择："+f.name;const r=new FileReader();r.onload=()=>state.fileText=r.result;r.readAsText(f)}};
 
 function toggleAdvanced(){const a=document.getElementById("advanced");a.classList.toggle("open");document.getElementById("advArrow").textContent=a.classList.contains("open")?"－":"＋"}
-function setStage(n){document.querySelectorAll(".stage").forEach((x,i)=>x.className="stage "+(i<n?"done":i===n?"on":""))}
+function setStage(n){document.querySelectorAll(".stage").forEach((x,i)=>x.className="stage "+(i<n?"done":i===n?"on":""));refreshTimer()}
+const STAGE_W=[1,1,1,1,2.2,1.2];
+let _t0=0,_ti=null;
+function fmtTime(s){if(s<=0)return "--";if(s<60)return Math.round(s)+" 秒";return Math.floor(s/60)+" 分 "+Math.round(s%60)+" 秒"}
+function startTimer(){_t0=Date.now();const el=document.getElementById("timer");if(el)el.style.display="flex";if(_ti)clearInterval(_ti);_ti=setInterval(refreshTimer,500);refreshTimer()}
+function refreshTimer(){
+  if(!_t0)return;
+  const sec=(Date.now()-_t0)/1000;
+  const st=document.querySelectorAll(".stage");
+  let cur=0;st.forEach((x,i)=>{if(x.classList.contains("on"))cur=i});
+  let dw=0,rw=0;
+  for(let i=0;i<cur;i++)dw+=STAGE_W[i];
+  for(let i=cur;i<STAGE_W.length;i++)rw+=STAGE_W[i];
+  const est=dw>0?sec/dw*rw:0;
+  const txt=document.getElementById("timerText");
+  if(txt)txt.innerHTML="已用 <b>"+fmtTime(sec)+"</b> · 预计还需约 <b>"+fmtTime(est)+"</b>";
+  const bar=document.getElementById("timerBar");
+  if(bar)bar.style.width=Math.min(100,Math.round(dw/(dw+rw)*100))+"%";
+}
+function stopTimer(){if(_ti){clearInterval(_ti);_ti=null}}
 function getKey(){return localStorage.getItem("zhiheng_api_key")||""}
 function getProvider(){const p=localStorage.getItem("zhiheng_provider");return p==="kimi"?"kimi":"deepseek"}
 function getModel(){const m=localStorage.getItem("zhiheng_model");return (m==="deepseek-v4-pro"||m==="kimi-k2-6")?m:"deepseek-v4-pro"}
@@ -251,7 +281,7 @@ function learnedPrompt(){
 async function start(){
  const brief=document.getElementById("brief").value.trim();
  if(!brief){alert("先把您知道的情况告诉我，零碎一点也没关系。");return}
- document.getElementById("work").style.display="block";setStage(0);
+ document.getElementById("work").style.display="block";startTimer();setStage(0);
  const payload={
    scene:state.scene, brief,
    speaker:document.getElementById("speaker").value,
@@ -272,7 +302,7 @@ async function start(){
    context.thesis=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.thesis,brainInput({brief:payload,situation:context.situation,strategy:context.strategy})));
 
    if(document.getElementById("mode").value==="adviser"){
-     setStage(5); renderBrainDesk(context); saveHistory("参谋",payload,context); return;
+     setStage(5); stopTimer(); renderBrainDesk(context); saveHistory("参谋",payload,context); return;
    }
 
    setStage(3);
@@ -303,9 +333,11 @@ async function start(){
      context.review=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.review,compactForWrite(context)+"\n【待审成稿】\n"+trim(context.draft,8000)));
    }
 
+   stopTimer();
    renderDraft(context);
    saveHistory("成稿",payload,context);
  }catch(e){
+   stopTimer();
    document.getElementById("result").innerHTML='<div class="error">'+esc(e.message)+'</div>'
  }
 }
