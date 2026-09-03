@@ -24,8 +24,9 @@ textarea::-webkit-resizer{display:none}
 select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B1A1A' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;cursor:pointer}
 ::placeholder{color:#b0a898;opacity:1}
 .chips{display:flex;flex-wrap:wrap;gap:8px}.chip{border:1.5px solid var(--line);background:#fff;border-radius:20px;padding:7px 13px;color:#69727e;font-size:13px}.chip.active{border-color:#8B1A1A;background:var(--accent2);color:var(--accent);font-weight:600}
-.drop{border:1.5px solid #D5C5A8;border-radius:10px;padding:15px;color:#8a939e;font-size:13px;background:#fffdf8;cursor:pointer;transition:.2s}
+.drop{border:1.5px solid #D5C5A8;border-radius:10px;padding:13px 15px;color:#8a939e;font-size:13px;background:#fffdf8;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;white-space:nowrap;text-align:center;min-height:46px}
 .drop:hover{border-color:#8B1A1A;background:#FFF8F0}
+.drop .file-name{margin-top:0;margin-left:8px;color:var(--accent);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .drop input{display:none}.drop b{color:#3e4752}.file-name{margin-top:7px;color:var(--accent)}
 .primary{width:100%;border:0;border-radius:11px;padding:14px;background:var(--accent);color:#fff;font-size:16px;font-weight:700;margin-top:5px}
 .primary:hover{filter:brightness(.96)}
@@ -53,7 +54,7 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 .model-card span{font-size:11px;color:var(--muted)}
 .model-tip{font-size:11px;color:#9aa2ad;margin:4px 0 12px;line-height:1.5}
 .set-field{margin-bottom:14px}
-@media(max-width:720px){.app{padding:18px 13px}.hero{padding:20px}.row{grid-template-columns:1fr;gap:7px}.adv-grid,.adviser{grid-template-columns:1fr}.scores{grid-template-columns:repeat(2,1fr)}header{align-items:flex-start}.top-actions{display:flex;gap:6px}.top-actions .ghost{padding:7px 10px;font-size:13px}}
+@media(max-width:720px){.app{padding:18px 13px}.hero{padding:20px}.row{grid-template-columns:1fr;gap:7px}.adv-grid,.adviser{grid-template-columns:1fr}.scores{grid-template-columns:repeat(2,1fr)}header{align-items:flex-start}.top-actions{display:flex;gap:6px}.top-actions .ghost{padding:7px 10px;font-size:13px}.drop{width:100%}#reference{width:100%;margin-left:0}}
 </style>
 </head>
 <body>
@@ -91,8 +92,8 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
   <div class="row">
     <label>有什么材料？<span class="hint">没有也可以直接开始</span></label>
     <div>
-      <label class="drop" for="file"><b>点击上传</b> 或把材料拖进这里<input id="file" type="file" accept=".txt,.docx,.pdf"><div class="file-name" id="fileName"></div></label>
-      <textarea id="reference" style="margin-top:9px;min-height:85px" placeholder="也可以直接粘贴材料、数据、政策依据……"></textarea>
+      <label class="drop" for="file"><b>点击上传材料</b><input id="file" type="file" accept=".txt,.docx,.pdf"><div class="file-name" id="fileName"></div></label>
+      <textarea id="reference" style="margin-top:9px;min-height:85px;width:100%;display:block" placeholder="也可以直接粘贴材料、数据、政策依据……"></textarea>
     </div>
   </div>
 
