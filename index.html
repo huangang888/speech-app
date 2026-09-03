@@ -54,6 +54,22 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 .model-card span{font-size:11px;color:var(--muted)}
 .model-tip{font-size:11px;color:#9aa2ad;margin:4px 0 12px;line-height:1.5}
 .set-field{margin-bottom:14px}
+.hist-list{max-height:52vh;overflow-y:auto;margin-bottom:14px}
+.hist-item{border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#fff}
+.hist-item .hi-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.hist-item .hi-time{font-size:12px;color:var(--muted)}
+.hist-badge{font-size:11px;padding:3px 9px;border-radius:20px;background:#F7EDE3;color:#8B1A1A;white-space:nowrap}
+.hist-item .hi-brief{font-size:13px;color:var(--text);line-height:1.6;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:8px}
+.hist-item .hi-actions{display:flex;gap:8px;flex-wrap:wrap}
+.hist-item .hi-actions button{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;font-size:12px;color:#596370;cursor:pointer;transition:.15s}
+.hist-item .hi-actions button:hover{border-color:#8B1A1A;color:#8B1A1A}
+.hist-item .hi-actions button.danger{color:#c93636;border-color:#e8b4b4}
+.hist-item .hi-actions button.danger:hover{background:#fff2f2}
+.hist-item.open .hi-detail{display:block}
+.hi-detail{display:none;margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+.hi-detail .hi-draft{font-size:13px;line-height:1.8;white-space:pre-wrap;max-height:30vh;overflow-y:auto;background:#fbf7f0;border:1px solid var(--line);border-radius:8px;padding:10px;margin-bottom:8px}
+.hist-foot{display:flex;gap:8px}
+.hist-foot button{flex:1}
 @media(max-width:720px){.app{padding:18px 13px}.hero{padding:20px}.row{grid-template-columns:1fr;gap:7px}.adv-grid,.adviser{grid-template-columns:1fr}.scores{grid-template-columns:repeat(2,1fr)}header{align-items:flex-start}.top-actions{display:flex;gap:6px}.top-actions .ghost{padding:7px 10px;font-size:13px}.drop{width:100%}#reference{width:100%;margin-left:0}}
 </style>
 </head>
@@ -130,13 +146,28 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
       <div class="set-field"><div class="field-title">API Key（仅保存在本机浏览器）</div><input id="setKey" type="password" placeholder="粘贴您的 API Key" autocomplete="off"></div>
       <div class="set-field"><div class="field-title">写稿模型</div>
         <div class="model-cards" id="modelCards">
-          <div class="model-card" data-provider="deepseek" onclick="pickModel(this)"><b>deepseek-v4-pro</b><span>逻辑强 · 默认</span></div>
-          <div class="model-card" data-provider="kimi" onclick="pickModel(this)"><b>kimi-k2-6</b><span>写作更像人</span></div>
+          <div class="model-card" data-provider="deepseek" data-model="deepseek-v4-pro" onclick="pickModel(this)"><b>deepseek-v4-pro</b><span>DeepSeek · 逻辑强 · 默认</span></div>
+          <div class="model-card" data-provider="kimi" data-model="kimi-k2.6" onclick="pickModel(this)"><b>kimi-k2.6</b><span>Kimi · 最接近人类写作</span></div>
+          <div class="model-card" data-provider="deepseek" data-model="deepseek-v4-flash" onclick="pickModel(this)"><b>deepseek-v4-flash</b><span>DeepSeek · 快速响应</span></div>
         </div>
         <div class="model-tip">点选服务商后自动填入对应模型名，也可手动修改下方模型名。</div>
       </div>
       <div class="set-field"><div class="field-title">模型名（可微调）</div><input id="setModel" placeholder="deepseek-v4-pro" autocomplete="off"></div>
       <button class="primary" onclick="saveSettings()">保存设置</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="histMask" onclick="if(event.target===this)closeHistory()">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-head">历史记录<span class="x" onclick="closeHistory()">×</span></div>
+    <div class="modal-body">
+      <div class="hist-list" id="histList"></div>
+      <div class="hist-foot">
+        <button class="secondary" onclick="exportHistoryTxt()">导出TXT合集</button>
+        <button class="secondary" onclick="exportHistoryJson()">导出JSON备份</button>
+        <button class="secondary danger" onclick="clearHistory()">清空历史</button>
+      </div>
     </div>
   </div>
 </div>
@@ -217,7 +248,7 @@ async function callAI(system,user){
    try{const e=await r.json();msg=(e?.error?.message||e?.message||"").slice(0,200)}catch(_){}
    let hint="";
    if(/context|token|length|maximum/i.test(msg)) hint="。疑似输入内容过长，请精简参考材料或去掉上传文件后再试";
-   else if(/model/i.test(msg)) hint="。疑似模型名称不正确，请到“设置”重新选择模型（1. deepseek-v4-pro / 2. kimi-k2-6）";
+   else if(/model/i.test(msg)) hint="。疑似模型名称不正确，请到“设置”重新选择模型（deepseek-v4-pro / kimi-k2.6 / deepseek-v4-flash）";
    else if(/key|auth|invalid/i.test(msg)) hint="。疑似 API Key 无效或已过期，请到“设置”重新填写";
    throw new Error("接口调用失败("+r.status+")"+(msg?"："+msg:"")+hint);
  }
@@ -427,7 +458,67 @@ function esc(s){return String(s||"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt
 function copyText(){const t=window.last?.draft||window.last?.thesis||"";navigator.clipboard?.writeText(t).then(()=>alert("已复制"))}
 function downloadTxt(){const t=window.last?.draft||"";const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/plain;charset=utf-8"}));a.download="讲话稿.txt";a.click()}
 function saveHistory(type,payload,data){state.history.unshift({time:new Date().toLocaleString(),type,payload,data});state.history=state.history.slice(0,30);localStorage.setItem("zhiheng_history",JSON.stringify(state.history))}
-function showHistory(){alert("历史记录已保存在本机。当前版本提供本地记录能力，后续可继续扩展为卡片式历史库。")}
+function showHistory(){
+  document.getElementById("histMask").style.display="flex";
+  renderHistory();
+}
+function closeHistory(){document.getElementById("histMask").style.display="none"}
+function renderHistory(){
+  const list=document.getElementById("histList");
+  if(!state.history.length){list.innerHTML='<div style="text-align:center;color:#9aa2ad;padding:30px 0;font-size:13px">暂无历史记录。生成讲话后会自动保存在这里。</div>';return}
+  list.innerHTML=state.history.map((h,i)=>{
+    const brief=(h.payload&&h.payload.brief||"").slice(0,80);
+    const draft=(h.data&&(h.data.draft||""))||"";
+    return '<div class="hist-item" id="hi'+i+'"><div class="hi-top"><span class="hi-time">'+esc(h.time||"")+'</span><span class="hist-badge">'+(h.type==="参谋"?"参谋":"成稿")+'</span></div><div class="hi-brief">'+esc(brief||"（无描述）")+'</div><div class="hi-actions"><button onclick="toggleHist('+i+')">'+(draft?"查看全文":"查看")+'</button><button onclick="saveOneHistory('+i+')">保存</button><button class="danger" onclick="deleteHistory('+i+')">删除</button></div><div class="hi-detail"><div class="hi-draft">'+esc(draft||"（该条记录无成稿内容）")+'</div><button class="secondary" onclick="copyHist('+i+')">复制全文</button></div></div>';
+  }).join("");
+}
+function toggleHist(i){
+  const el=document.getElementById("hi"+i);
+  if(el)el.classList.toggle("open");
+}
+function copyHist(i){
+  const d=state.history[i]&&state.history[i].data&&state.history[i].data.draft;
+  if(d)navigator.clipboard?.writeText(d).then(()=>alert("已复制"));
+}
+function saveOneHistory(i){
+  const h=state.history[i];
+  const draft=(h&&h.data&&h.data.draft)||"";
+  if(!draft){alert("该条记录无成稿内容");return}
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([draft],{type:"text/plain;charset=utf-8"}));
+  a.download="讲话稿_"+(h.time||"").replace(/[\/:]/g,"-")+".txt";a.click();
+}
+function deleteHistory(i){
+  if(!confirm("确定删除这条历史记录？"))return;
+  state.history.splice(i,1);
+  localStorage.setItem("zhiheng_history",JSON.stringify(state.history));
+  renderHistory();
+}
+function clearHistory(){
+  if(!state.history.length){alert("暂无历史记录");return}
+  if(!confirm("确定清空全部历史记录？此操作不可恢复。"))return;
+  state.history=[];
+  localStorage.setItem("zhiheng_history",JSON.stringify(state.history));
+  renderHistory();
+}
+function exportHistoryTxt(){
+  if(!state.history.length){alert("暂无历史记录");return}
+  let txt="";
+  state.history.forEach((h,i)=>{
+    txt+="【"+(h.type||"成稿")+"】"+(h.time||"")+"\n";
+    txt+="内容简介："+(h.payload&&h.payload.brief||"")+"\n\n";
+    txt+=(h.data&&h.data.draft||"")+"\n\n"+"─".repeat(30)+"\n\n";
+  });
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([txt],{type:"text/plain;charset=utf-8"}));
+  a.download="讲话助手历史合集.txt";a.click();
+}
+function exportHistoryJson(){
+  if(!state.history.length){alert("暂无历史记录");return}
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(state.history,null,2)],{type:"application/json;charset=utf-8"}));
+  a.download="讲话助手历史备份.json";a.click();
+}
 function showSettings(){
   document.getElementById("setKey").value=getKey();
   const p=getProvider(),m=getModel();
@@ -438,7 +529,7 @@ function showSettings(){
 function pickModel(el){
   document.querySelectorAll(".model-card").forEach(c=>c.classList.remove("active"));
   el.classList.add("active");
-  document.getElementById("setModel").value=el.dataset.provider==="kimi"?"kimi-k2-6":"deepseek-v4-pro";
+  document.getElementById("setModel").value=el.dataset.model||"deepseek-v4-pro";
 }
 function saveSettings(){
   const k=document.getElementById("setKey").value.trim();
@@ -446,7 +537,7 @@ function saveSettings(){
   const card=document.querySelector(".model-card.active");
   const provider=card?card.dataset.provider:"deepseek";
   localStorage.setItem("zhiheng_provider",provider);
-  const m=document.getElementById("setModel").value.trim()||(provider==="kimi"?"kimi-k2-6":"deepseek-v4-pro");
+  const m=document.getElementById("setModel").value.trim()||(provider==="kimi"?"kimi-k2.6":"deepseek-v4-pro");
   localStorage.setItem("zhiheng_model",m);
   closeSettings();
   alert("设置已保存："+m);
