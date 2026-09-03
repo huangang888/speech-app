@@ -200,8 +200,18 @@ function refreshTimer(){
 }
 function stopTimer(){if(_ti){clearInterval(_ti);_ti=null}}
 function getKey(){const p=getProvider();return p==="kimi"?(localStorage.getItem("zhiheng_kimi_key")||""):(localStorage.getItem("zhiheng_api_key")||"")}
-function getProvider(){const p=localStorage.getItem("zhiheng_provider");return p==="kimi"?"kimi":"deepseek"}
-function getModel(){return localStorage.getItem("zhiheng_model")||"deepseek-v4-pro"}
+function fixModel(m){
+  const x=String(m||"").trim();
+  if(!x)return "deepseek-v4-pro";
+  if(x==="kimi-k2-6"||x==="kimi-k2.6")return "kimi-k2.6";
+  if(x==="deepseek-v4-pro"||x==="deepseek-v4-flash")return x;
+  return x;
+}
+function getProvider(){
+  const m=fixModel(localStorage.getItem("zhiheng_model"));
+  return m.indexOf("kimi")===0?"kimi":"deepseek";
+}
+function getModel(){return fixModel(localStorage.getItem("zhiheng_model"))}
 
 const ZHENGHENG_MEMORY = `
 【知衡长期写作记忆】
