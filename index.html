@@ -389,15 +389,15 @@ async function start(){
    context.outline=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.outline,brainInput({brief:payload,situation:context.situation,strategy:context.strategy,thesis:context.thesis})));
 
    setStage(4);
-   context.draft=await callAI(`你是“首席撰稿人”，顶级党政讲话起草专家。请严格按照给定判断、矛盾、主旨和结构，写一篇领导讲话。要求：像领导现场讲出来，有判断、有轻重、有取舍；语言规范庄重，少用“要……要……要……”套话；金句从判断自然长出，一处即止；材料不足不编造；篇幅根据内容需要，讲透为止。`, `【讲话要素与判断】\n`+compactForWrite(context));
+   context.draft=await callAI(sys()+learnedPrompt()+`\n【首席撰稿人】\n你是顶级党政讲话起草专家。请严格按照给定判断、矛盾、主旨和结构，写一篇领导讲话。要求：像领导现场讲出来，有判断、有轻重、有取舍；语言规范庄重，少用“要……要……要……”套话；金句从判断自然长出，一处即止；材料不足不编造；篇幅根据内容需要，讲透为止。`, `【讲话要素与判断】\n`+compactForWrite(context));
 
    setStage(5);
-   context.review=cleanJSON(await callAI(BRAIN.review,compactForWrite(context)+"\n【待审成稿】\n"+trim(context.draft,6000)));
+   context.review=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.review,compactForWrite(context)+"\n【待审成稿】\n"+trim(context.draft,6000)));
 
    // 一次定向重写：只修真正的问题，不无限循环。
    if(context.review.route==="REWRITE"){
-     context.draft=await callAI(`你是“重写官”。这是一次针对性重写，不是另起炉灶。保留原稿好的判断和表达，只解决审稿官指出的核心问题。重写后仍是领导讲话，不是论文或调研报告。`, compactForWrite(context)+"\n【审稿意见】\n"+JSON.stringify({criticalProblems:context.review.criticalProblems||[],mustFix:context.review.mustFix||[],suggestions:context.review.suggestions||[]})+"\n【原稿】\n"+trim(context.draft,6000));
-     context.review=cleanJSON(await callAI(BRAIN.review,compactForWrite(context)+"\n【待审成稿】\n"+trim(context.draft,6000)));
+     context.draft=await callAI(sys()+learnedPrompt()+`\n【重写官】\n这是一次针对性重写，不是另起炉灶。保留原稿好的判断和表达，只解决审稿官指出的核心问题。重写后仍是领导讲话，不是论文或调研报告。`, compactForWrite(context)+"\n【审稿意见】\n"+JSON.stringify({criticalProblems:context.review.criticalProblems||[],mustFix:context.review.mustFix||[],suggestions:context.review.suggestions||[]})+"\n【原稿】\n"+trim(context.draft,6000));
+     context.review=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.review,compactForWrite(context)+"\n【待审成稿】\n"+trim(context.draft,6000)));
    }
 
    stopTimer();
@@ -492,8 +492,8 @@ async function rewriteWithFeedback(){
   const c=window.last;if(!c)return;
   const btn=event.target;btn.disabled=true;btn.textContent="重写中…";
   try{
-    c.draft=await callAI(`你是“改稿官”。按用户的具体修改意见，在保留原文真正好的判断和表达的基础上定向修改。修改后仍是领导讲话，不是论文或调研报告。`,"【用户修改意见】\n"+fb+"\n【原稿】\n"+trim(c.draft,6000));
-    c.review=cleanJSON(await callAI(BRAIN.review,compactForWrite(c)+"\n【待审成稿】\n"+trim(c.draft,6000)));
+    c.draft=await callAI(sys()+learnedPrompt()+`\n【改稿官】\n按用户的具体修改意见，在保留原文真正好的判断和表达的基础上定向修改。修改后仍是领导讲话，不是论文或调研报告。`,"【用户修改意见】\n"+fb+"\n【原稿】\n"+trim(c.draft,6000));
+    c.review=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.review,compactForWrite(c)+"\n【待审成稿】\n"+trim(c.draft,6000)));
     renderDraft(c);
     const m=document.getElementById("fbMsg");
     if(m)m.innerHTML="<span style=\"color:#5d8a6c\">已按您的意见重写并重新审稿，请查看。</span>";
