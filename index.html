@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>讲话助手·知衡版</title>
+<title>讲话助手</title>
 <style>
 :root{--bg:#FAF7F2;--card:#fff;--text:#2C2C2C;--muted:#666;--line:#D5C5A8;--accent:#8B1A1A;--accent2:#F7EDE3;--gold:#C9A96E;--danger:#c93636;--shadow:0 2px 16px rgba(0,0,0,.08)}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
@@ -21,7 +21,7 @@ input,textarea,select{width:100%;border:1.5px solid #D5C5A8;background:#fff;bord
 input:focus,textarea:focus,select:focus{border-color:#8B1A1A;box-shadow:0 0 0 3px rgba(139,26,26,.12)}
 textarea{resize:vertical;min-height:170px;line-height:1.7}
 .chips{display:flex;flex-wrap:wrap;gap:8px}.chip{border:1.5px solid var(--line);background:#fff;border-radius:20px;padding:7px 13px;color:#69727e;font-size:13px}.chip.active{border-color:#8B1A1A;background:var(--accent2);color:var(--accent);font-weight:600}
-.drop{border:1.5px dashed #C9A96E;border-radius:10px;padding:15px;color:#8a939e;font-size:13px;background:#fffdf8}
+.drop{border:1.5px solid #D5C5A8;border-radius:10px;padding:15px;color:#8a939e;font-size:13px;background:#fffdf8}
 .drop input{display:none}.drop b{color:#3e4752}.file-name{margin-top:7px;color:var(--accent)}
 .primary{width:100%;border:0;border-radius:11px;padding:14px;background:var(--accent);color:#fff;font-size:16px;font-weight:700;margin-top:5px}
 .primary:hover{filter:brightness(.96)}
@@ -37,16 +37,16 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 <body>
 <div class="app">
 <header>
-  <div class="brand"><div class="logo">衡</div><div><h1>讲话助手·知衡版</h1><div class="tagline">您说事，我来谋。 · v50.3</div></div></div>
+  <div class="brand"><div class="logo">黄</div><div><h1>讲话助手</h1><div class="tagline">您说事，我来谋。 · v50.3</div></div></div>
   <div class="top-actions"><button class="ghost" onclick="showHistory()">历史</button><button class="ghost" onclick="showSettings()">设置</button></div>
 </header>
 
 <section class="hero">
   <h2>这次讲话，您最想讲清楚什么？</h2>
-  <p>不用先想结构、金句、标题。把您知道的情况、想法、问题、担心的地方，零碎地写下来，知衡来替您梳理。</p>
+  <p>不用先想结构、金句、标题。把您知道的情况、想法、问题、担心的地方，零碎地写下来，帮您梳理。</p>
 
   <div class="row">
-    <label>什么场合？<span class="hint">不知道也没关系，可以让知衡判断</span></label>
+    <label>什么场合？<span class="hint">不知道也没关系，可以自动判断</span></label>
     <div class="chips" id="sceneChips">
       <button class="chip active" data-v="工作会议">工作会议</button>
       <button class="chip" data-v="调研座谈">调研座谈</button>
@@ -69,20 +69,20 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
   <div class="row">
     <label>有什么材料？<span class="hint">没有也可以直接开始</span></label>
     <div>
-      <label class="drop" for="file"><b>点击上传</b> 或把材料拖进这里（txt / docx / pdf）<input id="file" type="file" accept=".txt,.docx,.pdf"><div class="file-name" id="fileName"></div></label>
+      <label class="drop" for="file"><b>点击上传</b> 或把材料拖进这里<input id="file" type="file" accept=".txt,.docx,.pdf"><div class="file-name" id="fileName"></div></label>
       <textarea id="reference" style="margin-top:9px;min-height:85px" placeholder="也可以直接粘贴材料、数据、政策依据……"></textarea>
     </div>
   </div>
 
-  <button class="primary" onclick="start()">让知衡来谋</button>
+  <button class="primary" onclick="start()">现在开始思考</button>
 
   <div class="advanced" id="advanced">
-    <div class="adv-title" onclick="toggleAdvanced()"><span>高级设置 · 默认交给知衡判断</span><span id="advArrow">＋</span></div>
+    <div class="adv-title" onclick="toggleAdvanced()"><span>高级设置 · 默认自动判断</span><span id="advArrow">＋</span></div>
     <div class="adv-body">
       <div class="adv-grid">
         <div><div class="field-title">听众</div><input id="audience" placeholder="如：市直部门、学校负责人、基层干部"></div>
         <div><div class="field-title">模式</div><select id="mode"><option value="writer">成稿：谋完直接写</option><option value="adviser">参谋：先给方向和立意</option></select></div>
-        <div><div class="field-title">结构偏好（仅作参考）</div><select id="structure"><option>交给知衡判断</option><option>总分式</option><option>问题式</option><option>认知式</option><option>辩证式</option><option>时间式</option></select></div>
+        <div><div class="field-title">结构偏好（仅作参考）</div><select id="structure"><option>自动判断</option><option>总分式</option><option>问题式</option><option>认知式</option><option>辩证式</option><option>时间式</option></select></div>
         <div><div class="field-title">其他要求</div><input id="extra" placeholder="如：控制在2000字左右、少用套话、更加口语化"></div>
       </div>
     </div>
@@ -90,13 +90,13 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 </section>
 
 <section id="work">
-  <div style="font-size:12px;color:#8a939e;margin:0 0 8px 2px">知衡正在替您完成：看局面 → 找矛盾 → 定主旨 → 谋结构 → 写讲话 → 挑问题</div>
+  <div style="font-size:12px;color:#8a939e;margin:0 0 8px 2px">正在替您完成：看局面 → 找矛盾 → 定主旨 → 谋结构 → 写讲话 → 挑问题</div>
   <div class="stagebar" id="stagebar">
     <div class="stage">看清局面</div><div class="stage">找准矛盾</div><div class="stage">形成判断</div><div class="stage">设计逻辑</div><div class="stage">写成讲话</div><div class="stage">反向审稿</div>
   </div>
   <div class="result" id="result"></div>
 </section>
-<footer>讲话助手·知衡版　不只替您写，更替您想</footer>
+<footer>讲话助手　不只替您写，更替您想</footer>
 </div>
 
 <script>
@@ -291,7 +291,7 @@ async function start(){
 function renderBrainDesk(c){
  const s=c.strategy||{},t=c.thesis||{},k=c.situation||{};
  document.getElementById("result").innerHTML=`
- <div class="result-head"><b>知衡参谋桌</b><span class="badge">已经替您想了一遍</span></div>
+ <div class="result-head"><b>参谋桌</b><span class="badge">已经替您想了一遍</span></div>
  <div class="result-body">
    <div class="panel" style="margin-bottom:18px"><h3>一句话判断</h3><div class="bigjudgment">${esc(s.overallJudgment||s.raw||"")}</div></div>
    <div class="adviser">
@@ -309,10 +309,10 @@ function renderDraft(c){
  const r=c.review||{};
  const sc=r.scores||{};
  document.getElementById("result").innerHTML=`
- <div class="result-head"><b>讲话稿</b><span class="badge">${r.route==="PASS"?"知衡审稿通过":"知衡已完成定向校正"}</span></div>
+ <div class="result-head"><b>讲话稿</b><span class="badge">${r.route==="PASS"?"审稿通过":"已完成定向校正"}</span></div>
  <div class="result-body">
    <div class="speech" id="speech">${esc(c.draft)}</div>
-   <div class="review"><details><summary>展开“知衡审稿”</summary>
+   <div class="review"><details><summary>展开“审稿意见”</summary>
     <div class="scores">
       <div class="score">思想深度<strong>${esc(sc.thought??"—")}</strong></div>
       <div class="score">逻辑结构<strong>${esc(sc.logic??"—")}</strong></div>
@@ -323,10 +323,10 @@ function renderDraft(c){
    </details></div>
    <div class="cta-row"><button class="secondary" onclick="copyText()">复制全文</button><button class="secondary" onclick="downloadTxt()">导出TXT</button></div>
    <div class="learnbox">
-     <h4>让知衡越来越懂您 <span class="learn-tag">长期学习</span></h4>
-     <p>您如果亲自改过这篇，把最终版本粘贴进来。知衡会比较前后差异，只学习“为什么这样写”，不会机械记住一次性的姓名、数字和项目。</p>
+     <h4>让助手越来越懂您 <span class="learn-tag">长期学习</span></h4>
+     <p>您如果亲自改过这篇，把最终版本粘贴进来。助手会比较前后差异，只学习“为什么这样写”，不会机械记住一次性的姓名、数字和项目。</p>
      <textarea id="revisedDraft" placeholder="把您修改后的最终稿粘贴到这里……"></textarea>
-     <div class="learn-actions"><button class="secondary" onclick="learnFromRevision()">让知衡学习这次修改</button><span id="learnMsg" style="font-size:12px;color:#5d8a6c;padding:10px"></span></div>
+     <div class="learn-actions"><button class="secondary" onclick="learnFromRevision()">让助手学习这次修改</button><span id="learnMsg" style="font-size:12px;color:#5d8a6c;padding:10px"></span></div>
    </div>
  </div>`;
  window.last=c;
@@ -334,13 +334,13 @@ function renderDraft(c){
 function copyBrain(){const c=window.last||{};navigator.clipboard?.writeText(JSON.stringify({strategy:c.strategy,thesis:c.thesis},null,2)).then(()=>alert("已复制"))}
 
 function renderAdviser(x){
-document.getElementById("result").innerHTML=`<div class="result-head"><b>知衡参谋意见</b><span class="badge">先谋后写</span></div><div class="result-body"><div class="adviser"><div class="panel"><h3>一句话总判断</h3><div class="bigjudgment">${esc(x.adviser)}</div></div><div class="panel"><h3>核心立意</h3><div class="speech">${esc(x.thesis)}</div></div></div><div class="panel" style="margin-top:20px"><h3>知局分析</h3><div class="speech">${esc(x.know)}</div></div><div class="cta-row"><button class="primary" style="width:auto" onclick="continueWrite()">按这个思路写成讲话</button><button class="secondary" onclick="copyText()">复制参谋意见</button></div></div>`;window.last=x}
+document.getElementById("result").innerHTML=`<div class="result-head"><b>参谋意见</b><span class="badge">先谋后写</span></div><div class="result-body"><div class="adviser"><div class="panel"><h3>一句话总判断</h3><div class="bigjudgment">${esc(x.adviser)}</div></div><div class="panel"><h3>核心立意</h3><div class="speech">${esc(x.thesis)}</div></div></div><div class="panel" style="margin-top:20px"><h3>知局分析</h3><div class="speech">${esc(x.know)}</div></div><div class="cta-row"><button class="primary" style="width:auto" onclick="continueWrite()">按这个思路写成讲话</button><button class="secondary" onclick="copyText()">复制参谋意见</button></div></div>`;window.last=x}
 function continueWrite(){document.getElementById("mode").value="writer";start()}
 function renderDraft(x){
-document.getElementById("result").innerHTML=`<div class="result-head"><b>讲话稿</b><span class="badge">知衡已审</span></div><div class="result-body"><div class="speech" id="speech">${esc(x.draft)}</div><div class="review"><details><summary>查看“知衡审稿”意见</summary><div class="scores"><div class="score">思想深度<strong>—</strong></div><div class="score">逻辑结构<strong>—</strong></div><div class="score">针对性<strong>—</strong></div><div class="score">AI味控制<strong>—</strong></div></div><p class="speech" style="font-size:13px;line-height:1.7">${esc(x.review)}</p></details></div><div class="cta-row"><button class="secondary" onclick="copyText()">复制全文</button><button class="secondary" onclick="downloadTxt()">导出TXT</button></div></div>`;window.last=x}
+document.getElementById("result").innerHTML=`<div class="result-head"><b>讲话稿</b><span class="badge">已审</span></div><div class="result-body"><div class="speech" id="speech">${esc(x.draft)}</div><div class="review"><details><summary>查看“审稿”意见</summary><div class="scores"><div class="score">思想深度<strong>—</strong></div><div class="score">逻辑结构<strong>—</strong></div><div class="score">针对性<strong>—</strong></div><div class="score">AI味控制<strong>—</strong></div></div><p class="speech" style="font-size:13px;line-height:1.7">${esc(x.review)}</p></details></div><div class="cta-row"><button class="secondary" onclick="copyText()">复制全文</button><button class="secondary" onclick="downloadTxt()">导出TXT</button></div></div>`;window.last=x}
 function esc(s){return String(s||"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]))}
 function copyText(){const t=window.last?.draft||window.last?.thesis||"";navigator.clipboard?.writeText(t).then(()=>alert("已复制"))}
-function downloadTxt(){const t=window.last?.draft||"";const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/plain;charset=utf-8"}));a.download="知衡讲话稿.txt";a.click()}
+function downloadTxt(){const t=window.last?.draft||"";const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/plain;charset=utf-8"}));a.download="讲话稿.txt";a.click()}
 function saveHistory(type,payload,data){state.history.unshift({time:new Date().toLocaleString(),type,payload,data});state.history=state.history.slice(0,30);localStorage.setItem("zhiheng_history",JSON.stringify(state.history))}
 function showHistory(){alert("历史记录已保存在本机。当前版本提供本地记录能力，后续可继续扩展为卡片式历史库。")}
 function showSettings(){
