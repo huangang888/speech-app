@@ -253,7 +253,7 @@ async function callAI(system,user){
  const key=getKey(); if(!key) throw new Error("请先在“设置”中填写当前模型的 API Key。");
  const provider=getProvider(), model=getModel();
  const url=provider==="kimi"?"https://api.moonshot.cn/v1/chat/completions":"https://api.deepseek.com/chat/completions";
- const body=provider==="kimi"?{model,messages:[{role:"system",content:system},{role:"user",content:user}],temperature:0.6,max_tokens:4096,thinking:{type:"disabled"}}:{model,messages:[{role:"system",content:system},{role:"user",content:user}],temperature:0.6,max_tokens:4096};
+ const body={model,messages:[{role:"system",content:system},{role:"user",content:user}],temperature:0.6,max_tokens:4096,thinking:{type:"disabled"}};
  const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify(body)});
  if(!r.ok){
    let msg="";
