@@ -193,6 +193,22 @@ function cleanJSON(t){
   }
 }
 function brainInput(payload){return JSON.stringify(payload,null,2)}
+function trim(s,n){return String(s||"").length>n?String(s||"").slice(0,n)+"…[已截断]":String(s||"")}
+function compactForWrite(c){
+  const k=c.situation||{},s=c.strategy||{},t=c.thesis||{},o=c.outline||{},b=c.brief||{};
+  return JSON.stringify({
+    场合:b.scene||"",
+    要点:trim(b.brief,1500),
+    讲话人:b.speaker||"",
+    听众:b.audience||"",
+    材料:trim(b.reference,3000),
+    其他要求:b.extra||"",
+    局面:{coreSituation:k.coreSituation,contradictions:(k.contradictions||[]).slice(0,6),purpose:k.purpose},
+    参谋判断:{overallJudgment:s.overallJudgment,coreContradictions:(s.coreContradictions||[]).slice(0,5),breakthroughDirections:(s.breakthroughDirections||[]).slice(0,5),recommendedDirection:s.recommendedDirection,avoidDirections:(s.avoidDirections||[]).slice(0,4)},
+    主旨:{coreThesis:t.coreThesis,coreQuestion:t.coreQuestion,supportingJudgments:(t.supportingJudgments||[]).slice(0,6),titleDirections:(t.titleDirections||[]).slice(0,5)},
+    结构:{structure:o.structure,overallLogic:o.overallLogic,sections:(o.sections||[]).slice(0,8),openingTask:o.openingTask,endingTask:o.endingTask}
+  },null,1)
+}
 
 function getLearned(){
   try{return JSON.parse(localStorage.getItem("zhiheng_learned")||"[]")}catch(e){return[]}
@@ -223,7 +239,13 @@ async function learnFromRevision(){
 function learnedPrompt(){
   const x=getLearned();
   if(!x.length)return "";
-  return "\n【用户长期偏好学习结果】\n"+x.map((a,i)=>`${i+1}. ${a.rule}（${a.reason||"用户修改行为归纳"}）`).join("\n");
+  let out="";
+  for(let i=0;i<x.length&&out.length<900;i++){
+    const r=(x[i].rule||"").slice(0,120);
+    const rs=(x[i].reason||"用户修改行为归纳").slice(0,80);
+    out+=(i+1)+". "+r+"（"+rs+"）\n";
+  }
+  return "\n【用户长期偏好学习结果】\n"+out;
 }
 
 async function start(){
@@ -234,7 +256,7 @@ async function start(){
    scene:state.scene, brief,
    speaker:document.getElementById("speaker").value,
    audience:document.getElementById("audience").value,
-   reference:document.getElementById("reference").value+"\n"+state.fileText,
+   reference:trim(document.getElementById("reference").value+"\n"+state.fileText,6000),
    structurePreference:document.getElementById("structure").value,
    extra:document.getElementById("extra").value
  };
@@ -265,10 +287,10 @@ async function start(){
 允许有长短句变化；不要强制每句等长，不要强制每段排比。
 金句只能从真实判断自然长出来。少用空泛的“要……要……要……”，少用“我们要深刻认识……切实增强……”等套话。
 如果材料不足，不编事实。
-`+brainInput(context));
+`+compactForWrite(context));
 
    setStage(5);
-   context.review=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.review,brainInput(context)));
+   context.review=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.review,compactForWrite(context)+"\n【待审成稿】\n"+trim(context.draft,8000)));
 
    // 一次定向重写：只修真正的问题，不无限循环。
    if(context.review.route==="REWRITE"){
@@ -277,8 +299,8 @@ async function start(){
 这是一次针对性重写，不是另起炉灶。
 保留原稿真正好的判断和表达，只解决审稿官指出的核心问题。
 重写后仍必须符合“领导讲话”而不是“论文/调研报告”。
-`+brainInput(context));
-     context.review=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.review,brainInput(context)));
+`+compactForWrite(context)+"\n【审稿意见】\n"+JSON.stringify({criticalProblems:context.review.criticalProblems||[],mustFix:context.review.mustFix||[],suggestions:context.review.suggestions||[]})+"\n【原稿】\n"+trim(context.draft,8000));
+     context.review=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.review,compactForWrite(context)+"\n【待审成稿】\n"+trim(context.draft,8000)));
    }
 
    renderDraft(context);
