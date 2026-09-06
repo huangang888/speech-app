@@ -40,8 +40,9 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 .bar{height:5px;background:#EDE4D4;border-radius:3px;overflow:hidden;margin-top:6px}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,#C9A96E,#8B1A1A);border-radius:3px;transition:width .4s}
-.result{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}.result-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.result-head b{font-size:16px}.badge{font-size:12px;padding:5px 9px;border-radius:20px;background:#F7EDE3;color:#8B1A1A}.result-body{padding:24px}.adviser{display:grid;grid-template-columns:1.25fr 1fr;gap:20px}.panel{border:1px solid var(--line);border-radius:12px;padding:18px}.panel h3{font-size:14px;margin:0 0 11px}.bigjudgment{font-size:21px;line-height:1.55;font-weight:750}.list{margin:0;padding-left:20px;line-height:1.9}.cta-row{display:flex;gap:10px;margin-top:18px}.secondary{border:1.5px solid #D5C5A8;background:#fff;border-radius:9px;padding:10px 15px;color:#596370}.speech{font-size:16px;line-height:2.05;white-space:pre-wrap}
-.sp-title{color:#8B1A1A;font-weight:700;font-size:17px;margin:16px 0 4px;line-height:1.6}
+.result{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}.result-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.result-head b{font-size:16px}.badge{font-size:12px;padding:5px 9px;border-radius:20px;background:#F7EDE3;color:#8B1A1A}.result-body{padding:24px}.adviser{display:grid;grid-template-columns:1.25fr 1fr;gap:20px}.panel{border:1px solid var(--line);border-radius:12px;padding:18px}.panel h3{font-size:14px;margin:0 0 11px}.bigjudgment{font-size:21px;line-height:1.55;font-weight:750}.list{margin:0;padding-left:20px;line-height:1.9}.cta-row{display:flex;gap:10px;margin-top:18px}.secondary{border:1.5px solid #D5C5A8;background:#fff;border-radius:9px;padding:10px 15px;color:#596370}.speech{font-size:16px;line-height:1.55;white-space:pre-wrap}
+.sp-main{color:#8B1A1A;font-weight:800;font-size:20px;margin:0 0 14px;line-height:1.5;text-align:center}
+.sp-title{color:#8B1A1A;font-weight:700;font-size:16px;margin:14px 0 4px;line-height:1.5}
 .feedback{margin-top:18px;border:1.5px solid var(--line);border-radius:12px;background:#fffdf8;padding:16px}
 .fb-row{display:flex;gap:10px;flex-wrap:wrap}
 .fb-input{margin-top:12px}
@@ -237,11 +238,27 @@ const ZHENGHENG_MEMORY = `
 11. 党政公文以规范庄重为底色，新颖体现在判断、标题、提炼和表达，不把调研报告写成散文，不把讲话写成论文。
 12. 修改已审定稿：尊重原文架构，原则上不推倒重来；重点润色标题、打磨文字、提炼升华。数据留白不能擅自删除，必须补充或明确待核实。
 13. 语言细节：不用破折号；避免空泛四字词堆砌；成绩与问题转折清楚，避免用分号硬拼性质不同的两面；中文引号优先。
-14. 最终标准不是“像AI写得很好”，而是“像一个真正懂局面、懂政策、懂讲话的人想明白后写出来的”。
+15. 结构硬要求：讲话正文分部分推进，各部分小标题（观点）不少于3个，彼此贯穿一种明确逻辑关系，优先选用时间关系（过去/现在/将来）、辩证关系（是什么/为什么/怎么办）、角度关系（全局/基层/长远等不同视角）、总分关系（总要求/分项部署/落地保障）、并列关系（形势/基础/机遇等同质递进）五种之一；小标题句式统一、字数接近、节奏一致，全篇体现条理性、关系性、新颖性。
+16. 最终标准不是“像AI写得很好”，而是“像一个真正懂局面、懂政策、懂讲话的人想明白后写出来的”。
 
 【知衡判断优先级】
 真实性 > 政策边界 > 核心判断 > 逻辑闭合 > 针对性 > 现场感 > 语言质量 > 修辞装饰。
 如果这些要求发生冲突，按上述优先级处理。
+`;
+
+const FORMAT_RULES= `
+【格式与结构硬要求（每次写稿、改稿、重写必须执行）】
+1. 全文第一行是主标题，单独成行，不加#、**等任何符号标记（前端会自动加粗标红居中）。
+2. 正文分部分推进，每个部分必须有一个独立小标题（观点句），小标题单独成行，行内不再用**标记。
+3. 小标题（各部分观点）不少于3个，彼此必须贯穿一种明确的逻辑关系，从以下五种中选用一种：
+  ①时间关系：过去怎么看、现在怎么看、将来怎么看；
+  ②辩证关系：是什么、为什么、怎么办；
+  ③角度关系：从全局看、从基层看、从长远看（或其它三个不同视角）；
+  ④总分关系：总的要求、分项部署、落地保障；
+  ⑤并列关系：因为形势这样、因为基础这样、因为机遇这样（同质递进）。
+4. 小标题统一用“一、”“二、”“三、”或“一是”“二是”“三是”格式，句式统一、字数接近、节奏一致。
+5. 篇幅紧凑：段落之间不空行，小标题后直接接正文。
+6. 全篇体现条理性、关系性、新颖性：条理清楚、部分之间逻辑关系明确、判断和表达有新意。
 `;
 
 function sys(){
@@ -287,6 +304,7 @@ const BRAIN={
 输出严格JSON：coreThesis,coreQuestion,supportingJudgments[],logicRelation,evidenceNeeds[],titleDirections[]。`,
   outline:`你是“谋篇官”。结构不是模板，而是思想的骨架。
 判断用户偏好的结构是否真的适合；不适合就换。全篇只保留一条主逻辑，每一部分都必须承担不可替代的论证任务。
+各部分观点（sections）不得少于3个，且彼此贯穿一种明确逻辑关系（时间/辩证/角度/总分/并列五种之一）。
 输出严格JSON：structure,structureReason,overallLogic,openingTask,sections[{title,coreJudgment,logicalTask,evidence,caseSupport,transition}],endingTask。`,
   review:`你是“知衡审稿官”，采取对抗式审稿，不负责夸奖。
 检查：思想深度、逻辑闭合、针对性、事实准确、政策边界、领导讲话口语感、辨识度、AI味。
@@ -389,14 +407,14 @@ async function start(){
    context.outline=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.outline,brainInput({brief:payload,situation:context.situation,strategy:context.strategy,thesis:context.thesis})));
 
    setStage(4);
-   context.draft=await callAI(sys()+learnedPrompt()+`\n【首席撰稿人】\n你是顶级党政讲话起草专家。请严格按照给定判断、矛盾、主旨和结构，写一篇领导讲话。要求：像领导现场讲出来，有判断、有轻重、有取舍；语言规范庄重，少用“要……要……要……”套话；金句从判断自然长出，一处即止；材料不足不编造；篇幅根据内容需要，讲透为止。`, `【讲话要素与判断】\n`+compactForWrite(context));
+   context.draft=await callAI(sys()+learnedPrompt()+`\n【首席撰稿人】\n你是顶级党政讲话起草专家。请严格按照给定判断、矛盾、主旨和结构，写一篇领导讲话。要求：像领导现场讲出来，有判断、有轻重、有取舍；语言规范庄重，少用“要……要……要……”套话；金句从判断自然长出，一处即止；材料不足不编造；篇幅根据内容需要，讲透为止。`+FORMAT_RULES, `【讲话要素与判断】\n`+compactForWrite(context));
 
    setStage(5);
    context.review=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.review,compactForWrite(context)+"\n【待审成稿】\n"+trim(context.draft,6000)));
 
    // 一次定向重写：只修真正的问题，不无限循环。
    if(context.review.route==="REWRITE"){
-     context.draft=await callAI(sys()+learnedPrompt()+`\n【重写官】\n这是一次针对性重写，不是另起炉灶。保留原稿好的判断和表达，只解决审稿官指出的核心问题。重写后仍是领导讲话，不是论文或调研报告。`, compactForWrite(context)+"\n【审稿意见】\n"+JSON.stringify({criticalProblems:context.review.criticalProblems||[],mustFix:context.review.mustFix||[],suggestions:context.review.suggestions||[]})+"\n【原稿】\n"+trim(context.draft,6000));
+     context.draft=await callAI(sys()+learnedPrompt()+`\n【重写官】\n这是一次针对性重写，不是另起炉灶。保留原稿好的判断和表达，只解决审稿官指出的核心问题。重写后仍是领导讲话，不是论文或调研报告。`+FORMAT_RULES, compactForWrite(context)+"\n【审稿意见】\n"+JSON.stringify({criticalProblems:context.review.criticalProblems||[],mustFix:context.review.mustFix||[],suggestions:context.review.suggestions||[]})+"\n【原稿】\n"+trim(context.draft,6000));
      context.review=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.review,compactForWrite(context)+"\n【待审成稿】\n"+trim(context.draft,6000)));
    }
 
@@ -428,13 +446,21 @@ function renderBrainDesk(c){
 function continueWrite(){document.getElementById("mode").value="writer";start()}
 function renderSpeech(t){
   const lines=String(t||"").split("\n");
+  let firstLine=true;
   return lines.map(line=>{
     const s=line.trim();
     if(!s)return "";
-    if(/^#{1,4}\s/.test(s))return '<div class="sp-title">'+esc(s.replace(/^#{1,4}\s*/,""))+'</div>';
-    if(/^\*\*.+\*\*$/.test(s))return '<div class="sp-title">'+esc(s.replace(/^\*\*|\*\*$/g,""))+'</div>';
-    if(/^[一二三四五六七八九十]+、/.test(s)&&s.length<40)return '<div class="sp-title">'+esc(s)+'</div>';
-    if(/^（?[一二三四五六七八九十]+）/.test(s)&&s.length<40)return '<div class="sp-title">'+esc(s)+'</div>';
+    const isTitle=
+      /^#{1,4}\s/.test(s)||
+      (/^\*\*.+\*\*$/.test(s)&&s.length<45)||
+      (/^[一二三四五六七八九十]+、/.test(s)&&s.length<40)||
+      (/^（?[一二三四五六七八九十]+）/.test(s)&&s.length<40)||
+      (/^[一二三四五六七八九十]+是/.test(s)&&s.length<40)||
+      (/^第[一二三四五六七八九十]+[，,、]/.test(s)&&s.length<40);
+    const isMain=firstLine&&!isTitle&&s.length<=40&&!/[。，；：、？！]$/.test(s);
+    firstLine=false;
+    if(isMain)return '<div class="sp-main">'+esc(s)+'</div>';
+    if(isTitle)return '<div class="sp-title">'+esc(s.replace(/^#{1,4}\s*/,"").replace(/^\*\*|\*\*$/g,""))+'</div>';
     return esc(s);
   }).join("\n");
 }
@@ -492,7 +518,7 @@ async function rewriteWithFeedback(){
   const c=window.last;if(!c)return;
   const btn=event.target;btn.disabled=true;btn.textContent="重写中…";
   try{
-    c.draft=await callAI(sys()+learnedPrompt()+`\n【改稿官】\n按用户的具体修改意见，在保留原文真正好的判断和表达的基础上定向修改。修改后仍是领导讲话，不是论文或调研报告。`,"【用户修改意见】\n"+fb+"\n【原稿】\n"+trim(c.draft,6000));
+    c.draft=await callAI(sys()+learnedPrompt()+`\n【改稿官】\n按用户的具体修改意见，在保留原文真正好的判断和表达的基础上定向修改。修改后仍是领导讲话，不是论文或调研报告。`+FORMAT_RULES,"【用户修改意见】\n"+fb+"\n【原稿】\n"+trim(c.draft,6000));
     c.review=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.review,compactForWrite(c)+"\n【待审成稿】\n"+trim(c.draft,6000)));
     renderDraft(c);
     const m=document.getElementById("fbMsg");
