@@ -84,7 +84,7 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 <body>
 <div class="app">
 <header>
-  <div class="brand"><div class="logo">黄</div><div><h1>讲话助手</h1><div class="tagline">您说事，我来谋。 · v50.4</div></div></div>
+  <div class="brand"><div class="logo">黄</div><div><h1>讲话助手</h1><div class="tagline">您说事，我来谋。 · v50.5</div></div></div>
   <div class="top-actions"><button class="ghost" onclick="showHistory()">历史</button><button class="ghost" onclick="showSettings()">设置</button></div>
 </header>
 
@@ -261,6 +261,19 @@ const FORMAT_RULES= `
 6. 全篇体现条理性、关系性、新颖性：条理清楚、部分之间逻辑关系明确、判断和表达有新意。
 `;
 
+const SPEECH_MODEL_REF= `
+【范文库：《慢慢来 稳稳赢》· 开学典礼发言（刘鹏）】
+适用场合：开学典礼、毕业典礼、演讲发言、励志动员、典礼致辞等仪式类讲话；其他场合忽略本参考。
+这篇范文的写法要点，生成相关场合讲话时认真借鉴：
+1. 立意反着立：不落“加油冲刺、只争朝夕”俗套，提炼一个带辨识度的核心主张立篇（如“慢慢来，稳稳赢”），标题直接亮出。
+2. 素材保鲜：开篇用当下最新科技、时事、生活现象连排造画面（无人驾驶、AI大模型、无人机战争等），一听就是“今天的讲话”，不用陈年素材。
+3. 先共情再化解：用一组“少年成名”与“大器晚成”的对比段子先接住听众焦虑，先让人笑再让人松，再落到主旨句。
+4. 分论点排比递进：三个分论点句式统一、字数接近，如“慢慢来，是敬畏积蓄的力量；慢慢来，是接纳节奏的弹性；慢慢来，是守住心态的定力”，由外而内层层深入。
+5. 金句自然生长：每段用短句收束，金句从论证中长出（如“慢不是偷懒，是把根扎深，等风来”），不空喊口号。
+6. 首尾闭环：标题、开篇主旨、分论点、结尾金句一条线贯到底，结尾回扣标题。
+共性要求（所有场合适用）：素材保鲜、金句自然生长、首尾闭环。
+`;
+
 function sys(){
 return ZHENGHENG_MEMORY + `
 你是“知衡”，一名长期服务党政机关主要领导和分管领导的高级讲话参谋、政策研究员和文字总顾问。
@@ -407,7 +420,7 @@ async function start(){
    context.outline=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.outline,brainInput({brief:payload,situation:context.situation,strategy:context.strategy,thesis:context.thesis})));
 
    setStage(4);
-   context.draft=await callAI(sys()+learnedPrompt()+`\n【首席撰稿人】\n你是顶级党政讲话起草专家。请严格按照给定判断、矛盾、主旨和结构，写一篇领导讲话。要求：像领导现场讲出来，有判断、有轻重、有取舍；语言规范庄重，少用“要……要……要……”套话；金句从判断自然长出，一处即止；材料不足不编造；篇幅根据内容需要，讲透为止。`+FORMAT_RULES, `【讲话要素与判断】\n`+compactForWrite(context));
+   context.draft=await callAI(sys()+learnedPrompt()+`\n【首席撰稿人】\n你是顶级党政讲话起草专家。请严格按照给定判断、矛盾、主旨和结构，写一篇领导讲话。要求：像领导现场讲出来，有判断、有轻重、有取舍；语言规范庄重，少用“要……要……要……”套话；金句从判断自然长出，一处即止；材料不足不编造；篇幅根据内容需要，讲透为止。`+FORMAT_RULES+SPEECH_MODEL_REF, `【讲话要素与判断】\n`+compactForWrite(context));
 
    setStage(5);
    context.review=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.review,compactForWrite(context)+"\n【待审成稿】\n"+trim(context.draft,6000)));
