@@ -84,7 +84,7 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 <body>
 <div class="app">
 <header>
-  <div class="brand"><div class="logo">黄</div><div><h1>讲话助手</h1><div class="tagline">您说事，我来谋，话讲在点上，情用在对的人身上。 · v50.7</div></div></div>
+  <div class="brand"><div class="logo">黄</div><div><h1>讲话助手</h1><div class="tagline">您说事，我来谋，话讲在点上，情用在对的人身上。 · v50.8</div></div></div>
   <div class="top-actions"><button class="ghost" onclick="showHistory()">历史</button><button class="ghost" onclick="showSettings()">设置</button></div>
 </header>
 
@@ -136,10 +136,10 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 </section>
 
 <section id="work">
-  <div style="font-size:12px;color:#8a939e;margin:0 0 8px 2px">正在替您完成：看局面 → 找矛盾 → 定主旨 → 谋结构 → 写讲话 → 挑问题</div>
+  <div style="font-size:12px;color:#8a939e;margin:0 0 8px 2px">正在替您完成：整体谋划 → 写讲话 → 反向审稿</div>
   <div class="timer" id="timer" style="display:none"><span class="dot"></span><span id="timerText">正在准备…</span><span class="bar" style="flex:1"><i id="timerBar" style="width:0%"></i></span></div>
   <div class="stagebar" id="stagebar">
-    <div class="stage">看清局面</div><div class="stage">找准矛盾</div><div class="stage">形成判断</div><div class="stage">设计逻辑</div><div class="stage">写成讲话</div><div class="stage">反向审稿</div>
+    <div class="stage">整体谋划</div><div class="stage">写成讲话</div><div class="stage">反向审稿</div>
   </div>
   <div class="result" id="result"></div>
 </section>
@@ -187,7 +187,7 @@ document.getElementById("file").onchange=e=>{const f=e.target.files[0];if(f){doc
 
 function toggleAdvanced(){const a=document.getElementById("advanced");a.classList.toggle("open");document.getElementById("advArrow").textContent=a.classList.contains("open")?"－":"＋"}
 function setStage(n){document.querySelectorAll(".stage").forEach((x,i)=>x.className="stage "+(i<n?"done":i===n?"on":""));refreshTimer()}
-const STAGE_W=[1,1,1,1,2.2,1.2];
+const STAGE_W=[3,2.2,1.2];
 let _t0=0,_ti=null;
 function fmtTime(s){if(s<=0)return "--";if(s<60)return Math.round(s)+" 秒";return Math.floor(s/60)+" 分 "+Math.round(s%60)+" 秒"}
 function startTimer(){_t0=Date.now();const el=document.getElementById("timer");if(el)el.style.display="flex";if(_ti)clearInterval(_ti);_ti=setInterval(refreshTimer,500);refreshTimer()}
@@ -352,6 +352,18 @@ async function callAI(system,user){
 }
 
 const BRAIN={
+  planner:`你是“知衡总谋官”。一次完成从看局面到定结构的所有思考，输出一份完整谋篇蓝图，供撰稿人直接据此成稿，无需再分步。
+依次完成四件事：
+一、看局面：识别场合与政治语境、讲话人身份、听众心理、讲话真正目的、背景变化、表层现象、深层矛盾、利益关系/机制障碍/能力短板/阶段变化、政策边界、信息缺口。警惕把“工作还不够、认识还不深、力度还不大”当成问题。
+二、找矛盾：从现象入机制，从问题入矛盾，从矛盾入趋势，从趋势找突破口。优先找结构性、机制性、阶段性矛盾。判断主语始终是讲话人所在的组织与岗位。
+三、定主旨：把判断变成统领全篇的思想。主旨必须立在组织的立场与利益上，是一句维护谁、争取什么的话，不是个人认知的抒发。先比几个方案，只取最优。
+四、谋结构：设计一条主逻辑，各部分观点不少于3个，贯穿一种明确逻辑关系（时间/辩证/角度/总分/并列之一）。安排开头用情绪先接住听众，结尾落在动员与行动，情绪服务于立场与号召。
+全程守立言双纲：情绪是讲给听众的，不是留给自己的；公开言论是维护立场与利益的，不是表达个人认知的。
+必须输出严格JSON，含四个固定子对象：
+{"situation":{"coreSituation","contradictions[]","audiencePsychology","purpose","factsToVerify[]"},
+ "strategy":{"overallJudgment","coreContradictions[]","breakthroughDirections[]","recommendedDirection","avoidDirections[]"},
+ "thesis":{"coreThesis","coreQuestion","supportingJudgments[]","titleDirections[]"},
+ "outline":{"structure","overallLogic","openingTask","sections[{title,coreJudgment,logicalTask,evidence}]","endingTask"}}`,
   know:`你是“知局官”。不要写讲话。先把局面看清楚。
 必须识别：场合与政治语境、讲话人的身份、听众及其心理、讲话真正目的、为什么现在要讲、背景变化、表层现象、深层矛盾、利益关系/机制障碍/能力短板/认知偏差/阶段变化、政策边界、事实与数据、信息缺口。
 尤其警惕把“工作还不够”“认识还不深”“力度还不大”当成问题。
@@ -457,25 +469,20 @@ async function start(){
  const context={brief:payload,situation:null,strategy:null,thesis:null,outline:null,draft:null,review:null,learned:getLearned()};
  try{
    setStage(0);
-   context.situation=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.know,brainInput(payload)));
-
-   setStage(1);
-   context.strategy=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.adviser,brainInput({brief:payload,situation:context.situation})));
-
-   setStage(2);
-   context.thesis=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.thesis,brainInput({brief:payload,situation:context.situation,strategy:context.strategy})));
+   const plan=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.planner,brainInput(payload)));
+   context.situation=plan.situation||{};
+   context.strategy=plan.strategy||{};
+   context.thesis=plan.thesis||{};
+   context.outline=plan.outline||{};
 
    if(document.getElementById("mode").value==="adviser"){
-     setStage(5); stopTimer(); renderBrainDesk(context); saveHistory("参谋",payload,context); return;
+     setStage(2); stopTimer(); renderBrainDesk(context); saveHistory("参谋",payload,context); return;
    }
 
-   setStage(3);
-   context.outline=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.outline,brainInput({brief:payload,situation:context.situation,strategy:context.strategy,thesis:context.thesis})));
-
-   setStage(4);
+   setStage(1);
    context.draft=await callAI(sys()+learnedPrompt()+`\n【首席撰稿人】\n你是顶级党政讲话起草专家。请严格按照给定判断、矛盾、主旨和结构，写一篇领导讲话。要求：像领导现场讲出来，有判断、有轻重、有取舍；语言规范庄重，少用“要……要……要……”套话；金句从判断自然长出，一处即止；材料不足不编造；篇幅根据内容需要，讲透为止。`+FORMAT_RULES+SPEECH_MODEL_REF+DAODEJING_QUOTES, `【讲话要素与判断】\n`+compactForWrite(context));
 
-   setStage(5);
+   setStage(2);
    context.review=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.review,compactForWrite(context)+"\n【待审成稿】\n"+trim(context.draft,6000)));
 
    // 一次定向重写：只修真正的问题，不无限循环。
