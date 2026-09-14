@@ -79,48 +79,62 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 .hist-foot{display:flex;gap:8px}
 .hist-foot button{flex:1}
 @media(max-width:720px){.app{padding:18px 13px}.hero{padding:20px}.row{grid-template-columns:1fr;gap:7px}.adv-grid,.adviser{grid-template-columns:1fr}.scores{grid-template-columns:repeat(2,1fr)}header{align-items:flex-start}.top-actions{display:flex;gap:6px}.top-actions .ghost{padding:7px 10px;font-size:13px}.drop{width:100%}#reference{width:100%;margin-left:0}.fb-row{flex-direction:column}.fb-row button{width:100%}}
+
+.picker-input{width:100%;padding:11px 14px;border:1px solid var(--line);border-radius:10px;font-size:14px;background:#fff;margin-top:8px}
+.picker-input:focus{outline:none;border-color:var(--accent)}
+.picker-groups{margin-top:8px}
+.pg{margin-bottom:6px}
+.pg-title{font-size:12px;color:var(--muted);font-weight:600;margin:8px 0 6px;letter-spacing:.5px}
+.pg-items{display:flex;flex-wrap:wrap;gap:8px}
+.pg-chip{padding:6px 12px;border:1px solid var(--line);border-radius:20px;font-size:13px;color:var(--text);background:#fff;cursor:pointer;transition:.15s}
+.pg-chip:hover{border-color:var(--accent);color:var(--accent)}
+.pg-chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.pg-empty{font-size:12px;color:#9aa2ad;padding:8px 2px}
+.field-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.field-head label{margin:0}
+.clear-btn{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:14px;padding:3px 10px;font-size:12px;cursor:pointer}
+.clear-btn:hover{color:var(--danger);border-color:var(--danger)}
+.ref-box{position:relative;margin-top:9px}
+.ref-clear{position:absolute;top:6px;right:8px;z-index:2}
+.ref-box textarea{margin-top:0!important}
+.ident-preview{margin-top:10px;font-size:13px;color:var(--accent);background:var(--accent2);padding:9px 13px;border-radius:8px}
+.ident-preview b{font-weight:600}
+.modal-mask.fullmask{align-items:flex-start;padding:3vh 4vw}
+.fullbox{width:100%;max-width:1080px;height:90vh;background:#fff;border-radius:12px;box-shadow:0 10px 50px rgba(0,0,0,.22);display:flex;flex-direction:column;overflow:hidden}
+.full-head{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line)}
+.full-body{flex:1;overflow:auto;padding:26px 34px}
 </style>
 </head>
 <body>
 <div class="app">
 <header>
-  <div class="brand"><div class="logo">黄</div><div><h1>讲话助手</h1><div class="tagline">您说事，我来谋，话讲在点上，情用在对的人身上。 · v50.9</div></div></div>
+  <div class="brand"><div class="logo">黄</div><div><h1>讲话助手</h1><div class="tagline">您说事，我来谋，话讲在点上，情用在对的人身上。 · v51.0</div></div></div>
   <div class="top-actions"><button class="ghost" onclick="showHistory()">历史</button><button class="ghost" onclick="showSettings()">设置</button></div>
 </header>
 
 <section class="hero">
-  <p>不用先想结构、金句、标题，把您知道的情况零碎写下来。先记知衡的两句话，情绪是讲给听众的，不是留给自己的；公开言论是维护立场与利益的，不是表达个人认知的。剩下的交给知衡。</p>
+  <p>不用先想结构、金句、标题，把您知道的情况零碎写下来，剩下的交给助手，一次帮您谋篇、成稿。</p>
 
-  <div class="row">
-    <label>什么场合？<span class="hint">不知道也没关系，可以自动判断</span></label>
-    <div class="chips" id="sceneChips">
-      <button class="chip active" data-v="工作会议">工作会议</button>
-      <button class="chip" data-v="调研座谈">调研座谈</button>
-      <button class="chip" data-v="汇报发言">汇报发言</button>
-      <button class="chip" data-v="部署讲话">部署讲话</button>
-      <button class="chip" data-v="其他">其他</button>
-    </div>
-  </div>
+  
+<div class="row">
+    <div class="field-head"><label>什么场合？<span class="hint">可输入或从下方点选，不知道可留空自动判断</span></label></div>
+    <input id="scene" class="picker-input" placeholder="输入场合关键词，或从下方选择…" autocomplete="off" oninput="filterScene(this.value)">
+    <div class="picker-groups" id="sceneGroups"></div>
+</div>
 
-  <div class="row">
-    <label>我的身份<span class="hint">可选，决定讲话板块；不选则自动判断</span></label>
-    <div class="chips" id="identityChips">
-      <button class="chip" data-v="领导">领导</button>
-      <button class="chip" data-v="下属">下属</button>
-      <button class="chip" data-v="成员单位领导">成员单位领导</button>
-      <button class="chip" data-v="主持人">主持人</button>
-      <button class="chip" data-v="来宾/嘉宾">来宾/嘉宾</button>
-      <button class="chip" data-v="与会代表/先进">与会代表/先进</button>
-    </div>
-  </div>
-
-  <div class="row">
+<div class="row">
+    <div class="field-head"><label>我的身份<span class="hint">可选，决定讲话板块；可输入或点选，不选自动判断</span></label></div>
+    <input id="identity" class="picker-input" placeholder="输入身份，或从下方选择…" autocomplete="off" oninput="filterIdentity(this.value)">
+    <div class="picker-groups" id="identityGroups"></div>
+    <div class="ident-preview" id="identPreview" style="display:none"></div>
+</div>
+<div class="row">
     <label>讲话人<span class="hint">可不填</span></label>
     <input id="speaker" placeholder="如：市政府分管领导、局长、县委书记……">
   </div>
 
   <div class="row">
-    <label>把情况告诉我<span class="hint">越真实、越具体越好；不用整理</span></label>
+    <div class="field-head"><label>把情况告诉我<span class="hint">越真实、越具体越好；不用整理</span></label><button class="clear-btn" onclick="clearInput('brief')">清空</button></div>
     <textarea id="brief" placeholder="例如：明天参加全市高中教育工作座谈会。我现在最担心的是优质生源流失、出生人口下降，高中学校之间竞争越来越激烈。过去大家主要拼升学率，但现在单纯靠抢生源可能越来越难。我希望这次讲话不要停留在“提高教学质量”这种常规表述上，要把形势变化、真正矛盾和下一步怎么破讲透。"></textarea>
   </div>
 
@@ -128,7 +142,7 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
     <label>有什么材料？<span class="hint">没有也可以直接开始</span></label>
     <div>
       <label class="drop" for="file"><b>点击上传材料</b><input id="file" type="file" accept=".txt,.docx,.pdf"><div class="file-name" id="fileName"></div></label>
-      <textarea id="reference" style="margin-top:9px;min-height:85px;width:100%;display:block" placeholder="也可以直接粘贴材料、数据、政策依据……"></textarea>
+      <div class="ref-box"><span class="ref-clear"><button class="clear-btn" onclick="clearInput('reference')">清空材料</button></span><textarea id="reference" style="margin-top:9px;min-height:85px;width:100%;display:block" placeholder="也可以直接粘贴材料、数据、政策依据……"></textarea></div>
     </div>
   </div>
 
@@ -194,8 +208,7 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 
 <script>
 const state={scene:"工作会议",identity:"",fileText:"",context:null,history:JSON.parse(localStorage.getItem("zhiheng_history")||"[]")};
-document.querySelectorAll(".chip").forEach(x=>x.onclick=()=>{document.querySelectorAll(".chip").forEach(y=>y.classList.remove("active"));x.classList.add("active");state.scene=x.dataset.v});
-document.querySelectorAll("#identityChips .chip").forEach(x=>x.onclick=()=>{document.querySelectorAll("#identityChips .chip").forEach(y=>y.classList.remove("active"));x.classList.add("active");state.identity=x.dataset.v});
+
 document.getElementById("file").onchange=e=>{const f=e.target.files[0];if(f){document.getElementById("fileName").textContent="已选择："+f.name;const r=new FileReader();r.onload=()=>state.fileText=r.result;r.readAsText(f)}};
 
 function toggleAdvanced(){const a=document.getElementById("advanced");a.classList.toggle("open");document.getElementById("advArrow").textContent=a.classList.contains("open")?"－":"＋"}
@@ -234,41 +247,39 @@ function getProvider(){
 function getModel(){return fixModel(localStorage.getItem("zhiheng_model"))}
 
 const ZHENGHENG_MEMORY = `
-【知衡立言双纲】（最高写作原则，权重高于下列所有要求）
+【立言双纲】（最高写作原则，权重高于下列所有要求）
 纲一　情绪是用来影响他人的，不是用来左右自己的。
 1. 讲话里的每一处情感，都是讲给台下的，不是留给自己的。写动情处先问一句：这情绪是替我排遣，还是替听众点燃？替我排遣的不写，替听众点燃的才落笔。
-2. 讲话人站在台上，先稳住自己的心，才能操持听众的心。成稿里不出现"我很委屈、我压力很大"这类自怜自艾，凡情绪必指向听众的反应和行动的号召。
-3. 情绪是武器，不是伤口。用它激奋、认同、温暖、紧迫，而不是反过来左右讲话人的分寸。越是有情绪处，越要收得住、端得稳、落得实。
-4. 高明的动情是把听众说热，自己始终清醒。金句、排比、故事都服务于此刻要让谁心里一热、一紧、一起，绝非自我感动。
+2. 讲话人不是倾诉者，是把情绪当武器、当工具的人。越是激动处越要稳，情绪用来提振士气、凝聚共识，不暴露自己的委屈与软肋。
+3. 判断一段情绪该不该写，只看它在听众心里起什么作用，不问它替自己排遣了什么。对自己无益、对听众也无益的情绪，一律删。
 纲二　公开言论是用来维护立场和利益的，不是表达个人思想和认知的。
-5. 每句话都有它该站的位置。公开讲话是职务行为、立场行为，分寸由职务定、力度由利益定、边界由政策定，不由个人心绪定。
-6. 不作个人认知的展览。思想、观点、判断都化进该维护的立场和该争取的利益，不让个人好恶、个人心得、个人情绪越位冒头。
-7. 言出有据，权责对位。讲成绩要托得住，讲问题要归得准，讲下一步要落得下。任何表态都先问：这符合谁的利益，维护谁的立场，站稳谁的阵脚。
+4. 每一句话都要落在该站的立场上，为组织代言、为工作发声，不为个人立言。讲认识，讲的是领会上级精神的正确认识；讲问题，讲的是组织需要正视的问题。
+5. 言出有据，权责对位。讲得过界的，越位表态的，把自己的委屈、牢骚、个人不满当观点讲的，都是失位。
+6. 讲政治永远是第一位的。任何表述都不与现行政策、法规、领导核心精神相抵触，不搞惊人之语，不图语出惊人。
+7. 对问题要归因精准，不放大不缩小；讲短板不推诿，讲问题归得准，讲下一步落得下。任何表态先问：符合谁的利益，维护谁的立场，站稳谁的阵脚。
 8. 立场决定分寸，利益决定轻重。对听众是争取不是俯视，对工作是推动不是表演，对大局是维护不是拆台。话锋所向，都是组织的立场和整体的利益。
-【知衡长期写作记忆】
+【长期写作记忆】
 写作定位：大秘般的逻辑思路、诗人般的文化情怀、专家级的严谨态度、学者型的钻研精神。
 总标准：观点新颖、逻辑清晰、语句鲜活、结构严谨、依据准确、排版精致、大气蓬勃、感人至深、令人振奋、追求极致。
 核心要求：
-1. 意图穿透：理解用户真正想解决什么，写“心里想要的那一篇”，不能只改写表面要求。
-2. 先看局、再找矛盾、再形成判断、再设计结构、最后落笔。思想先于语言，判断先于结构，事实先于修辞。
-3. 提炼不照搬：素材只作为证据和原料，用更高站位、更强逻辑、更精文字重新提炼。
-4. 问题有分寸：肯定成绩是主流，问题不尖刻、不绝对、不以偏概全；涉及领导主抓领域，优先归因于客观形势、机制、环境、阶段性约束，给足台阶。
-5. 每个重要判断尽可能有具体事实、数据、案例支撑；存疑数据必须核实，不能编造。
-6. 建议具体化：尽量回答谁来做、做什么、怎么做、做到什么程度，避免“进一步加强、持续提升”式空话。
-7. 标题精准优先于工整：罩得住正文、不空喊口号、不搞生造概念；并列标题尽量统一结构、字数和语法节奏，同时避免重复用字和重复风格。
-8. 公文比喻要庄重规范，如“落地生根、后半篇文章、中梗阻、扶上马送一程”，不使用轻佻、口语化、文艺腔比喻。
-9. 金句只在需要时使用，最好一处即止；必须扣题、从正文判断自然生长，不硬造。结尾宜短促、有记忆点、有行动或愿景落点。
-10. 思想的化境：不靠“值得深思、引人思考、我们应当”等指令性句式，而通过选择事实、安排细节、陌生化视角和语言克制让思想自己出现。
-11. 党政公文以规范庄重为底色，新颖体现在判断、标题、提炼和表达，不把调研报告写成散文，不把讲话写成论文。
-12. 修改已审定稿：尊重原文架构，原则上不推倒重来；重点润色标题、打磨文字、提炼升华。数据留白不能擅自删除，必须补充或明确待核实。
-13. 语言细节：不用破折号；避免空泛四字词堆砌；成绩与问题转折清楚，避免用分号硬拼性质不同的两面；中文引号优先。
-15. 结构硬要求：讲话正文分部分推进，各部分小标题（观点）不少于3个，彼此贯穿一种明确逻辑关系，优先选用时间关系（过去/现在/将来）、辩证关系（是什么/为什么/怎么办）、角度关系（全局/基层/长远等不同视角）、总分关系（总要求/分项部署/落地保障）、并列关系（形势/基础/机遇等同质递进）五种之一；小标题句式统一、字数接近、节奏一致，全篇体现条理性、关系性、新颖性。
-16. 最终标准不是“像AI写得很好”，而是“像一个真正懂局面、懂政策、懂讲话的人想明白后写出来的”。
-
-【知衡判断优先级】
-真实性 > 政策边界 > 核心判断 > 逻辑闭合 > 针对性 > 现场感 > 语言质量 > 修辞装饰。
-如果这些要求发生冲突，按上述优先级处理。
-`;
+1. 意图穿透：先弄清这次讲话想让听众发生什么改变、达成什么目的，再动笔。
+2. 结构总分总：先给总判断，再分层次展开，最后收拢升华。
+3. 党政语言：规范、庄重、凝练，符合公文语感。
+4. 短句为主：一句话不长于20字，节奏明快。
+5. 排比递进：每层不少于三句，形成气势。
+6. 修辞适度：比喻、拟人、对仗、引用，为表情达意服务，不炫技。
+7. 金句点睛：全文至少两处经得起琢磨的话，从判断里自然长出，不硬塞。
+8. 零虚构：事实必须有依据，数据必须有出处，不编造本地情况。
+9. 身份意识：什么身份讲什么话，讲越位就是错位。
+10. 言之有物：有高度、有深度、有操作，不写正确的空话。
+11. 避黑话：不用“切实”“进一步”“高度重视”等万能空话充数。
+12. 语句推敲：双音词为主，避免欧化长句，读来上口。
+13. 画面感：用细节、场景、对比让人看得见、记得住。
+14. 五步修改：删赘语、调语序、替俗词、破陈套、留真情。
+【格式与结构硬要求】
+各部分小标题（观点）不少于3个，贯穿五种逻辑关系之一：时间（过去/现在/将来）、辩证（是什么/为什么/怎么办）、角度（全局/基层/长远）、总分（总要求/分项部署/落地保障）、并列（形势/基础/机遇）。小标题统一“一、”“一是”格式，句式统一、字数接近、节奏一致，段落间不空行，全篇条理清晰、关系顺畅、新颖有致。
+【判断优先级】真实性 > 政策边界 > 核心判断 > 逻辑闭合 > 针对性 > 现场感 > 语言质量 > 修辞装饰。发生冲突时按此优先。
+`;;
 
 const FORMAT_RULES= `
 【格式与结构硬要求（每次写稿、改稿、重写必须执行）】
@@ -285,45 +296,71 @@ const FORMAT_RULES= `
 6. 全篇体现条理性、关系性、新颖性：条理清楚、部分之间逻辑关系明确、判断和表达有新意。
 `;
 
-const IDENTITY_BLOCKS={
-  "领导":{intro:"讲话人是统揽全局的主官，讲话是定方向、做部署、明要求的。全篇严格围绕以下四个板块展开，各板块之下再分点展开。",blocks:[
-    ["定调子","统一思想、明确基调","对会议主题的政治定性、对当前形势的基本判断、对工作的总体要求和期望"],
-    ["把方向","确立目标、指明路径","工作的指导思想、基本原则、目标任务和重点方向，确保不偏航、不走样"],
-    ["控全局","统筹兼顾、协调各方","对各领域、各条线工作的整体部署，资源配置、力量统筹和节奏把握"],
-    ["防风险","底线思维、筑牢防线","对潜在风险隐患的预警提示，对廉洁、安全、稳定等底线工作的强调要求"]]},
-  "下属":{intro:"讲话人是部门或单位负责人，讲话是领命表态、汇报落实的。全篇严格围绕以下四个板块展开，各板块之下再分点展开。",blocks:[
-    ["讲认识","统一思想、提高站位","对会议主题和上级部署的理解领会，表明态度和决心"],
-    ["讲问题","查摆不足、分析短板","本单位/本领域存在的突出问题、薄弱环节及原因剖析"],
-    ["讲措施","具体举措、落实路径","针对问题提出的对策办法、工作思路和重点任务"],
-    ["讲落实","责任到人、跟踪问效","组织保障、时间节点、责任分工和督查问效机制"]]},
-  "成员单位领导":{intro:"讲话人是成员单位的负责人，讲话是配合大局、汇报分管、落实部署、建言献策的。全篇严格围绕以下四个板块展开，各板块之下再分点展开。",blocks:[
-    ["讲配合","站位全局、协同补位","对正职工作的支持态度，与其他班子成员的协作配合意愿"],
-    ["讲分管","分管领域、具体进展","自己分管工作的现状、成效、问题和下一步打算"],
-    ["讲执行","执行部署、细化措施","对会议确定事项在分管范围内如何落地的具体安排"],
-    ["讲建议","建言献策、补充完善","从分管角度对全局工作提出建设性意见和补充建议"]]},
-  "主持人":{intro:"讲话人是会议主持人，讲话是掌控流程、串联衔接、推动会议顺畅有序的。全篇严格围绕以下四个板块展开，各板块之下再分点展开。",blocks:[
-    ["定场","开场定调、营造氛围","宣布会议开始，说明会议主题、目的和议程，交代参会情况，营造庄重氛围"],
-    ["串联","承上启下、把控流程","衔接各议程、引导发言节奏，在环节转换间自然过渡，保证会议顺畅有序"],
-    ["小结","提炼升华、聚合共识","对各阶段发言进行精当点评小结，提炼共同观点，推动形成共识"],
-    ["收尾","总结升华、致谢展望","概括会议成果，部署落实要求，致谢与会人员，展望后续工作"]]},
-  "来宾/嘉宾":{intro:"讲话人是应邀出席的来宾或嘉宾，讲话是致贺致敬、表达期许的。全篇严格围绕以下四个板块展开，各板块之下再分点展开。",blocks:[
-    ["致贺","祝贺成就、表达认同","对主办方/受贺方取得的成就表示祝贺，表明出席的荣幸与认同"],
-    ["致敬","表达敬意、赞许风范","对相关方的工作、贡献、精神表达敬意，肯定其价值和影响"],
-    ["期许","寄予期望、提出愿景","从嘉宾视角表达对未来的期望，提出合作与发展的美好愿景"],
-    ["祝愿","表达祝愿、传递情谊","以真诚祝愿收束，表达对事业发展、与会人员的美好祝愿"]]},
-  "与会代表/先进":{intro:"讲话人是与会代表或先进典型，讲话是交流感受、分享收获、表明决心、建言献策的。全篇严格围绕以下四个板块展开，各板块之下再分点展开。",blocks:[
-    ["谈感受","表达心情、反映心声","谈参会的感受、受到的触动，反映本领域基层的真实情况与心声"],
-    ["谈收获","分享所得、交流经验","分享在会议、培训或实践中获得的启发与收获，交流可借鉴的经验"],
-    ["表决心","表明态度、作出承诺","围绕会议部署表明态度，承诺在自身职责范围内抓好落实"],
-    ["提建议","建言献策、反映诉求","结合工作实际提出建设性意见，反映需要解决的困难与诉求"]]}
-};
+const IDENTITY_LIB=[
+ {group:"上级领导",items:[
+  {name:"本级党政主要领导",blocks:[["定调子","统一思想、明确基调","对会议主题的政治定性、对当前形势的基本判断、对工作的总体要求和期望"],["把方向","确立目标、指明路径","工作的指导思想、基本原则、目标任务和重点方向"],["控全局","统筹兼顾、协调各方","对各领域、各条线工作的整体部署，资源配置、力量统筹、节奏把握"],["防风险","底线思维、筑牢防线","对潜在风险隐患的预警提示，对廉洁、安全、稳定等底线工作的强调要求"]]},
+  {name:"部门主要领导",blocks:[["讲认识","统一思想、提高站位","对会议主题和上级部署的理解领会，表明态度和决心"],["讲问题","查摆不足、分析短板","本单位、本领域存在的突出问题、薄弱环节及原因剖析"],["讲措施","具体举措、落实路径","针对问题提出的对策办法、工作思路和重点任务"],["讲落实","责任到人、跟踪问效","组织保障、时间节点、责任分工和督查问效机制"]]},
+  {name:"上级检查指导领导",blocks:[["定基调","肯定成绩、点明方向","对受检单位工作的总体评价和值得肯定的经验"],["点问题","指出不足、点透短板","客观指出存在的突出问题和薄弱环节"],["提要求","明确标准、指引路径","对整改和下步工作提出具体要求和努力方向"],["鼓士气","寄予期望、激发干劲","以鼓励性要求收束，提振信心、推动落实"]]}]},
+ {group:"部门单位负责人",items:[
+  {name:"部门负责人",blocks:[["讲认识","统一思想、提高站位","对会议主题和上级部署的理解领会，表明态度和决心"],["讲问题","查摆不足、分析短板","本单位、本领域存在的突出问题、薄弱环节及原因剖析"],["讲措施","具体举措、落实路径","针对问题提出的对策办法、工作思路和重点任务"],["讲落实","责任到人、跟踪问效","组织保障、时间节点、责任分工和督查问效机制"]]},
+  {name:"基层单位负责人",blocks:[["讲认识","领会精神、明确站位","对上级会议精神的领会把握和本单位承接的使命"],["讲实情","如实反映、讲清难处","本单位真实情况、现实困难及深层原因"],["讲办法","立足实际、拿出招法","结合本单位实际提出的务实举措和可行路径"],["讲打算","明确节点、表态落实","下步时间安排、责任分解和完成标准"]]}]},
+ {group:"班子成员分管",items:[
+  {name:"副职领导",blocks:[["讲配合","站位全局、协同补位","对正职工作的支持态度，与其他班子成员的协作配合意愿"],["讲分管","分管领域、具体进展","自己分管工作的现状、成效、问题和下一步打算"],["讲执行","执行部署、细化措施","对会议确定事项在分管范围内如何落地的具体安排"],["讲建议","建言献策、补充完善","从分管角度对全局工作提出建设性意见和补充建议"]]},
+  {name:"分管领导",blocks:[["讲研判","看清大势、找准方位","对分管领域形势的研判和面临机遇挑战的把握"],["讲思路","明确重点、理清路径","分管工作的总体思路、重点任务和主攻方向"],["讲举措","细化措施、逐项落地","把目标任务转化为可操作、可考核的具体举措"],["讲担当","压实责任、表态推进","以鲜明态度表态，带头抓、带头推、带头落实"]]}]},
+ {group:"下属执行层",items:[
+  {name:"科室负责人",blocks:[["领任务","明确职责、认领任务","对交办任务的理解领受，表明态度和信心"],["表态度","服从安排、担当作为","对完成任务的决心和自觉性"],["讲举措","细化方案、明确步骤","完成任务的思路、步骤和具体安排"],["抓落实","倒排工期、务求实效","责任到人、节点到天，确保落地见效"]]},
+  {name:"一般干部",blocks:[["讲体会","学习领会、谈出认识","对会议精神的学习体会和思想认识"],["表态度","服从安排、积极作为","个人服从组织、立足岗位干好的态度"],["讲行动","立足岗位、怎么干好","结合本职岗位的具体打算和行动"],["表决心","坚守本色、担当尽责","对干好工作、不拖后腿的决心"]]}]},
+ {group:"基层干部",items:[
+  {name:"乡镇街道干部",blocks:[["讲实情","反映实况、讲清难处","基层一线的真实情况、群众反映和现实困难"],["讲难处","正视困难、分析根源","推进工作中遇到的矛盾和困难及深层原因"],["讲办法","立足基层、拿出招法","结合基层实际想出的务实管用办法"],["讲打算","明确计划、承诺落实","下步工作打算、时间安排和落实承诺"]]},
+  {name:"村社区干部",blocks:[["讲感受","贴近群众、谈出温度","把群众的感受和呼声带到会上的真情表达"],["讲实情","摸清底数、讲透问题","本村本社区的真实情况、突出问题和实际需求"],["讲办法","因地制宜、小切口破题","从基层实际出发可落地、能见效的招法"],["讲信心","感恩奋进、表态落实","对办好群众身边事的信心和落实承诺"]]}]},
+ {group:"代表先进",items:[
+  {name:"党代表/人大代表/政协委员",blocks:[["谈感受","表达心情、反映心声","参加盛会的感受，反映所联系群众的心声与期盼"],["谈履职","立足本职、报告履职","履职尽责的情况、体会和下步打算"],["谈建议","建言献策、反映诉求","围绕大局和群众关切提出的建设性意见建议"],["表决心","担当作为、继续奋进","对贯彻落实部署、发挥代表作用的承诺"]]},
+  {name:"先进典型/劳模",blocks:[["谈感受","表达心情、感谢组织","获此荣誉的激动心情和对组织培养的感谢"],["谈事迹","分享经历、交流经验","立足岗位干出的实绩、悟出的经验"],["谈不足","查摆差距、自我鞭策","对照标准找差距、明方向"],["表决心","发挥示范、带动大家","继续发挥先锋作用，带动身边人干事创业"]]},
+  {name:"代表发言",blocks:[["谈感受","表达心情、反映心声","参加此次活动的感受和受到的触动"],["谈收获","分享所得、交流经验","在活动中获得的启发与可借鉴的经验"],["表决心","表明态度、作出承诺","围绕活动主题表明态度、承诺抓好落实"],["提建议","建言献策、反映诉求","结合工作实际提出建设性意见和诉求"]]}]},
+ {group:"来宾嘉宾",items:[
+  {name:"上级来宾",blocks:[["致贺","祝贺成就、表达认同","对主办方取得的成就表示祝贺，表明出席的荣幸与认同"],["致敬","表达敬意、赞许风范","对相关方的工作、贡献、精神表达敬意"],["期许","寄予期望、提出愿景","从上级和更高站位表达对发展的期望"],["祝愿","表达祝愿、传递情谊","以真诚祝愿收束，表达美好祝愿"]]},
+  {name:"友好单位/专家嘉宾",blocks:[["致贺","祝贺成就、表达荣幸","对主办方成就的祝贺和受邀出席的荣幸"],["致敬","表达敬意、点赞做法","对值得学习借鉴的好做法好经验点赞"],["期许","深化合作、共建共享","从合作共赢视角表达携手发展的愿景"],["祝愿","传递祝福、展望未来","以祝福收束，展望合作新前景"]]},
+  {name:"乡贤嘉宾",blocks:[["致谢","感念乡情、表达谢意","对家乡的感念和受邀出席的谢意"],["致敬","点赞家乡、肯定变化","对家乡发展变化、干部群众奋斗的肯定"],["期许","反哺家乡、共谋发展","表达回报桑梓、助力家乡的意愿"],["祝愿","寄托深情、展望未来","以深情的祝愿收束"]]}]},
+ {group:"主持人",items:[
+  {name:"会议主持人",blocks:[["定场","开场定调、营造氛围","宣布会议开始，说明主题、目的和议程，营造庄重氛围"],["串联","承上启下、把控流程","衔接各议程、引导发言节奏，保证会议顺畅有序"],["小结","提炼升华、聚合共识","对阶段发言精当点评小结，推动形成共识"],["收尾","总结升华、致谢展望","概括成果、部署落实、致谢展望"]]}]},
+ {group:"个人家庭",items:[
+  {name:"婚礼/生日/家庭个人致辞",blocks:[["致谢","感谢到场、感恩亲友","对到场亲友的欢迎和感谢，点明今日主题"],["回顾","温暖回顾、道出情谊","回顾一路走来的点滴，让感情落地"],["期许","表达愿景、寄予希望","对新人/寿星/家人的期许与祝福"],["祝愿","举杯祝愿、圆满收束","以真诚祝愿收束全篇"]]},
+  {name:"获奖/成功个人感言",blocks:[["致谢","感谢培养、感谢支持","对组织培养、同事支持的感谢"],["回顾","回望历程、道出不易","讲出取得成绩背后的付出与不易"],["归功","谦逊归功、摆正位置","把成绩归于集体、归于大家的支持"],["展望","砥砺前行、再创佳绩","表态继续努力、回馈大家"]]}]}
+];
+;
+
+
+
+const SCENES=[
+ {group:"工作类",items:["工作会议","调研座谈","汇报发言","部署讲话","动员大会","经验交流","学习研讨","党课","组织生活会","民主生活会","述职述廉","征求意见","工作汇报","招商推介","协商议政","监督评议","开幕词","闭幕词","培训讲座","现场推进会","表彰大会","警示教育","督导反馈","评审论证"]},
+ {group:"生活类",items:["婚礼致辞","生日祝福","家庭聚会","乔迁新居","升学宴","谢师宴","寿宴","满月酒","家庭会议","人生感悟","悼词追思","慰问探望"]},
+ {group:"仪式活动",items:["演讲发言","读书分享","获奖感言","宴会致词","颁奖典礼","揭牌仪式","签约仪式","开工仪式","剪彩仪式","年会","校友聚会","同学聚会","欢迎致辞","答谢致辞"]}
+];
+const WRITER_TASK=`
+【一次成稿，直接输出正文】
+请你在一次写作里完成下面全部四件事，然后直接输出完整讲话稿正文：
+1. 先在心里看局面。结合场合、讲话人身份、听众、参考材料，判断这次讲话的真正目的与核心矛盾，想清楚“这一场要解决什么”。
+2. 再定主旨与结构。确立一句话主旨，搭起总分总的骨架，各部分配小标题（用“一、”“一是”格式，句式统一、字数接近），首尾呼应、层层递进。
+3. 一气写成讲话稿。让听众能“听见”你，有判断、有轻重、有取舍；语言规范庄重，少用套话；金句从判断里自然长出，一处即止；材料不足不编造，不写正确的空话。
+4. 篇幅按内容需要，讲透为止；若用户提了字数要求则严格遵守。
+注意：不要输出JSON，不要输出“以下是讲话稿”之类的话，直接从正文第一行开始写。`;
+
+
+const SELF_CHECK=`
+【轻量自检】
+你是资深审稿人，对刚写成的讲话稿做一次简短自检。只抓重点，不重写原文，不罗列十条八条。
+只输出一行JSON（前面不要任何文字），格式如下：
+{"scores":{"思想":"9","结构":"8","针对性":"8","现场感":"9"},"strengths":["两条最突出的优点"],"keyIssue":"最需要改的一个问题（一句话）","advice":"一条具体改进建议"}
+评分0-10整数。`;
 function identityPrompt(){
   const id=state.identity;
-  if(!id||!IDENTITY_BLOCKS[id])return "";
-  const b=IDENTITY_BLOCKS[id];
-  let p="\n【身份板块框架】我的身份是“"+id+"”。"+b.intro+"\n讲话内容严格限定在以下四个板块之内，不越位讲其他板块：\n";
-  b.blocks.forEach((x,i)=>p+=(i+1)+"．"+x[0]+"（"+x[1]+"）："+x[2]+"\n");
-  p+="谋结构时，把上述四个板块作为全篇的章节骨架，每一板块之下再设若干分点，使全篇板块清晰、界限分明。";
+  if(!id)return "";
+  let found=null;
+  IDENTITY_LIB.forEach(g=>g.items.forEach(it=>{if(it.name===id)found=it}));
+  if(!found)return "";
+  let p="\n【身份板块框架】我的身份是“"+id+"”。\n讲话内容围绕以下板块展开，不越位讲其他板块：\n";
+  found.blocks.forEach((x,i)=>p+=(i+1)+"．"+x[0]+"（"+x[1]+"）："+x[2]+"\n");
+  p+="把上述板块作为全篇章节骨架，每一板块之下再设若干分点，板块清晰、界限分明。";
   return p;
 }
 
@@ -378,14 +415,13 @@ const DAODEJING_QUOTES= `
 
 function sys(){
 return ZHENGHENG_MEMORY + `
-你是“知衡”，一名长期服务党政机关主要领导和分管领导的高级讲话参谋、政策研究员和文字总顾问。
-你的任务不是把用户的话换一种说法，而是先理解局面，再识别真正矛盾，形成判断，设计逻辑，最后写成能让领导自然讲出来的讲话。
+你是长期服务党政机关主要领导和分管领导的高级讲话撰稿人、政策研究员和文字总顾问。
+你的任务不是把用户的话换一种说法，而是先看清局面、识别真正矛盾、形成判断、设计逻辑，然后一气呵成写出能让领导自然讲出来的讲话。
 最高原则：思想先于语言，判断先于结构，事实先于修辞，针对性先于漂亮，内容决定形式。
-另守立言双纲：情绪是讲给听众的，不是留给自己的；公开言论是维护立场与利益的，不是表达个人认知的。写任何一段话，先问两句，这话要让谁心里起什么反应，这话在维护谁、争取什么，答得清再落笔。
-讲话不是论文，不追求面面俱到。不要为了“金句”而金句，不要机械排比，不要堆砌四字词，不要反复使用“要……要……要……”，不要制造空泛的正确话。
-没有依据的事实不能编造；没有材料的本地情况不能冒充掌握；不能确定的数据明确标注待核实。
-用户指定的结构、价值、标题都只是偏好。如果与你形成的核心判断冲突，应优先保证思想和逻辑，并说明调整理由。
-最终目标：让人觉得这不是AI把话写漂亮了，而是有人真正想明白了这件事。`;
+立言双纲：情绪是讲给听众的，不是留给自己的；公开言论是维护立场与利益的，不是表达个人认知的。落笔前先问两句，这话要让谁心里起什么反应，这话在维护谁、争取什么，答得清再落笔。
+讲话不是论文，不追求面面俱到。不为金句而金句，不机械排比，不堆砌四字词，不用“要……要……要……”，不造空泛的正确话。
+没有依据的事实不编造，没有材料的本地情况不冒充掌握，不确定的数据标注待核实。
+最终目标：让人觉得不是AI把话写漂亮了，而是有人真正想明白了这件事。`;
 }
 
 async function callAI(system,user){
@@ -407,7 +443,7 @@ async function callAI(system,user){
 }
 
 const BRAIN={
-  planner:`你是“知衡总谋官”。一次完成从看局面到定结构的所有思考，输出一份完整谋篇蓝图，供撰稿人直接据此成稿，无需再分步。
+  planner:`你是“参谋官”。一次完成从看局面到定结构的所有思考，输出一份完整谋篇蓝图，供撰稿人直接据此成稿，无需再分步。
 依次完成四件事：
 一、看局面：识别场合与政治语境、讲话人身份、听众心理、讲话真正目的、背景变化、表层现象、深层矛盾、利益关系/机制障碍/能力短板/阶段变化、政策边界、信息缺口。警惕把“工作还不够、认识还不深、力度还不大”当成问题。
 二、找矛盾：从现象入机制，从问题入矛盾，从矛盾入趋势，从趋势找突破口。优先找结构性、机制性、阶段性矛盾。判断主语始终是讲话人所在的组织与岗位。
@@ -418,31 +454,7 @@ const BRAIN={
 {"situation":{"coreSituation","contradictions[]","audiencePsychology","purpose","factsToVerify[]"},
  "strategy":{"overallJudgment","coreContradictions[]","breakthroughDirections[]","recommendedDirection","avoidDirections[]"},
  "thesis":{"coreThesis","coreQuestion","supportingJudgments[]","titleDirections[]"},
- "outline":{"structure","overallLogic","openingTask","sections[{title,coreJudgment,logicalTask,evidence}]","endingTask"}}`,
-  know:`你是“知局官”。不要写讲话。先把局面看清楚。
-必须识别：场合与政治语境、讲话人的身份、听众及其心理、讲话真正目的、为什么现在要讲、背景变化、表层现象、深层矛盾、利益关系/机制障碍/能力短板/认知偏差/阶段变化、政策边界、事实与数据、信息缺口。
-尤其警惕把“工作还不够”“认识还不深”“力度还不大”当成问题。
-立言双纲落点：除“讲话人想表达什么”，更要看清“这话在维护什么立场、影响谁的情绪、争取什么利益”，并把 audiencePsychology 细化为“听众此刻的情绪从哪来、可以被什么点燃”。
-输出严格JSON：background,timing,coreSituation,contradictions[],audiencePsychology,purpose,verifiedFacts[],factsToVerify[],informationGaps[]。`,
-  adviser:`你是“首席参谋”。核心问题只有一个：面对这个局面，讲话人现在最应该讲什么？
-从现象进入机制，从问题进入矛盾，从矛盾进入趋势，从趋势找到突破口。
-优先寻找结构性矛盾、机制性矛盾、阶段性矛盾，而不是罗列工作任务。
-立言双纲落点：判断的主语始终是讲话人所在的组织与岗位。overallJudgment 是一句站得住立场、争得到利益的话，不替个人立言、不替个人宣泄。
-输出严格JSON：overallJudgment,coreContradictions[],breakthroughDirections[],recommendedDirection,keyJudgment,avoidDirections[]。`,
-  thesis:`你是“立意官”。把参谋判断变成能够统领全篇的思想。
-先内部提出至少5个主旨方案，再比较其深度、针对性、新意、政治质量、解释力、可展开性、领导讲话适配度、本地适配度，最终只输出最优方案。
-立言双纲落点：coreThesis 必须立在组织的立场与利益上，是一句“维护谁、争取什么”的话，不是个人认知的抒发。比较方案时把“立场站位、情绪动员力”作为一等权重。
-输出严格JSON：coreThesis,coreQuestion,supportingJudgments[],logicRelation,evidenceNeeds[],titleDirections[]。`,
-  outline:`你是“谋篇官”。结构不是模板，而是思想的骨架。
-判断用户偏好的结构是否真的适合；不适合就换。全篇只保留一条主逻辑，每一部分都必须承担不可替代的论证任务。
-各部分观点（sections）不得少于3个，且彼此贯穿一种明确逻辑关系（时间/辩证/角度/总分/并列五种之一）。
-立言双纲落点：每一部分都要落到“该站的立场”和“要争取的听众”。openingTask 用情绪先接住听众，endingTask 落在动员与行动上，情绪服务于立场与号召。
-输出严格JSON：structure,structureReason,overallLogic,openingTask,sections[{title,coreJudgment,logicalTask,evidence,caseSupport,transition}],endingTask。`,
-  review:`你是“知衡审稿官”，采取对抗式审稿，不负责夸奖。
-检查：思想深度、逻辑闭合、针对性、事实准确、政策边界、领导讲话口语感、辨识度、AI味、情绪工具性、立场与利益。
-重点抓：正确但没有价值、漂亮但没有思想、全面但没有重点、结构完整但逻辑松散、硬塞金句、机械排比、本地名词堆砌、政策词堆砌、自我情绪流露、个人认知越位、立场与利益不清。
-立言双纲审稿落点：凡“我很难受、我压力大”式自我情绪，一律视为情绪用错了对象；凡个人心得、个人好恶越位取代组织立场，一律视为立场不稳。
-输出严格JSON：scores{thought,logic,targeting,fact,policy,oral,distinctiveness,aiTaste,emotion,stand},criticalProblems[],mustFix[],suggestions[],retain[],route。route只能是PASS、REWRITE、RETURN_TO_KNOW、RETURN_TO_ADVISER、RETURN_TO_THESIS、RETURN_TO_OUTLINE。`
+ "outline":{"structure","overallLogic","openingTask","sections[{title,coreJudgment,logicalTask,evidence}]","endingTask"}}`
 };
 
 function cleanJSON(t){
@@ -521,31 +533,22 @@ async function start(){
    structurePreference:document.getElementById("structure").value,
    extra:document.getElementById("extra").value
  };
- const context={brief:payload,situation:null,strategy:null,thesis:null,outline:null,draft:null,review:null,learned:getLearned()};
+ const context={brief:payload,draft:null,check:null,learned:getLearned()};
  try{
-   setStage(0);
-   const plan=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.planner+identityPrompt(),brainInput(payload)));
-   context.situation=plan.situation||{};
-   context.strategy=plan.strategy||{};
-   context.thesis=plan.thesis||{};
-   context.outline=plan.outline||{};
-
    if(document.getElementById("mode").value==="adviser"){
+     setStage(0);
+     const plan=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.planner+identityPrompt(),brainInput(payload)));
+     context.situation=plan.situation||{};
+     context.strategy=plan.strategy||{};
+     context.thesis=plan.thesis||{};
+     context.outline=plan.outline||{};
      setStage(2); stopTimer(); renderBrainDesk(context); saveHistory("参谋",payload,context); return;
    }
-
    setStage(1);
-   context.draft=await callAI(sys()+learnedPrompt()+`\n【首席撰稿人】\n你是顶级党政讲话起草专家。请严格按照给定判断、矛盾、主旨和结构，写一篇领导讲话。要求：像领导现场讲出来，有判断、有轻重、有取舍；语言规范庄重，少用“要……要……要……”套话；金句从判断自然长出，一处即止；材料不足不编造；篇幅根据内容需要，讲透为止。`+FORMAT_RULES+SPEECH_MODEL_REF+DAODEJING_QUOTES, `【讲话要素与判断】\n`+compactForWrite(context));
-
+   const userIn="【场合】"+(payload.scene||"（自动判断）")+"\n【讲话人】"+(payload.speaker||"（自动判断）")+"\n【身份】"+(payload.identity||"（自动判断）")+"\n【听众】"+(payload.audience||"")+"\n【其他要求】"+(payload.extra||"")+"\n【参考材料】\n"+(payload.reference||"")+"\n【您知道的情况】\n"+brief;
+   context.draft=await callAI(sys()+learnedPrompt()+identityPrompt()+WRITER_TASK+FORMAT_RULES+SPEECH_MODEL_REF+DAODEJING_QUOTES,userIn);
    setStage(2);
-   context.review=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.review,compactForWrite(context)+"\n【待审成稿】\n"+trim(context.draft,6000)));
-
-   // 一次定向重写：只修真正的问题，不无限循环。
-   if(context.review.route==="REWRITE"){
-     context.draft=await callAI(sys()+learnedPrompt()+`\n【重写官】\n这是一次针对性重写，不是另起炉灶。保留原稿好的判断和表达，只解决审稿官指出的核心问题。重写后仍是领导讲话，不是论文或调研报告。`+FORMAT_RULES, compactForWrite(context)+"\n【审稿意见】\n"+JSON.stringify({criticalProblems:context.review.criticalProblems||[],mustFix:context.review.mustFix||[],suggestions:context.review.suggestions||[]})+"\n【原稿】\n"+trim(context.draft,6000));
-     context.review=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.review,compactForWrite(context)+"\n【待审成稿】\n"+trim(context.draft,6000)));
-   }
-
+   context.check=cleanJSON(await callAI(sys()+"\n"+SELF_CHECK,trim(context.draft,6000)));
    stopTimer();
    renderDraft(context);
    saveHistory("成稿",payload,context);
@@ -593,22 +596,18 @@ function renderSpeech(t){
   }).join("\n");
 }
 function renderDraft(c){
- const r=c.review||{};
- const sc=r.scores||{};
- const scList=[
-   ["思想深度",sc.thought],["逻辑结构",sc.logic],["针对性",sc.targeting],["事实准确",sc.fact],
-   ["政策边界",sc.policy],["口语现场",sc.oral],["辨识度",sc.distinctiveness],["AI味控制",sc.aiTaste],
-   ["情绪工具性",sc.emotion],["立场与利益",sc.stand]
- ];
+ const ch=c.check||{};
+ const sc=ch.scores||{};
+ const scList=[["思想",sc.思想],["结构",sc.结构],["针对性",sc.针对性],["现场感",sc.现场感]];
  document.getElementById("result").innerHTML=`
- <div class="result-head"><b>讲话稿</b><span class="badge">${r.route==="PASS"?"审稿通过":"已完成定向校正"}</span></div>
+ <div class="result-head"><b>讲话稿</b><span class="badge">已写就</span></div>
  <div class="result-body">
    <div class="speech" id="speech">${renderSpeech(c.draft)}</div>
-   <div class="review"><details><summary>展开“审稿意见”</summary>
-    <div class="scores">
-      ${scList.map(x=>'<div class="score">'+x[0]+'<strong>'+(x[1]!=null?x[1]:"—")+'</strong></div>').join("")}
-    </div>
-    <p class="speech" style="font-size:13px;line-height:1.7"><b>关键问题：</b>${esc((r.criticalProblems||[]).join("；"))||"—"}<br><b>必改项：</b>${esc((r.mustFix||[]).join("；"))||"—"}<br><b>建议：</b>${esc((r.suggestions||[]).join("；"))||"—"}<br><b>保留：</b>${esc((r.retain||[]).join("；"))||"—"}</p>
+   <div class="review"><details><summary>展开“自检意见”</summary>
+     <div class="scores">
+       ${scList.map(x=>'<div class="score">'+x[0]+'<strong>'+(x[1]!=null?x[1]:"—")+'</strong></div>').join("")}
+     </div>
+     <p class="speech" style="font-size:13px;line-height:1.7"><b>优点：</b>${esc((ch.strengths||[]).join("；"))||"—"}<br><b>最需改进：</b>${esc(ch.keyIssue||"—")}<br><b>建议：</b>${esc(ch.advice||"—")}</p>
    </details></div>
    <div class="cta-row"><button class="secondary" onclick="copyText()">复制全文</button><button class="secondary" onclick="downloadTxt()">导出TXT</button></div>
    <div class="feedback">
@@ -647,11 +646,11 @@ async function rewriteWithFeedback(){
   const c=window.last;if(!c)return;
   const btn=event.target;btn.disabled=true;btn.textContent="重写中…";
   try{
-    c.draft=await callAI(sys()+learnedPrompt()+`\n【改稿官】\n按用户的具体修改意见，在保留原文真正好的判断和表达的基础上定向修改。修改后仍是领导讲话，不是论文或调研报告。`+FORMAT_RULES,"【用户修改意见】\n"+fb+"\n【原稿】\n"+trim(c.draft,6000));
-    c.review=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.review,compactForWrite(c)+"\n【待审成稿】\n"+trim(c.draft,6000)));
+    c.draft=await callAI(sys()+learnedPrompt()+identityPrompt()+`\n【改稿官】\n按用户的具体修改意见，在保留原文真正好的判断和表达的基础上定向修改。修改后仍是领导讲话，不是论文或调研报告。`+FORMAT_RULES,"【用户修改意见】\n"+fb+"\n【原稿】\n"+trim(c.draft,6000));
+    c.check=cleanJSON(await callAI(sys()+"\n"+SELF_CHECK,trim(c.draft,6000)));
     renderDraft(c);
     const m=document.getElementById("fbMsg");
-    if(m)m.innerHTML="<span style=\"color:#5d8a6c\">已按您的意见重写并重新审稿，请查看。</span>";
+    if(m)m.innerHTML="<span style=\"color:#5d8a6c\">已按您的意见重写并通过自检，请查看。</span>";
   }catch(e){
     alert("重写失败："+e.message);
   }finally{
@@ -679,7 +678,7 @@ function renderHistory(){
   list.innerHTML=state.history.map((h,i)=>{
     const brief=(h.payload&&h.payload.brief||"").slice(0,80);
     const draft=(h.data&&(h.data.draft||""))||"";
-    return '<div class="hist-item" id="hi'+i+'"><div class="hi-top"><span class="hi-time">'+esc(h.time||"")+'</span><span class="hist-badge">'+(h.type==="参谋"?"参谋":"成稿")+'</span></div><div class="hi-brief">'+esc(brief||"（无描述）")+'</div><div class="hi-actions"><button onclick="toggleHist('+i+')">'+(draft?"查看全文":"查看")+'</button><button onclick="saveOneHistory('+i+')">保存</button><button class="danger" onclick="deleteHistory('+i+')">删除</button></div><div class="hi-detail"><div class="hi-draft">'+esc(draft||"（该条记录无成稿内容）")+'</div><button class="secondary" onclick="copyHist('+i+')">复制全文</button></div></div>';
+    return '<div class="hist-item" id="hi'+i+'"><div class="hi-top"><span class="hi-time">'+esc(h.time||"")+'</span><span class="hist-badge">'+(h.type==="参谋"?"参谋":"成稿")+'</span></div><div class="hi-brief">'+esc(brief||"（无描述）")+'</div><div class="hi-actions"><button onclick="fullViewHistory('+i+')">'+(draft?"查看全文":"查看")+'</button><button onclick="saveOneHistory('+i+')">保存</button><button class="danger" onclick="deleteHistory('+i+')">删除</button></div></div>';
   }).join("");
 }
 function toggleHist(i){
@@ -756,6 +755,91 @@ function saveSettings(){
   alert("设置已保存："+m+"（当前选择："+(provider==="kimi"?"Kimi":"DeepSeek")+"）");
 }
 function closeSettings(){document.getElementById("setMask").style.display="none"}
+
+
+function bindScene(){
+  const c=document.getElementById("sceneGroups");
+  if(!c)return;
+  let html="";
+  SCENES.forEach(g=>{
+    html+='<div class="pg"><div class="pg-title">'+g.group+'</div><div class="pg-items">'+g.items.map(it=>'<span class="pg-chip'+(state.scene===it?' on':'')+'" data-v="'+it+'" onclick="pickScene(this)">'+it+'</span>').join("")+'</div></div>';
+  });
+  c.innerHTML=html;
+}
+function pickScene(el){const v=el.dataset.v;state.scene=v;document.getElementById("scene").value=v;bindScene();}
+function filterScene(v){
+  const q=v.trim();
+  state.scene=q;
+  const c=document.getElementById("sceneGroups");
+  if(!c)return;
+  let html="";
+  SCENES.forEach(g=>{
+    const items=g.items.filter(it=>!q||it.indexOf(q)>=0);
+    if(!items.length)return;
+    html+='<div class="pg"><div class="pg-title">'+g.group+'</div><div class="pg-items">'+items.map(it=>'<span class="pg-chip'+(state.scene===it?' on':'')+'" data-v="'+it+'" onclick="pickScene(this)">'+it+'</span>').join("")+'</div></div>';
+  });
+  c.innerHTML=html||'<div class="pg-empty">没有匹配的场合，可继续输入自定义场合</div>';
+}
+function bindIdentity(){
+  const c=document.getElementById("identityGroups");
+  if(!c)return;
+  let html="";
+  IDENTITY_LIB.forEach(g=>{
+    html+='<div class="pg"><div class="pg-title">'+g.group+'</div><div class="pg-items">'+g.items.map(it=>'<span class="pg-chip'+(state.identity===it.name?' on':'')+'" data-v="'+it.name+'" onclick="pickIdentity(this)">'+it.name+'</span>').join("")+'</div></div>';
+  });
+  c.innerHTML=html;
+  renderIdentPreview();
+}
+function pickIdentity(el){const v=el.dataset.v;state.identity=v;document.getElementById("identity").value=v;bindIdentity();}
+function filterIdentity(v){
+  const q=v.trim();
+  state.identity=q;
+  const c=document.getElementById("identityGroups");
+  if(!c)return;
+  let html="";
+  IDENTITY_LIB.forEach(g=>{
+    const items=g.items.filter(it=>!q||it.name.indexOf(q)>=0);
+    if(!items.length)return;
+    html+='<div class="pg"><div class="pg-title">'+g.group+'</div><div class="pg-items">'+items.map(it=>'<span class="pg-chip'+(state.identity===it.name?' on':'')+'" data-v="'+it.name+'" onclick="pickIdentity(this)">'+it.name+'</span>').join("")+'</div></div>';
+  });
+  c.innerHTML=html||'<div class="pg-empty">没有匹配的身份，可继续输入自定义身份</div>';
+  renderIdentPreview();
+}
+function renderIdentPreview(){
+  const pv=document.getElementById("identPreview");
+  if(!pv)return;
+  const id=state.identity;
+  let found=null;
+  IDENTITY_LIB.forEach(g=>g.items.forEach(it=>{if(it.name===id)found=it}));
+  if(!found){pv.style.display="none";return;}
+  pv.style.display="block";
+  pv.innerHTML='<b>将围绕这四块讲：</b>'+found.blocks.map(x=>x[0]).join(" · ");
+}
+function clearInput(id){const el=document.getElementById(id);if(el){el.value="";el.focus&&el.focus();}}
+function fullViewHistory(i){
+  const h=state.history[i];
+  const draft=(h&&h.data&&h.data.draft)||"";
+  if(!draft){alert("该条记录无成稿正文，无法全文回看");return}
+  window._fullIdx=i;
+  document.getElementById("fullMask").style.display="flex";
+  document.getElementById("fullContent").innerHTML=renderSpeech(draft);
+  document.getElementById("fullTitle").textContent="历史讲话 · "+(h.time||"");
+}
+function copyHistFull(){
+  const i=window._fullIdx;
+  const d=state.history[i]&&state.history[i].data&&state.history[i].data.draft;
+  if(d)navigator.clipboard?.writeText(d).then(()=>alert("已复制"));
+}
+function closeFullView(){document.getElementById("fullMask").style.display="none"}
+bindScene();bindIdentity();
 </script>
+
+<div class="modal-mask fullmask" id="fullMask" onclick="if(event.target===this)closeFullView()">
+  <div class="fullbox">
+    <div class="full-head"><b id="fullTitle">历史讲话 · 全文</b><div><button class="secondary" style="margin-right:8px" onclick="copyHistFull()">复制全文</button><span class="x" onclick="closeFullView()">×</span></div></div>
+    <div class="full-body speech" id="fullContent"></div>
+  </div>
+</div>
+
 </body>
 </html>
