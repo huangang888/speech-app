@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>讲话助手</title>
 <style>
 :root{--bg:#FAF7F2;--card:#fff;--text:#2C2C2C;--muted:#666;--line:#D5C5A8;--accent:#8B1A1A;--accent2:#F7EDE3;--gold:#C9A96E;--danger:#c93636;--shadow:0 2px 16px rgba(0,0,0,.08)}
@@ -103,29 +103,40 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 .fullbox{width:100%;max-width:1080px;height:90vh;background:#fff;border-radius:12px;box-shadow:0 10px 50px rgba(0,0,0,.22);display:flex;flex-direction:column;overflow:hidden}
 .full-head{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid var(--line)}
 .full-body{flex:1;overflow:auto;padding:26px 34px}
+
+.page{position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;z-index:70}
+.page.show{display:flex}
+.page-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line);background:#fff}
+.page-title{font-size:16px;font-weight:600}
+.page-body{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column}
+.hist-list{flex:1}
+.file-name{word-break:break-all;white-space:normal;font-size:12px;color:var(--muted);margin-top:6px;line-height:1.6}
+.drop{max-width:100%;overflow:hidden}
+.file-clear{margin-top:8px}
+.file-clear .clear-btn{width:100%;padding:7px}
+select.picker-input{-webkit-appearance:none;appearance:none;padding-right:28px;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 55%,calc(100% - 12px) 55%;background-size:6px 6px;background-repeat:no-repeat}
 </style>
 </head>
 <body>
-<div class="app">
+<div class="app" id="app">
 <header>
-  <div class="brand"><div class="logo">黄</div><div><h1>讲话助手</h1><div class="tagline">您说事，我来谋，话讲在点上，情用在对的人身上。 · v51.0</div></div></div>
+  <div class="brand"><div class="logo">黄</div><div><h1>讲话助手</h1><div class="tagline">您说事，我来谋，话讲在点上，情用在对的人身上。 · v51.1</div></div></div>
   <div class="top-actions"><button class="ghost" onclick="showHistory()">历史</button><button class="ghost" onclick="showSettings()">设置</button></div>
 </header>
 
 <section class="hero">
-  <p>不用先想结构、金句、标题，把您知道的情况零碎写下来，剩下的交给助手，一次帮您谋篇、成稿。</p>
+    
 
-  
 <div class="row">
-    <div class="field-head"><label>什么场合？<span class="hint">可输入或从下方点选，不知道可留空自动判断</span></label></div>
-    <input id="scene" class="picker-input" placeholder="输入场合关键词，或从下方选择…" autocomplete="off" oninput="filterScene(this.value)">
-    <div class="picker-groups" id="sceneGroups"></div>
+    <div class="field-head"><label>什么场合？<span class="hint">可选，不知道可留空自动判断</span></label></div>
+    <select id="sceneSel" class="picker-input" onchange="onScenePick(this)"></select>
+    <input id="sceneCustom" class="picker-input" placeholder="自定义场合…" style="display:none" oninput="state.scene=this.value">
 </div>
 
 <div class="row">
-    <div class="field-head"><label>我的身份<span class="hint">可选，决定讲话板块；可输入或点选，不选自动判断</span></label></div>
-    <input id="identity" class="picker-input" placeholder="输入身份，或从下方选择…" autocomplete="off" oninput="filterIdentity(this.value)">
-    <div class="picker-groups" id="identityGroups"></div>
+    <div class="field-head"><label>我的身份<span class="hint">可选，决定讲话板块；不选自动判断</span></label></div>
+    <select id="identitySel" class="picker-input" onchange="onIdentPick(this)"></select>
+    <input id="identityCustom" class="picker-input" placeholder="自定义身份…" style="display:none" oninput="state.identity=this.value;renderIdentPreview()">
     <div class="ident-preview" id="identPreview" style="display:none"></div>
 </div>
 <div class="row">
@@ -133,7 +144,14 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
     <input id="speaker" placeholder="如：市政府分管领导、局长、县委书记……">
   </div>
 
+  
   <div class="row">
+    <div class="field-title">听众</div><input id="audience" placeholder="如：市直部门、学校负责人、基层干部">
+    <div class="field-title">模式</div><select id="mode"><option value="writer">成稿：谋完直接写</option><option value="adviser">参谋：先给方向和立意</option></select>
+    <div class="field-title">结构偏好（仅作参考）</div><select id="structure"><option>自动判断</option><option>总分式</option><option>问题式</option><option>认知式</option><option>辩证式</option><option>时间式</option></select>
+    <div class="field-title">其他要求</div><input id="extra" placeholder="如：控制在2000字左右、少用套话、更加口语化">
+  </div>
+<div class="row">
     <div class="field-head"><label>把情况告诉我<span class="hint">越真实、越具体越好；不用整理</span></label><button class="clear-btn" onclick="clearInput('brief')">清空</button></div>
     <textarea id="brief" placeholder="例如：明天参加全市高中教育工作座谈会。我现在最担心的是优质生源流失、出生人口下降，高中学校之间竞争越来越激烈。过去大家主要拼升学率，但现在单纯靠抢生源可能越来越难。我希望这次讲话不要停留在“提高教学质量”这种常规表述上，要把形势变化、真正矛盾和下一步怎么破讲透。"></textarea>
   </div>
@@ -141,24 +159,15 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
   <div class="row">
     <label>有什么材料？<span class="hint">没有也可以直接开始</span></label>
     <div>
-      <label class="drop" for="file"><b>点击上传材料</b><input id="file" type="file" accept=".txt,.docx,.pdf"><div class="file-name" id="fileName"></div></label>
+      <label class="drop" for="file"><b>点击上传材料</b><input id="file" type="file" accept=".txt,.docx,.pdf" multiple><div class="file-name" id="fileName"></div></label>
+      <div class="file-clear" id="fileClear" style="display:none"><button class="clear-btn" onclick="clearFiles()">清除已上传材料</button></div>
       <div class="ref-box"><span class="ref-clear"><button class="clear-btn" onclick="clearInput('reference')">清空材料</button></span><textarea id="reference" style="margin-top:9px;min-height:85px;width:100%;display:block" placeholder="也可以直接粘贴材料、数据、政策依据……"></textarea></div>
     </div>
   </div>
 
   <button class="primary" onclick="start()">现在开始思考</button>
 
-  <div class="advanced" id="advanced">
-    <div class="adv-title" onclick="toggleAdvanced()"><span>高级设置 · 默认自动判断</span><span id="advArrow">＋</span></div>
-    <div class="adv-body">
-      <div class="adv-grid">
-        <div><div class="field-title">听众</div><input id="audience" placeholder="如：市直部门、学校负责人、基层干部"></div>
-        <div><div class="field-title">模式</div><select id="mode"><option value="writer">成稿：谋完直接写</option><option value="adviser">参谋：先给方向和立意</option></select></div>
-        <div><div class="field-title">结构偏好（仅作参考）</div><select id="structure"><option>自动判断</option><option>总分式</option><option>问题式</option><option>认知式</option><option>辩证式</option><option>时间式</option></select></div>
-        <div><div class="field-title">其他要求</div><input id="extra" placeholder="如：控制在2000字左右、少用套话、更加口语化"></div>
-      </div>
-    </div>
-  </div>
+  
 </section>
 
 <section id="work">
@@ -171,45 +180,50 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 </section>
 <footer>讲话助手　不只替您写，更替您想</footer>
 </div>
-
-<div class="modal-mask" id="setMask" onclick="if(event.target===this)closeSettings()">
-  <div class="modal">
-    <div class="modal-head">设置<span class="x" onclick="closeSettings()">×</span></div>
-    <div class="modal-body">
-      <div class="set-field"><div class="field-title">DeepSeek API Key（写 deepseek 模型用）</div><input id="setKey" type="password" placeholder="粘贴 DeepSeek API Key" autocomplete="off"></div>
-      <div class="set-field"><div class="field-title">Kimi API Key（写 kimi 模型用）</div><input id="setKimiKey" type="password" placeholder="粘贴 Kimi API Key" autocomplete="off"></div>
-      <div class="set-field"><div class="field-title">写稿模型</div>
-        <div class="model-cards" id="modelCards">
-          <div class="model-card" data-provider="deepseek" data-model="deepseek-v4-pro" onclick="pickModel(this)"><b>deepseek-v4-pro</b><span>DeepSeek · 逻辑强 · 默认</span></div>
-          <div class="model-card" data-provider="kimi" data-model="kimi-k2.6" onclick="pickModel(this)"><b>kimi-k2.6</b><span>Kimi · 最接近人类写作</span></div>
-          <div class="model-card" data-provider="deepseek" data-model="deepseek-v4-flash" onclick="pickModel(this)"><b>deepseek-v4-flash</b><span>DeepSeek · 快速响应</span></div>
-        </div>
-        <div class="model-tip">点选服务商后自动填入对应模型名，也可手动修改下方模型名。</div>
-      </div>
-      <div class="set-field"><div class="field-title">模型名（可微调）</div><input id="setModel" placeholder="deepseek-v4-pro" autocomplete="off"></div>
-      <button class="primary" onclick="saveSettings()">保存设置</button>
+<div class="page" id="historyPage">
+  <div class="page-head"><div class="page-title">历史记录</div><button class="ghost" onclick="closeHistory()">返回</button></div>
+  <div class="page-body">
+    <div class="hist-list" id="histList"></div>
+    <div class="hist-foot">
+      <button class="secondary" onclick="exportHistoryTxt()">导出TXT合集</button>
+      <button class="secondary" onclick="exportHistoryJson()">导出JSON备份</button>
+      <button class="secondary danger" onclick="clearHistory()">清空历史</button>
     </div>
   </div>
 </div>
 
-<div class="modal-mask" id="histMask" onclick="if(event.target===this)closeHistory()">
-  <div class="modal" style="max-width:560px">
-    <div class="modal-head">历史记录<span class="x" onclick="closeHistory()">×</span></div>
-    <div class="modal-body">
-      <div class="hist-list" id="histList"></div>
-      <div class="hist-foot">
-        <button class="secondary" onclick="exportHistoryTxt()">导出TXT合集</button>
-        <button class="secondary" onclick="exportHistoryJson()">导出JSON备份</button>
-        <button class="secondary danger" onclick="clearHistory()">清空历史</button>
+<div class="page" id="settingsPage">
+  <div class="page-head"><div class="page-title">设置</div><button class="ghost" onclick="closeSettings()">返回</button></div>
+  <div class="page-body">
+    <div class="set-field"><div class="field-title">DeepSeek API Key（写 deepseek 模型用）</div><input id="setKey" type="password" placeholder="粘贴 DeepSeek API Key" autocomplete="off"></div>
+    <div class="set-field"><div class="field-title">Kimi API Key（写 kimi 模型用）</div><input id="setKimiKey" type="password" placeholder="粘贴 Kimi API Key" autocomplete="off"></div>
+    <div class="set-field"><div class="field-title">写稿模型</div>
+      <div class="model-cards" id="modelCards">
+        <div class="model-card" data-provider="deepseek" data-model="deepseek-v4-pro" onclick="pickModel(this)"><b>deepseek-v4-pro</b><span>DeepSeek · 逻辑强 · 默认</span></div>
+        <div class="model-card" data-provider="kimi" data-model="kimi-k2.6" onclick="pickModel(this)"><b>kimi-k2.6</b><span>Kimi · 最接近人类写作</span></div>
+        <div class="model-card" data-provider="deepseek" data-model="deepseek-v4-flash" onclick="pickModel(this)"><b>deepseek-v4-flash</b><span>DeepSeek · 快速响应</span></div>
       </div>
+      <div class="model-tip">点选服务商后自动填入对应模型名，也可手动修改下方模型名。</div>
     </div>
+    <div class="set-field"><div class="field-title">模型名（可微调）</div><input id="setModel" placeholder="deepseek-v4-pro" autocomplete="off"></div>
+    <button class="primary" onclick="saveSettings()">保存设置</button>
   </div>
 </div>
+
+</div>
+
+
 
 <script>
 const state={scene:"工作会议",identity:"",fileText:"",context:null,history:JSON.parse(localStorage.getItem("zhiheng_history")||"[]")};
 
-document.getElementById("file").onchange=e=>{const f=e.target.files[0];if(f){document.getElementById("fileName").textContent="已选择："+f.name;const r=new FileReader();r.onload=()=>state.fileText=r.result;r.readAsText(f)}};
+document.getElementById("file").onchange=e=>{
+  const files=e.target.files;
+  if(!files||!files.length)return;
+  const names=[];const parts=[];let pending=files.length;
+  const fin=()=>{state.fileText=parts.join("\n\n");document.getElementById("fileName").textContent="已选择 "+files.length+" 份："+names.join("、");document.getElementById("fileClear").style.display="block";};
+  Array.from(files).forEach(f=>{names.push(f.name);const r=new FileReader();r.onload=()=>{parts.push(r.result||"");if(--pending===0)fin();};r.onerror=()=>{if(--pending===0)fin();};r.readAsText(f);});
+};
 
 function toggleAdvanced(){const a=document.getElementById("advanced");a.classList.toggle("open");document.getElementById("advArrow").textContent=a.classList.contains("open")?"－":"＋"}
 function setStage(n){document.querySelectorAll(".stage").forEach((x,i)=>x.className="stage "+(i<n?"done":i===n?"on":""));refreshTimer()}
@@ -667,11 +681,8 @@ function esc(s){return String(s||"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt
 function copyText(){const t=window.last?.draft||window.last?.thesis||"";navigator.clipboard?.writeText(t).then(()=>alert("已复制"))}
 function downloadTxt(){const t=window.last?.draft||"";const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/plain;charset=utf-8"}));a.download="讲话稿.txt";a.click()}
 function saveHistory(type,payload,data){state.history.unshift({time:new Date().toLocaleString(),type,payload,data});state.history=state.history.slice(0,30);localStorage.setItem("zhiheng_history",JSON.stringify(state.history))}
-function showHistory(){
-  document.getElementById("histMask").style.display="flex";
-  renderHistory();
-}
-function closeHistory(){document.getElementById("histMask").style.display="none"}
+function showHistory(){document.querySelector(".app").style.display="none";document.getElementById("historyPage").classList.add("show");renderHistory();}
+function closeHistory(){document.getElementById("historyPage").classList.remove("show");document.querySelector(".app").style.display="";}
 function renderHistory(){
   const list=document.getElementById("histList");
   if(!state.history.length){list.innerHTML='<div style="text-align:center;color:#9aa2ad;padding:30px 0;font-size:13px">暂无历史记录。生成讲话后会自动保存在这里。</div>';return}
@@ -734,7 +745,8 @@ function showSettings(){
   const p=getProvider(),m=getModel();
   document.querySelectorAll(".model-card").forEach(c=>c.classList.toggle("active",c.dataset.provider===p));
   document.getElementById("setModel").value=m;
-  document.getElementById("setMask").style.display="flex";
+  document.querySelector(".app").style.display="none";
+  document.getElementById("settingsPage").classList.add("show");
 }
 function pickModel(el){
   document.querySelectorAll(".model-card").forEach(c=>c.classList.remove("active"));
@@ -754,57 +766,45 @@ function saveSettings(){
   closeSettings();
   alert("设置已保存："+m+"（当前选择："+(provider==="kimi"?"Kimi":"DeepSeek")+"）");
 }
-function closeSettings(){document.getElementById("setMask").style.display="none"}
+function closeSettings(){document.getElementById("settingsPage").classList.remove("show");document.querySelector(".app").style.display="";}
+
 
 
 function bindScene(){
-  const c=document.getElementById("sceneGroups");
-  if(!c)return;
-  let html="";
+  const sel=document.getElementById("sceneSel");
+  if(!sel)return;
+  let h='<option value="">（自动判断）</option>';
   SCENES.forEach(g=>{
-    html+='<div class="pg"><div class="pg-title">'+g.group+'</div><div class="pg-items">'+g.items.map(it=>'<span class="pg-chip'+(state.scene===it?' on':'')+'" data-v="'+it+'" onclick="pickScene(this)">'+it+'</span>').join("")+'</div></div>';
+    h+='<optgroup label="'+g.group+'">'+g.items.map(it=>'<option'+(state.scene===it?' selected':'')+'>'+it+'</option>').join("")+'</optgroup>';
   });
-  c.innerHTML=html;
+  h+='<option value="__custom">其他（自定义）…</option>';
+  sel.innerHTML=h;
 }
-function pickScene(el){const v=el.dataset.v;state.scene=v;document.getElementById("scene").value=v;bindScene();}
-function filterScene(v){
-  const q=v.trim();
-  state.scene=q;
-  const c=document.getElementById("sceneGroups");
-  if(!c)return;
-  let html="";
-  SCENES.forEach(g=>{
-    const items=g.items.filter(it=>!q||it.indexOf(q)>=0);
-    if(!items.length)return;
-    html+='<div class="pg"><div class="pg-title">'+g.group+'</div><div class="pg-items">'+items.map(it=>'<span class="pg-chip'+(state.scene===it?' on':'')+'" data-v="'+it+'" onclick="pickScene(this)">'+it+'</span>').join("")+'</div></div>';
-  });
-  c.innerHTML=html||'<div class="pg-empty">没有匹配的场合，可继续输入自定义场合</div>';
+function onScenePick(sel){
+  const cus=document.getElementById("sceneCustom");
+  if(sel.value==="__custom"){cus.style.display="block";cus.focus();state.scene=cus.value||"";}
+  else{cus.style.display="none";state.scene=sel.value;}
 }
+
+
 function bindIdentity(){
-  const c=document.getElementById("identityGroups");
-  if(!c)return;
-  let html="";
+  const sel=document.getElementById("identitySel");
+  if(!sel)return;
+  let h='<option value="">（自动判断）</option>';
   IDENTITY_LIB.forEach(g=>{
-    html+='<div class="pg"><div class="pg-title">'+g.group+'</div><div class="pg-items">'+g.items.map(it=>'<span class="pg-chip'+(state.identity===it.name?' on':'')+'" data-v="'+it.name+'" onclick="pickIdentity(this)">'+it.name+'</span>').join("")+'</div></div>';
+    h+='<optgroup label="'+g.group+'">'+g.items.map(it=>'<option'+(state.identity===it.name?' selected':'')+'>'+it.name+'</option>').join("")+'</optgroup>';
   });
-  c.innerHTML=html;
+  h+='<option value="__custom">其他（自定义）…</option>';
+  sel.innerHTML=h;
   renderIdentPreview();
 }
-function pickIdentity(el){const v=el.dataset.v;state.identity=v;document.getElementById("identity").value=v;bindIdentity();}
-function filterIdentity(v){
-  const q=v.trim();
-  state.identity=q;
-  const c=document.getElementById("identityGroups");
-  if(!c)return;
-  let html="";
-  IDENTITY_LIB.forEach(g=>{
-    const items=g.items.filter(it=>!q||it.name.indexOf(q)>=0);
-    if(!items.length)return;
-    html+='<div class="pg"><div class="pg-title">'+g.group+'</div><div class="pg-items">'+items.map(it=>'<span class="pg-chip'+(state.identity===it.name?' on':'')+'" data-v="'+it.name+'" onclick="pickIdentity(this)">'+it.name+'</span>').join("")+'</div></div>';
-  });
-  c.innerHTML=html||'<div class="pg-empty">没有匹配的身份，可继续输入自定义身份</div>';
+function onIdentPick(sel){
+  const cus=document.getElementById("identityCustom");
+  if(sel.value==="__custom"){cus.style.display="block";cus.focus();state.identity=cus.value||"";}
+  else{cus.style.display="none";state.identity=sel.value;}
   renderIdentPreview();
 }
+
 function renderIdentPreview(){
   const pv=document.getElementById("identPreview");
   if(!pv)return;
@@ -832,6 +832,13 @@ function copyHistFull(){
 }
 function closeFullView(){document.getElementById("fullMask").style.display="none"}
 bindScene();bindIdentity();
+
+function clearFiles(){
+  const fi=document.getElementById("file");if(fi)fi.value="";
+  state.fileText="";
+  document.getElementById("fileName").textContent="";
+  document.getElementById("fileClear").style.display="none";
+}
 </script>
 
 <div class="modal-mask fullmask" id="fullMask" onclick="if(event.target===this)closeFullView()">
