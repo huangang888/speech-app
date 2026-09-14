@@ -103,6 +103,18 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
   </div>
 
   <div class="row">
+    <label>我的身份<span class="hint">可选，决定讲话板块；不选则自动判断</span></label>
+    <div class="chips" id="identityChips">
+      <button class="chip" data-v="领导">领导</button>
+      <button class="chip" data-v="下属">下属</button>
+      <button class="chip" data-v="成员单位领导">成员单位领导</button>
+      <button class="chip" data-v="主持人">主持人</button>
+      <button class="chip" data-v="来宾/嘉宾">来宾/嘉宾</button>
+      <button class="chip" data-v="与会代表/先进">与会代表/先进</button>
+    </div>
+  </div>
+
+  <div class="row">
     <label>讲话人<span class="hint">可不填</span></label>
     <input id="speaker" placeholder="如：市政府分管领导、局长、县委书记……">
   </div>
@@ -181,8 +193,9 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 </div>
 
 <script>
-const state={scene:"工作会议",fileText:"",context:null,history:JSON.parse(localStorage.getItem("zhiheng_history")||"[]")};
+const state={scene:"工作会议",identity:"",fileText:"",context:null,history:JSON.parse(localStorage.getItem("zhiheng_history")||"[]")};
 document.querySelectorAll(".chip").forEach(x=>x.onclick=()=>{document.querySelectorAll(".chip").forEach(y=>y.classList.remove("active"));x.classList.add("active");state.scene=x.dataset.v});
+document.querySelectorAll("#identityChips .chip").forEach(x=>x.onclick=()=>{document.querySelectorAll("#identityChips .chip").forEach(y=>y.classList.remove("active"));x.classList.add("active");state.identity=x.dataset.v});
 document.getElementById("file").onchange=e=>{const f=e.target.files[0];if(f){document.getElementById("fileName").textContent="已选择："+f.name;const r=new FileReader();r.onload=()=>state.fileText=r.result;r.readAsText(f)}};
 
 function toggleAdvanced(){const a=document.getElementById("advanced");a.classList.toggle("open");document.getElementById("advArrow").textContent=a.classList.contains("open")?"－":"＋"}
@@ -271,6 +284,48 @@ const FORMAT_RULES= `
 5. 篇幅紧凑：段落之间不空行，小标题后直接接正文。
 6. 全篇体现条理性、关系性、新颖性：条理清楚、部分之间逻辑关系明确、判断和表达有新意。
 `;
+
+const IDENTITY_BLOCKS={
+  "领导":{intro:"讲话人是统揽全局的主官，讲话是定方向、做部署、明要求的。全篇严格围绕以下四个板块展开，各板块之下再分点展开。",blocks:[
+    ["定调子","统一思想、明确基调","对会议主题的政治定性、对当前形势的基本判断、对工作的总体要求和期望"],
+    ["把方向","确立目标、指明路径","工作的指导思想、基本原则、目标任务和重点方向，确保不偏航、不走样"],
+    ["控全局","统筹兼顾、协调各方","对各领域、各条线工作的整体部署，资源配置、力量统筹和节奏把握"],
+    ["防风险","底线思维、筑牢防线","对潜在风险隐患的预警提示，对廉洁、安全、稳定等底线工作的强调要求"]]},
+  "下属":{intro:"讲话人是部门或单位负责人，讲话是领命表态、汇报落实的。全篇严格围绕以下四个板块展开，各板块之下再分点展开。",blocks:[
+    ["讲认识","统一思想、提高站位","对会议主题和上级部署的理解领会，表明态度和决心"],
+    ["讲问题","查摆不足、分析短板","本单位/本领域存在的突出问题、薄弱环节及原因剖析"],
+    ["讲措施","具体举措、落实路径","针对问题提出的对策办法、工作思路和重点任务"],
+    ["讲落实","责任到人、跟踪问效","组织保障、时间节点、责任分工和督查问效机制"]]},
+  "成员单位领导":{intro:"讲话人是成员单位的负责人，讲话是配合大局、汇报分管、落实部署、建言献策的。全篇严格围绕以下四个板块展开，各板块之下再分点展开。",blocks:[
+    ["讲配合","站位全局、协同补位","对正职工作的支持态度，与其他班子成员的协作配合意愿"],
+    ["讲分管","分管领域、具体进展","自己分管工作的现状、成效、问题和下一步打算"],
+    ["讲执行","执行部署、细化措施","对会议确定事项在分管范围内如何落地的具体安排"],
+    ["讲建议","建言献策、补充完善","从分管角度对全局工作提出建设性意见和补充建议"]]},
+  "主持人":{intro:"讲话人是会议主持人，讲话是掌控流程、串联衔接、推动会议顺畅有序的。全篇严格围绕以下四个板块展开，各板块之下再分点展开。",blocks:[
+    ["定场","开场定调、营造氛围","宣布会议开始，说明会议主题、目的和议程，交代参会情况，营造庄重氛围"],
+    ["串联","承上启下、把控流程","衔接各议程、引导发言节奏，在环节转换间自然过渡，保证会议顺畅有序"],
+    ["小结","提炼升华、聚合共识","对各阶段发言进行精当点评小结，提炼共同观点，推动形成共识"],
+    ["收尾","总结升华、致谢展望","概括会议成果，部署落实要求，致谢与会人员，展望后续工作"]]},
+  "来宾/嘉宾":{intro:"讲话人是应邀出席的来宾或嘉宾，讲话是致贺致敬、表达期许的。全篇严格围绕以下四个板块展开，各板块之下再分点展开。",blocks:[
+    ["致贺","祝贺成就、表达认同","对主办方/受贺方取得的成就表示祝贺，表明出席的荣幸与认同"],
+    ["致敬","表达敬意、赞许风范","对相关方的工作、贡献、精神表达敬意，肯定其价值和影响"],
+    ["期许","寄予期望、提出愿景","从嘉宾视角表达对未来的期望，提出合作与发展的美好愿景"],
+    ["祝愿","表达祝愿、传递情谊","以真诚祝愿收束，表达对事业发展、与会人员的美好祝愿"]]},
+  "与会代表/先进":{intro:"讲话人是与会代表或先进典型，讲话是交流感受、分享收获、表明决心、建言献策的。全篇严格围绕以下四个板块展开，各板块之下再分点展开。",blocks:[
+    ["谈感受","表达心情、反映心声","谈参会的感受、受到的触动，反映本领域基层的真实情况与心声"],
+    ["谈收获","分享所得、交流经验","分享在会议、培训或实践中获得的启发与收获，交流可借鉴的经验"],
+    ["表决心","表明态度、作出承诺","围绕会议部署表明态度，承诺在自身职责范围内抓好落实"],
+    ["提建议","建言献策、反映诉求","结合工作实际提出建设性意见，反映需要解决的困难与诉求"]]}
+};
+function identityPrompt(){
+  const id=state.identity;
+  if(!id||!IDENTITY_BLOCKS[id])return "";
+  const b=IDENTITY_BLOCKS[id];
+  let p="\n【身份板块框架】我的身份是“"+id+"”。"+b.intro+"\n讲话内容严格限定在以下四个板块之内，不越位讲其他板块：\n";
+  b.blocks.forEach((x,i)=>p+=(i+1)+"．"+x[0]+"（"+x[1]+"）："+x[2]+"\n");
+  p+="谋结构时，把上述四个板块作为全篇的章节骨架，每一板块之下再设若干分点，使全篇板块清晰、界限分明。";
+  return p;
+}
 
 const SPEECH_MODEL_REF= `
 【范文库：《慢慢来 稳稳赢》· 开学典礼发言（刘鹏）】
@@ -459,7 +514,7 @@ async function start(){
  if(!brief){alert("先把您知道的情况告诉我，零碎一点也没关系。");return}
  document.getElementById("work").style.display="block";startTimer();setStage(0);
  const payload={
-   scene:state.scene, brief,
+   scene:state.scene, identity:state.identity, brief,
    speaker:document.getElementById("speaker").value,
    audience:document.getElementById("audience").value,
    reference:trim(document.getElementById("reference").value+"\n"+state.fileText,6000),
@@ -469,7 +524,7 @@ async function start(){
  const context={brief:payload,situation:null,strategy:null,thesis:null,outline:null,draft:null,review:null,learned:getLearned()};
  try{
    setStage(0);
-   const plan=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.planner,brainInput(payload)));
+   const plan=cleanJSON(await callAI(sys()+learnedPrompt()+"\n"+BRAIN.planner+identityPrompt(),brainInput(payload)));
    context.situation=plan.situation||{};
    context.strategy=plan.strategy||{};
    context.thesis=plan.thesis||{};
