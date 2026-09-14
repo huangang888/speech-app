@@ -6,9 +6,9 @@
 <title>讲话助手</title>
 <style>
 :root{--bg:#FAF7F2;--card:#fff;--text:#2C2C2C;--muted:#666;--line:#D5C5A8;--accent:#8B1A1A;--accent2:#F7EDE3;--gold:#C9A96E;--danger:#c93636;--shadow:0 2px 16px rgba(0,0,0,.08)}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);line-height:1.5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
 button,input,textarea,select{font:inherit}button{cursor:pointer}
-.app{max-width:1120px;margin:auto;padding:28px 24px 60px}
+.app{max-width:1120px;margin:auto;padding:24px 20px 50px}
 header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
 .brand{display:flex;align-items:center;gap:13px}.logo{width:42px;height:42px;border-radius:12px;background:#8B1A1A;color:#fff;display:grid;place-items:center;font-weight:800;font-size:18px}
 h1{font-size:22px;margin:0 0 3px;letter-spacing:.5px}.tagline{font-size:13px;color:var(--muted)}
@@ -16,10 +16,10 @@ h1{font-size:22px;margin:0 0 3px;letter-spacing:.5px}.tagline{font-size:13px;col
 .hero{background:linear-gradient(135deg,#fff 0%,#FAF7F2 100%);border:1px solid var(--line);border-radius:18px;padding:30px;box-shadow:var(--shadow)}
 .hero h2{font-size:25px;margin:0 0 7px}.hero p{margin:0 0 25px;color:var(--muted);font-size:14px}
 .row{display:grid;grid-template-columns:190px 1fr;gap:16px;margin-bottom:18px;align-items:start}
-label{font-weight:700;font-size:14px;padding-top:12px}.hint{display:block;font-size:12px;font-weight:400;color:#9aa2ad;margin-top:5px;line-height:1.5}
+label{font-weight:700;font-size:14px;padding-top:12px}.hint{display:block;font-size:12px;font-weight:400;color:#9aa2ad;margin-top:4px;line-height:1.4}
 input,textarea,select{width:100%;border:1.5px solid #D5C5A8;background:#fff;border-radius:10px;padding:12px 13px;outline:none;transition:.15s;color:var(--text)}
 input:focus,textarea:focus,select:focus{border-color:#8B1A1A;box-shadow:0 0 0 3px rgba(139,26,26,.12)}
-textarea{resize:none;min-height:170px;line-height:1.7}
+textarea{resize:none;min-height:170px;line-height:1.5}
 textarea::-webkit-resizer{display:none}
 select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B1A1A' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px;cursor:pointer}
 ::placeholder{color:#b0a898;opacity:1}
@@ -40,7 +40,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 .bar{height:5px;background:#EDE4D4;border-radius:3px;overflow:hidden;margin-top:6px}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,#C9A96E,#8B1A1A);border-radius:3px;transition:width .4s}
-.result{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}.result-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.result-head b{font-size:16px}.badge{font-size:12px;padding:5px 9px;border-radius:20px;background:#F7EDE3;color:#8B1A1A}.result-body{padding:24px}.adviser{display:grid;grid-template-columns:1.25fr 1fr;gap:20px}.panel{border:1px solid var(--line);border-radius:12px;padding:18px}.panel h3{font-size:14px;margin:0 0 11px}.bigjudgment{font-size:21px;line-height:1.55;font-weight:750}.list{margin:0;padding-left:20px;line-height:1.9}.cta-row{display:flex;gap:10px;margin-top:18px}.secondary{border:1.5px solid #D5C5A8;background:#fff;border-radius:9px;padding:10px 15px;color:#596370}.speech{font-size:16px;line-height:1.55;white-space:pre-wrap}
+.result{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);overflow:hidden}.result-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.result-head b{font-size:16px}.badge{font-size:12px;padding:5px 9px;border-radius:20px;background:#F7EDE3;color:#8B1A1A}.result-body{padding:20px 22px}.adviser{display:grid;grid-template-columns:1.25fr 1fr;gap:20px}.panel{border:1px solid var(--line);border-radius:12px;padding:18px}.panel h3{font-size:14px;margin:0 0 11px}.bigjudgment{font-size:21px;line-height:1.55;font-weight:750}.list{margin:0;padding-left:20px;line-height:1.9}.cta-row{display:flex;gap:10px;margin-top:18px}.secondary{border:1.5px solid #D5C5A8;background:#fff;border-radius:9px;padding:10px 15px;color:#596370}.speech{font-size:16px;line-height:1.45;white-space:pre-wrap}
 .sp-main{color:#8B1A1A;font-weight:800;font-size:20px;margin:0 0 14px;line-height:1.5;text-align:center}
 .sp-title{color:#8B1A1A;font-weight:700;font-size:16px;margin:14px 0 4px;line-height:1.5}
 .feedback{margin-top:18px;border:1.5px solid var(--line);border-radius:12px;background:#fffdf8;padding:16px}
@@ -115,12 +115,22 @@ footer{text-align:center;color:#a0a7b0;font-size:11px;margin-top:25px}
 .file-clear{margin-top:8px}
 .file-clear .clear-btn{width:100%;padding:7px}
 select.picker-input{-webkit-appearance:none;appearance:none;padding-right:28px;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 18px) 55%,calc(100% - 12px) 55%;background-size:6px 6px;background-repeat:no-repeat}
+
+.dd{position:relative;margin-top:8px}
+.dd-trigger{display:flex;justify-content:space-between;align-items:center;width:100%;padding:12px 13px;border:1.5px solid #D5C5A8;border-radius:10px;background:#fff;cursor:pointer;font-size:14px;color:var(--text)}
+.dd-trigger .dd-arrow{color:#9aa2ad;margin-left:8px;font-size:12px}
+.dd-panel{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;border:1.5px solid #D5C5A8;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.14);max-height:320px;overflow:auto;z-index:30}
+.dd-group{color:#B30000;font-weight:700;text-align:center;font-size:13px;padding:11px 12px 4px;background:#FBF3EE;letter-spacing:1px}
+.dd-opt{padding:11px 14px;font-size:14px;cursor:pointer;text-align:left}
+.dd-opt:hover,.dd-opt.on{background:#F7EDE3;color:#8B1A1A}
+.dd-opt:first-child{margin-top:6px}
+.dd-opt[data-v="__custom"]{border-top:1px solid var(--line);margin-top:4px;padding-top:12px;color:#8B1A1A}
 </style>
 </head>
 <body>
 <div class="app" id="app">
 <header>
-  <div class="brand"><div class="logo">黄</div><div><h1>讲话助手</h1><div class="tagline">您说事，我来谋，话讲在点上，情用在对的人身上。 · v51.1</div></div></div>
+  <div class="brand"><div class="logo">黄</div><div><h1>讲话助手</h1><div class="tagline">您说事，我来谋，话讲在点上，情用在对的人身上。 · v51.2</div></div></div>
   <div class="top-actions"><button class="ghost" onclick="showHistory()">历史</button><button class="ghost" onclick="showSettings()">设置</button></div>
 </header>
 
@@ -129,7 +139,7 @@ select.picker-input{-webkit-appearance:none;appearance:none;padding-right:28px;b
 
 <div class="row">
     <div class="field-head"><label>什么场合？<span class="hint">可选，不知道可留空自动判断</span></label></div>
-    <select id="sceneSel" class="picker-input" onchange="onScenePick(this)"></select>
+    <div class="dd" id="sceneDD"><div class="dd-trigger" onclick="toggleSceneDD()"><span id="sceneVal" class="dd-val">（自动判断）</span><span class="dd-arrow">▾</span></div><div class="dd-panel" id="scenePanel" style="display:none"></div></div>
     <input id="sceneCustom" class="picker-input" placeholder="自定义场合…" style="display:none" oninput="state.scene=this.value">
 </div>
 
@@ -771,20 +781,29 @@ function closeSettings(){document.getElementById("settingsPage").classList.remov
 
 
 function bindScene(){
-  const sel=document.getElementById("sceneSel");
-  if(!sel)return;
-  let h='<option value="">（自动判断）</option>';
+  const pan=document.getElementById("scenePanel");
+  if(!pan)return;
+  let h='<div class="dd-opt'+(state.scene===""?' on':'')+'" data-v="" onclick="pickSceneOpt(this)">（自动判断）</div>';
   SCENES.forEach(g=>{
-    h+='<optgroup label="'+g.group+'">'+g.items.map(it=>'<option'+(state.scene===it?' selected':'')+'>'+it+'</option>').join("")+'</optgroup>';
+    h+='<div class="dd-group">'+g.group+'</div>';
+    g.items.forEach(it=>{h+='<div class="dd-opt'+(state.scene===it?' on':'')+'" data-v="'+it+'" onclick="pickSceneOpt(this)">'+it+'</div>';});
   });
-  h+='<option value="__custom">其他（自定义）…</option>';
-  sel.innerHTML=h;
+  h+='<div class="dd-opt" data-v="__custom" onclick="pickSceneOpt(this)">其他（自定义）…</div>';
+  pan.innerHTML=h;
+  const tv=document.getElementById("sceneVal");
+  if(tv){if(!state.scene)tv.textContent="（自动判断）";else tv.textContent=state.scene;}
 }
-function onScenePick(sel){
+
+function pickSceneOpt(el){
+  const v=el.dataset.v;
   const cus=document.getElementById("sceneCustom");
-  if(sel.value==="__custom"){cus.style.display="block";cus.focus();state.scene=cus.value||"";}
-  else{cus.style.display="none";state.scene=sel.value;}
+  if(v==="__custom"){cus.style.display="block";cus.focus();state.scene=cus.value||"";}
+  else{cus.style.display="none";state.scene=v;}
+  document.getElementById("scenePanel").style.display="none";
+  bindScene();
 }
+function toggleSceneDD(){const p=document.getElementById("scenePanel");p.style.display=(p.style.display==="none")?"block":"none";}
+
 
 
 function bindIdentity(){
@@ -839,6 +858,8 @@ function clearFiles(){
   document.getElementById("fileName").textContent="";
   document.getElementById("fileClear").style.display="none";
 }
+
+document.addEventListener("click",e=>{const dd=document.getElementById("sceneDD");if(dd&&!dd.contains(e.target)){const p=document.getElementById("scenePanel");if(p)p.style.display="none";}});
 </script>
 
 <div class="modal-mask fullmask" id="fullMask" onclick="if(event.target===this)closeFullView()">
